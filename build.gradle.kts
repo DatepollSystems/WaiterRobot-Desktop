@@ -19,10 +19,20 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
     implementation(compose.desktop.currentOs)
+
+    implementation("io.ktor:ktor-client-core:1.6.8")
+    implementation("io.ktor:ktor-client-cio:1.6.8")
+    implementation("io.ktor:ktor-client-websockets:1.6.8")
+    implementation("io.ktor:ktor-client-logging:1.6.8")
 }
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "11"
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
 compose.desktop {
