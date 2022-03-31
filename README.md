@@ -1,4 +1,7 @@
 # WaiterRobot-Mediator
 
-    Setup-Info:
-        Install and use OpenJDK11 (everthing else needs a different Setup)
+## Recommendations
+
+- Install the `Compose Multiplatform IDE Support`
+  plugin ([details](https://plugins.jetbrains.com/plugin/16541-compose-multiplatform-ide-support)) for IntelliJ IDEA
+
