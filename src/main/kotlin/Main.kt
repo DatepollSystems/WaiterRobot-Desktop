@@ -30,3 +30,7 @@ fun main() = application {
         App()
     }
 }
+
+fun testStringMethod(): String{
+    return "Yes"
+}
