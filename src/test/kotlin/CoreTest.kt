@@ -21,9 +21,7 @@ class CoreTest {
                 App()
             }
         )
-
-        val image = scene.render(1)
-
-        assertNotNull(image)
+        
+        scene.render()
     }
 }
