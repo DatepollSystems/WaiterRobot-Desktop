@@ -45,3 +45,8 @@ compose.desktop {
         }
     }
 }
+
+// Change to `kotlin.sourceSets.all` if you also use the `@OptIn` annotation in the main source set
+kotlin.sourceSets.test {
+    languageSettings.optIn("kotlin.RequiresOptIn")
+}
