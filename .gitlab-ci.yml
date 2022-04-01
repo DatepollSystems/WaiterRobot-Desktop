@@ -15,4 +15,4 @@ test:
   stage: test
   script:
     - ./gradlew -v
-    - ./gradlew test
+    - ./gradlew test --stacktrace
