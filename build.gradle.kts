@@ -18,6 +18,7 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test"))
+    testImplementation(compose("org.jetbrains.compose.ui:ui-test-junit4")) // Eventually will be included in a later compose version and then can be removed
     implementation(compose.desktop.currentOs)
 
     implementation("io.ktor:ktor-client-core:1.6.8")
