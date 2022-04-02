@@ -1,0 +1,18 @@
+image: openjdk:11-jdk
+
+variables:
+  GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
+
+cache:
+  paths:
+    - .gradle/wrapper
+#    - .gradle/caches
+
+stages:
+  - test
+
+test:
+  stage: test
+  script:
+    - ./gradlew -v
+    - ./gradlew test --stacktrace

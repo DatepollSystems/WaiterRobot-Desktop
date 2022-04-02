@@ -3,8 +3,8 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.5.31"
-    id("org.jetbrains.compose") version "1.0.0"
+    kotlin("jvm") version "1.6.10"
+    id("org.jetbrains.compose") version "1.1.1"
 }
 
 group = "org.datepollsystems.waiterrobot"
@@ -17,6 +17,7 @@ repositories {
 }
 
 dependencies {
+    testImplementation(kotlin("test"))
     implementation(compose.desktop.currentOs)
 
     implementation("io.ktor:ktor-client-core:1.6.8")
@@ -29,6 +30,11 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "11"
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
 compose.desktop {
     application {
         mainClass = "MainKt"
@@ -38,4 +44,9 @@ compose.desktop {
             packageVersion = "1.0.0"
         }
     }
+}
+
+// Change to `kotlin.sourceSets.all` if you also use the `@OptIn` annotation in the main source set
+kotlin.sourceSets.test {
+    languageSettings.optIn("kotlin.RequiresOptIn")
 }
