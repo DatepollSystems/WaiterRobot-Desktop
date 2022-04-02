@@ -9,18 +9,4 @@ class CoreTest {
     fun `test a special method`() {
         asserter.assertEquals("", testStringMethod(), "Yes")
     }
-
-    @OptIn(ExperimentalComposeUiApi::class)
-    @Test
-    fun `test window`(){
-        val scene = ImageComposeScene(
-            width = 100,
-            height = 200,
-            content = {
-                App()
-            }
-        )
-        
-        scene.render()
-    }
 }
