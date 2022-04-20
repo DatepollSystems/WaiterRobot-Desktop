@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.6.10"
+    kotlin("plugin.serialization") version "1.6.10"
     id("org.jetbrains.compose") version "1.1.1"
 }
 
@@ -20,10 +21,17 @@ dependencies {
     testImplementation(kotlin("test"))
     implementation(compose.desktop.currentOs)
 
-    implementation("io.ktor:ktor-client-core:1.6.8")
-    implementation("io.ktor:ktor-client-cio:1.6.8")
-    implementation("io.ktor:ktor-client-websockets:1.6.8")
-    implementation("io.ktor:ktor-client-logging:1.6.8")
+    val ktorVersion = "2.0.0"
+    implementation("io.ktor:ktor-client-core:$ktorVersion")
+    implementation("io.ktor:ktor-client-cio:$ktorVersion")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+    implementation("io.ktor:ktor-client-auth:$ktorVersion")
+    implementation("io.ktor:ktor-client-logging:$ktorVersion")
+    implementation("io.ktor:ktor-client-websockets:$ktorVersion")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.10")
 }
 
 tasks.withType<KotlinCompile> {
@@ -46,7 +54,6 @@ compose.desktop {
     }
 }
 
-// Change to `kotlin.sourceSets.all` if you also use the `@OptIn` annotation in the main source set
-kotlin.sourceSets.test {
+kotlin.sourceSets.all {
     languageSettings.optIn("kotlin.RequiresOptIn")
 }
