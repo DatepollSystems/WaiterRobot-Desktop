@@ -13,8 +13,22 @@ import kotlin.test.assertEquals
 class SerializationTest {
 
     @Test
-    fun `PrintPdfMessage De-Serialization`() {
+    fun `PrintPdfMessage De-Serialization as AbstractWsMessage with WsMessageBody`() {
         val data: AbstractWsMessage<WsMessageBody> = PrintPdfMessage(
+            httpStatus = 200,
+            body = PrintPdfBody(100L, 100L, PrintPdfBody.File("mime", "data/base64"))
+        )
+
+        val string = Json.encodeToString(data)
+        val decoded = Json.decodeFromString<AbstractWsMessage<WsMessageBody>>(string)
+
+        assertEquals(data, decoded)
+        assertEquals(decoded::class.createType(), typeOf<PrintPdfMessage>())
+    }
+
+    @Test
+    fun `PrintPdfMessage De-Serialization as AbstractWsMessage with PrintPdfBody`() {
+        val data: AbstractWsMessage<PrintPdfBody> = PrintPdfMessage(
             httpStatus = 200,
             body = PrintPdfBody(100L, 100L, PrintPdfBody.File("mime", "data/base64"))
         )
