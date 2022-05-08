@@ -32,6 +32,10 @@ fun createClient(enableNetworkLogs: Boolean = false) = HttpClient {
 }
 
 fun createAuthenticatedClient(enableNetworkLogs: Boolean = false) = createClient(enableNetworkLogs).config {
+    configureAuth()
+}
+
+fun HttpClientConfig<*>.configureAuth() {
     install(Auth) {
         suspend fun refreshTokens(sessionToken: String): BearerTokens? {
             val authApi = AuthApi(createClient())
@@ -39,12 +43,8 @@ fun createAuthenticatedClient(enableNetworkLogs: Boolean = false) = createClient
                 val tokenInfo = authApi.refresh(sessionToken)
 
                 System.setProperty("accessToken", tokenInfo.accessToken)
-                tokenInfo.sessionToken?.let {
-                    System.setProperty(
-                        "sessionToken",
-                        it
-                    )
-                } // Only override when got a new sessionToken
+                // Only override when got a new sessionToken
+                tokenInfo.sessionToken?.let { System.setProperty("sessionToken", it) }
 
                 BearerTokens(
                     accessToken = tokenInfo.accessToken,
@@ -81,4 +81,3 @@ fun createAuthenticatedClient(enableNetworkLogs: Boolean = false) = createClient
         }
     }
 }
-
