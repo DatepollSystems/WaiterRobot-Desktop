@@ -4,17 +4,20 @@ import io.ktor.client.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.serialization.*
 import io.ktor.serialization.kotlinx.*
+import io.ktor.websocket.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.onSubscription
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import org.datepollsystems.waiterrobot.mediator.api.AuthApi
 import org.datepollsystems.waiterrobot.mediator.api.configureAuth
 import org.datepollsystems.waiterrobot.mediator.api.createClient
 import org.datepollsystems.waiterrobot.mediator.app.Config
 import org.datepollsystems.waiterrobot.mediator.ws.messages.AbstractWsMessage
-import org.datepollsystems.waiterrobot.mediator.ws.messages.PrintPdfBody
-import org.datepollsystems.waiterrobot.mediator.ws.messages.PrintPdfMessage
+import org.datepollsystems.waiterrobot.mediator.ws.messages.HelloMessage
+import org.datepollsystems.waiterrobot.mediator.ws.messages.PrintedPdfMessage
 import org.datepollsystems.waiterrobot.mediator.ws.messages.WsMessageBody
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.reflect.KClass
@@ -33,6 +36,7 @@ class WsClient {
     private val closed: AtomicBoolean = AtomicBoolean(false)
     private val handlers: MutableMap<KType, WsMessageHandler<WsMessageBody>> = mutableMapOf()
     private val scope = CoroutineScope(Dispatchers.IO)
+    private var session: WebSocketSession? = null
 
     suspend fun start() {
         if (closed.get()) throw IllegalStateException("WsClient was already closed")
@@ -42,12 +46,23 @@ class WsClient {
 
         // Launch the websocket session and handling in the background and keep running
         scope.launch {
+            // When testing with local server change ".wss" to ".ws" (as no TLS possible)
             client.wss(Config.WS_URL) {
+                println("Ws session started") // TODO logger
+
+                session = this
                 val sendMsgHandler = launch { handleSend() }
                 val incomingMsgHandler = launch { handleIncomingMessage() }
 
+                println("Ws client launched in background") // TODO logger
+
                 incomingMsgHandler.join() // Wait for completion
+                println("Ws incoming handler job completed") // TODO logger
+
                 sendMsgHandler.cancelAndJoin()
+                println("Ws sending job completed") // TODO logger
+
+                stop()
             }
         }
 
@@ -55,23 +70,33 @@ class WsClient {
         startUpJob.join()
     }
 
-    fun stop() {
+    suspend fun stop() {
         if (!closed.compareAndSet(false, true)) return
-        scope.coroutineContext.cancelChildren()
+        if (session != null) {
+            session?.close()
+            session = null
+            println("Ws session closed") // TODO logger
+        }
+        client.close()
+        println("Ws Client closed") // TODO logger
+        scope.cancel()
     }
 
     fun <T : WsMessageBody> handle(clazz: KClass<out AbstractWsMessage<T>>, handler: WsMessageHandler<T>) {
-        @Suppress("UNCHECKED_CAST")
+        @Suppress("UNCHECKED_CAST") // T mut be a subtype of WsMessageBody (see function signature)
         handler as WsMessageHandler<WsMessageBody>
+        @Suppress("DEPRECATION")
         handle(clazz.createType(), handler)
     }
 
     inline fun <reified T : AbstractWsMessage<WsMessageBody>> handle(noinline handler: suspend (T) -> Unit) {
-        @Suppress("UNCHECKED_CAST")
+        @Suppress("UNCHECKED_CAST") // T mut be a subtype of WsMessageBody (see function signature)
         handler as WsMessageHandler<WsMessageBody>
+        @Suppress("DEPRECATION")
         handle(typeOf<T>(), handler)
     }
 
+    @Deprecated("Do not use this, use one of the other handle function") // To mark it as "do not use"
     fun handle(type: KType, handler: WsMessageHandler<WsMessageBody>) {
         if (!type.isSubtypeOf(typeOf<AbstractWsMessage<WsMessageBody>>())) {
             // check this as handle has to be public, but we can't "put" a constraint on KType
@@ -86,17 +111,25 @@ class WsClient {
     }
 
     private suspend fun DefaultClientWebSocketSession.handleIncomingMessage() {
-        while (scope.isActive) { // Keep listening as long as the coroutine is active
+        while (coroutineContext.isActive) { // Keep listening as long as the coroutine is active
             try {
                 val message = receiveDeserialized<AbstractWsMessage<WsMessageBody>>()
-                println("Got message: $message")
+                println("Got message: $message") // TODO logger
                 handlers[message::class.createType()]?.invoke(message)
                     ?: throw IllegalArgumentException("No handler implemented for message type '${message::class}'")
-            } catch (e: CancellationException) { // Cancellation is fine and expected
-            } catch (e: WebsocketContentConvertException) {
-                // TODO log
-                println("Receiver error: $e")
+            } catch (e: ClosedReceiveChannelException) {
+                // Cancellation is fine and expected
+                println("Canceled receiving") // TODO logger
+                coroutineContext.cancel()
+            } catch (e: CancellationException) {
+                // Cancellation is fine and expected
+                println("Canceled receiving") // TODO logger
+            } catch (e: ContentConvertException) {
+                println("Could not convert incoming message: $e") // TODO logger
+            } catch (e: SerializationException) {
+                println("Could not deserialize incoming message: $e") // TODO logger
             } catch (e: Exception) {
+                println("Websocket handleIncomingMessage error: $e") // TODO logger
                 TODO("Handle websocket connection gone")
             }
         }
@@ -107,14 +140,18 @@ class WsClient {
             sendFlow.onSubscription {
                 startUpJob.complete() // sendFlow has a subscriber -> client is ready
             }.collect {
-                println("Sending message: $it")
+                println("Sending message: $it") // TODO logger
                 sendSerialized(it)
             }
-        } catch (e: CancellationException) { // Cancellation is fine and expected
-        } catch (e: WebsocketContentConvertException) {
-            // TODO log
-            println("Send Error: $e")
+        } catch (e: CancellationException) {
+            // Cancellation is fine and expected
+            println("Canceled sending") // TODO logger
+        } catch (e: ContentConvertException) {
+            println("Could not convert outgoing message: $e") // TODO logger
+        } catch (e: SerializationException) {
+            println("Could not serialize outgoing message: $e") // TODO logger
         } catch (e: Exception) {
+            println("Websocket handleSend error: $e") // TODO logger
             TODO("Handle websocket connection gone")
         }
     }
@@ -133,8 +170,8 @@ private fun createWsClient() = HttpClient {
 fun main(): Unit = runBlocking {
     val wsClient = WsClient()
     // Register a Handler for a specific websocket message
-    wsClient.handle<PrintPdfMessage> {
-        println("Handler for PrintPdfMessage called with: $it")
+    wsClient.handle<PrintedPdfMessage> {
+        println("Handler for PrintedPdfMessage called with: $it")
     }
 
     // Login
@@ -149,9 +186,9 @@ fun main(): Unit = runBlocking {
     try {
         // Send a message to the server
         wsClient.send(
-            PrintPdfMessage(
+            HelloMessage(
                 httpStatus = 200,
-                body = PrintPdfBody(id = 1, printerId = 1, file = PrintPdfBody.File(mime = "mime", data = "pdf/base64"))
+                body = HelloMessage.Body(text = "Test Message")
             )
         )
     } catch (e: Exception) {
@@ -159,7 +196,7 @@ fun main(): Unit = runBlocking {
     }
 
     launch {
-        repeat(100) {
+        repeat(10) {
             println("I'm alive since $it sec.")
             delay(1000)
         }
