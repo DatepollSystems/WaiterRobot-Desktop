@@ -1,5 +1,3 @@
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.ImageComposeScene
 import kotlin.test.Test
 import kotlin.test.asserter
 

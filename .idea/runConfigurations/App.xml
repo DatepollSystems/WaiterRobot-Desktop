@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="App" type="JetRunConfigurationType">
-    <option name="MAIN_CLASS_NAME" value="MainKt" />
+    <option name="MAIN_CLASS_NAME" value="org.datepollsystems.waiterrobot.mediator.App" />
     <module name="Mediator.main" />
     <shortenClasspath name="NONE" />
     <method v="2">
