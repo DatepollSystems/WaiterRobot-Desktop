@@ -17,8 +17,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.datepollsystems.waiterrobot.mediator.ui.common.LoadableScreen
 import org.datepollsystems.waiterrobot.mediator.ui.theme.Typography
-import org.datepollsystems.waiterrobot.mediator.utils.icons.Visibility
-import org.datepollsystems.waiterrobot.mediator.utils.icons.VisibilityOff
+import org.datepollsystems.waiterrobot.mediator.utils.icons.filled.Visibility
+import org.datepollsystems.waiterrobot.mediator.utils.icons.filled.VisibilityOff
 
 @Composable
 fun LoginScreen(vm: LoginViewModel) {
