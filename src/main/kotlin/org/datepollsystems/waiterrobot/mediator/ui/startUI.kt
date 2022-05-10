@@ -7,10 +7,14 @@ import org.datepollsystems.waiterrobot.mediator.ui.theme.WaiterRobotTheme
 
 fun startUI(onClose: () -> Unit = {}) {
     application {
-        Window(onCloseRequest = {
-            onClose()
-            this.exitApplication()
-        }) {
+        Window(
+            title = "WaiterRobot Mediator",
+            icon = null, // TODO
+            onCloseRequest = {
+                onClose()
+                this.exitApplication()
+            }
+        ) {
             WaiterRobotTheme {
                 Navigation()
             }
