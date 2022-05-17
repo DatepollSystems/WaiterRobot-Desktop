@@ -29,9 +29,9 @@ dependencies {
     implementation("io.ktor:ktor-client-auth:$ktorVersion")
     implementation("io.ktor:ktor-client-logging:$ktorVersion")
     implementation("io.ktor:ktor-client-websockets:$ktorVersion")
-
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.10")
+    implementation("org.apache.pdfbox:pdfbox:2.0.0")
 }
 
 tasks.withType<KotlinCompile> {
