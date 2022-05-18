@@ -8,6 +8,7 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
+import org.datepollsystems.waiterrobot.mediator.App
 
 fun createClient(enableNetworkLogs: Boolean = false) = HttpClient {
     install(ContentNegotiation) {
@@ -58,15 +59,16 @@ fun HttpClientConfig<*>.configureAuth() {
         }
 
         bearer {
-            // TODO check on startup if access and session token are there, otherwise logout
             loadTokens {
                 // TODO use other storage?
                 val accessToken: String? = System.getProperty("accessToken", null)
                 val sessionToken: String? = System.getProperty("sessionToken", null)
 
                 return@loadTokens when {
-                    // TODO logout when no sessionToken found
-                    sessionToken == null -> throw java.lang.IllegalStateException("No session token saved")
+                    sessionToken == null -> {
+                        App.logout()
+                        null
+                    }
                     accessToken == null -> refreshTokens(sessionToken)
                     else -> BearerTokens(accessToken, sessionToken)
                 }

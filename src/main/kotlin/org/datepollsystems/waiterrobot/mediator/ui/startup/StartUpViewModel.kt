@@ -15,7 +15,7 @@ class StartUpViewModel(navigator: Navigator, viewModelScope: CoroutineScope) :
     init {
         viewModelScope.launch {
             delay(1500)
-            val startScreen = if (System.getProperty("sessionToken").emptyToNull() != null) {
+            val startScreen = if (System.getProperty("sessionToken", null).emptyToNull() != null) {
                 Screen.LoginScreen
             } else {
                 Screen.MainScreen("You were already logged in!")
