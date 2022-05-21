@@ -15,6 +15,7 @@ import org.datepollsystems.waiterrobot.mediator.api.AuthApi
 import org.datepollsystems.waiterrobot.mediator.api.configureAuth
 import org.datepollsystems.waiterrobot.mediator.api.createClient
 import org.datepollsystems.waiterrobot.mediator.app.Config
+import org.datepollsystems.waiterrobot.mediator.app.Settings
 import org.datepollsystems.waiterrobot.mediator.ws.messages.AbstractWsMessage
 import org.datepollsystems.waiterrobot.mediator.ws.messages.HelloMessage
 import org.datepollsystems.waiterrobot.mediator.ws.messages.PrintedPdfMessage
@@ -176,8 +177,8 @@ fun main(): Unit = runBlocking {
 
     // Login
     val tokens = AuthApi(createClient()).login("admin@admin.org", "admin")
-    System.setProperty("accessToken", tokens.accessToken)
-    System.setProperty("sessionToken", tokens.sessionToken!!)
+    Settings.accessToken = tokens.accessToken
+    Settings.refreshToken = tokens.refreshToken!!
 
     // Connect to the websocket
     // Start suspends till the websocket is ready

@@ -9,6 +9,7 @@ import io.ktor.client.plugins.logging.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import org.datepollsystems.waiterrobot.mediator.App
+import org.datepollsystems.waiterrobot.mediator.app.Settings
 
 fun createClient(enableNetworkLogs: Boolean = false) = HttpClient {
     install(ContentNegotiation) {
@@ -43,13 +44,13 @@ fun HttpClientConfig<*>.configureAuth() {
             return try {
                 val tokenInfo = authApi.refresh(sessionToken)
 
-                System.setProperty("accessToken", tokenInfo.accessToken)
+                Settings.accessToken = tokenInfo.accessToken
                 // Only override when got a new sessionToken
-                tokenInfo.sessionToken?.let { System.setProperty("sessionToken", it) }
+                tokenInfo.refreshToken?.let { Settings.refreshToken = it }
 
                 BearerTokens(
                     accessToken = tokenInfo.accessToken,
-                    refreshToken = sessionToken
+                    refreshToken = tokenInfo.refreshToken ?: sessionToken
                 )
             } catch (e: Exception) {
                 // TODO improve request errors handling (-> try again, logout?, no connection info)
@@ -61,8 +62,8 @@ fun HttpClientConfig<*>.configureAuth() {
         bearer {
             loadTokens {
                 // TODO use other storage?
-                val accessToken: String? = System.getProperty("accessToken", null)
-                val sessionToken: String? = System.getProperty("sessionToken", null)
+                val accessToken: String? = Settings.accessToken
+                val sessionToken: String? = Settings.refreshToken
 
                 return@loadTokens when {
                     sessionToken == null -> {
@@ -75,7 +76,7 @@ fun HttpClientConfig<*>.configureAuth() {
             }
 
             refreshTokens {
-                val sessionToken: String = System.getProperty("sessionToken", null)
+                val sessionToken: String = Settings.refreshToken
                     ?: throw IllegalStateException("No session token stored")
 
                 return@refreshTokens refreshTokens(sessionToken)

@@ -2,6 +2,7 @@ package org.datepollsystems.waiterrobot.mediator.ui.login
 
 import kotlinx.coroutines.CoroutineScope
 import org.datepollsystems.waiterrobot.mediator.api.AuthApi
+import org.datepollsystems.waiterrobot.mediator.app.Settings
 import org.datepollsystems.waiterrobot.mediator.core.ScreenState
 import org.datepollsystems.waiterrobot.mediator.core.ViewModel
 import org.datepollsystems.waiterrobot.mediator.navigation.Navigator
@@ -16,8 +17,8 @@ class LoginViewModel(navigator: Navigator, viewModelScope: CoroutineScope, priva
 
         try {
             val tokens = authApi.login(email, password)
-            System.setProperty("accessToken", tokens.accessToken)
-            System.setProperty("sessionToken", tokens.sessionToken!!)
+            Settings.accessToken = tokens.accessToken
+            Settings.refreshToken = tokens.refreshToken!!
 
             navigator.navigate(Screen.MainScreen("Logged in successfully")) // TODO
         } catch (e: Exception) {
