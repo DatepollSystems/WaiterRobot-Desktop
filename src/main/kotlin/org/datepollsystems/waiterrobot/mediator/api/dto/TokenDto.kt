@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class TokenDto(
     @SerialName("token") val accessToken: String,
-    val sessionToken: String?
+    @SerialName("sessionToken") val refreshToken: String?
 )
