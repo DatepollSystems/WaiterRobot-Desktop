@@ -20,7 +20,7 @@ class LoginViewModel(navigator: Navigator, viewModelScope: CoroutineScope, priva
             Settings.accessToken = tokens.accessToken
             Settings.refreshToken = tokens.refreshToken!!
 
-            navigator.navigate(Screen.MainScreen("Logged in successfully")) // TODO
+            navigator.navigate(Screen.ConfigurePrintersScreen)
         } catch (e: Exception) {
             reduce { copy(screenState = ScreenState.Idle, loginErrorMessage = "Wrong credentials. Please try again!") }
         }

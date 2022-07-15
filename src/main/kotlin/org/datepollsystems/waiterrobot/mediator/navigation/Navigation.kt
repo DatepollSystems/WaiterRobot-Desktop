@@ -5,8 +5,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.CoroutineScope
-import org.datepollsystems.waiterrobot.mediator.api.AuthApi
-import org.datepollsystems.waiterrobot.mediator.api.createClient
+import org.datepollsystems.waiterrobot.mediator.api.*
+import org.datepollsystems.waiterrobot.mediator.ui.configurePrinters.ConfigurePrintersScreen
+import org.datepollsystems.waiterrobot.mediator.ui.configurePrinters.ConfigurePrintersViewModel
 import org.datepollsystems.waiterrobot.mediator.ui.login.LoginScreen
 import org.datepollsystems.waiterrobot.mediator.ui.login.LoginViewModel
 import org.datepollsystems.waiterrobot.mediator.ui.main.MainScreen
@@ -19,10 +20,23 @@ fun Navigation() {
     val navigator = remember { Navigator(Screen.StartUpScreen) }
 
     val screenState = navigator.screenState.collectAsState().value
+    // TODO proper dependency injection (use koin?)
     when (screenState) {
         Screen.StartUpScreen -> WithCoroutineScope { StartUpScreen(StartUpViewModel(navigator, it)) }
         Screen.LoginScreen -> WithCoroutineScope { LoginScreen(LoginViewModel(navigator, it, AuthApi(createClient()))) }
         is Screen.MainScreen -> WithCoroutineScope { MainScreen(screenState, MainScreenViewModel(navigator, it)) }
+        Screen.ConfigurePrintersScreen -> WithCoroutineScope {
+            val client = createAuthenticatedClient(true)
+            ConfigurePrintersScreen(
+                ConfigurePrintersViewModel(
+                    navigator,
+                    it,
+                    OrganisationApi(client),
+                    EventApi(client),
+                    PrinterApi(client)
+                )
+            )
+        }
     }.let {} // Force exhaustive
 }
 

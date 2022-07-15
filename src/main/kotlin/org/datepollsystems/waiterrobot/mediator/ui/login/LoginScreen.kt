@@ -6,6 +6,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,8 +19,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.datepollsystems.waiterrobot.mediator.ui.common.LoadableScreen
 import org.datepollsystems.waiterrobot.mediator.ui.theme.Typography
-import org.datepollsystems.waiterrobot.mediator.utils.icons.filled.Visibility
-import org.datepollsystems.waiterrobot.mediator.utils.icons.filled.VisibilityOff
 
 @Composable
 fun LoginScreen(vm: LoginViewModel) {
