@@ -1,4 +1,4 @@
-image: openjdk:11-jdk
+image: openjdk:17-jdk
 
 variables:
   GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
