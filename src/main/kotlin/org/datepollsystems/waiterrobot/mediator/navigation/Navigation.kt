@@ -6,12 +6,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.CoroutineScope
 import org.datepollsystems.waiterrobot.mediator.api.*
+import org.datepollsystems.waiterrobot.mediator.core.PrinterService
 import org.datepollsystems.waiterrobot.mediator.ui.configurePrinters.ConfigurePrintersScreen
 import org.datepollsystems.waiterrobot.mediator.ui.configurePrinters.ConfigurePrintersViewModel
 import org.datepollsystems.waiterrobot.mediator.ui.login.LoginScreen
 import org.datepollsystems.waiterrobot.mediator.ui.login.LoginViewModel
-import org.datepollsystems.waiterrobot.mediator.ui.main.MainScreen
-import org.datepollsystems.waiterrobot.mediator.ui.main.MainScreenViewModel
 import org.datepollsystems.waiterrobot.mediator.ui.startup.StartUpScreen
 import org.datepollsystems.waiterrobot.mediator.ui.startup.StartUpViewModel
 
@@ -23,8 +22,16 @@ fun Navigation() {
     // TODO proper dependency injection (use koin?)
     when (screenState) {
         Screen.StartUpScreen -> WithCoroutineScope { StartUpScreen(StartUpViewModel(navigator, it)) }
-        Screen.LoginScreen -> WithCoroutineScope { LoginScreen(LoginViewModel(navigator, it, AuthApi(createClient()))) }
-        is Screen.MainScreen -> WithCoroutineScope { MainScreen(screenState, MainScreenViewModel(navigator, it)) }
+        Screen.LoginScreen -> WithCoroutineScope {
+            LoginScreen(
+                LoginViewModel(
+                    navigator,
+                    it,
+                    AuthApi(createClient(true))
+                )
+            )
+        }
+        //is Screen.MainScreen -> WithCoroutineScope { MainScreen(screenState, MainScreenViewModel(navigator, it)) }
         Screen.ConfigurePrintersScreen -> WithCoroutineScope {
             val client = createAuthenticatedClient(true)
             ConfigurePrintersScreen(
@@ -33,7 +40,8 @@ fun Navigation() {
                     it,
                     OrganisationApi(client),
                     EventApi(client),
-                    PrinterApi(client)
+                    PrinterApi(client),
+                    PrinterService()
                 )
             )
         }

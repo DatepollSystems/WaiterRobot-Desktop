@@ -16,17 +16,24 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.toSize
 
 @Composable
-fun <T : Any> DropDownInput(label: String, items: List<T>, itemName: (T) -> String, onSelectionChange: (T) -> Unit) {
+fun <T : Any> DropDownInput(
+    modifier: Modifier = Modifier,
+    label: String,
+    items: List<T>,
+    onSelectionChange: (T) -> Unit,
+    placeHolderText: String,
+    selectedOptionText: String?,
+    content: @Composable (T) -> Unit
+) {
     var expanded: Boolean by remember { mutableStateOf(false) }
-    var selectedText by remember { mutableStateOf("") }
     var textFieldSize by remember { mutableStateOf(Size.Zero) } // This value is used to assign to the DropDown the same width
 
     val icon = if (expanded) Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown
 
-    Column {
+    Column(modifier = modifier) {
         OutlinedTextField(
-            value = selectedText,
-            onValueChange = { selectedText = it },
+            value = selectedOptionText ?: placeHolderText,
+            onValueChange = { /* Do nothing */ },
             modifier = Modifier
                 .fillMaxWidth()
                 .onGloballyPositioned { coordinates -> textFieldSize = coordinates.size.toSize() }
@@ -45,15 +52,13 @@ fun <T : Any> DropDownInput(label: String, items: List<T>, itemName: (T) -> Stri
                 .width(with(LocalDensity.current) { textFieldSize.width.toDp() })
         ) {
             items.forEach {
-                val itemLabel = itemName(it)
                 DropdownMenuItem(
                     onClick = {
-                        selectedText = itemLabel
                         expanded = false
                         onSelectionChange(it)
                     }
                 ) {
-                    Text(text = itemLabel)
+                    content(it)
                 }
             }
         }
