@@ -14,7 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.datepollsystems.waiterrobot.mediator.api.dto.GetPrinterDto
-import org.datepollsystems.waiterrobot.mediator.core.LocalPrinterInfo
+import org.datepollsystems.waiterrobot.mediator.printer.LocalPrinterInfo
 import org.datepollsystems.waiterrobot.mediator.ui.common.DropDownInput
 import org.datepollsystems.waiterrobot.mediator.ui.common.LoadableScreen
 

@@ -1,3 +1,5 @@
+package org.datepollsystems.waiterrobot.mediator.ws
+
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -91,5 +93,13 @@ class SerializationTest {
 
         assertEquals(data, decoded)
         assertEquals(decoded::class.createType(), typeOf<PrintedPdfMessage>())
+    }
+
+    @Test
+    fun `Test`() {
+        val string = """{"messageObjectId":"BM_HELLO","httpStatus":200,"body":{"text":"Hello Test Message"}}"""
+        val decoded = Json.decodeFromString<AbstractWsMessage<WsMessageBody>>(string)
+
+        assertEquals(decoded::class.createType(), typeOf<HelloMessageResponse>())
     }
 }

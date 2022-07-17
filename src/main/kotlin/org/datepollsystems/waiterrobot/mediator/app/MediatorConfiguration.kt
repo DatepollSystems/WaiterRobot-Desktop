@@ -9,8 +9,8 @@ import java.io.File
 
 @Serializable
 data class MediatorConfiguration(
-    val selectedOrganisationId: ID?,
-    val selectedEventId: ID?,
+    val selectedOrganisationId: ID,
+    val selectedEventId: ID,
     val localToBackendPrinterId: Map<String, ID>
 ) {
     fun save() {

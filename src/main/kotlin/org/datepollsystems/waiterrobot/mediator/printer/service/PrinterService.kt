@@ -1,26 +1,51 @@
-package org.datepollsystems.waiterrobot.mediator.core
+package org.datepollsystems.waiterrobot.mediator.printer.service
 
-import javax.print.DocFlavor
-import javax.print.PrintServiceLookup
+import kotlinx.coroutines.CoroutineScope
+import org.datepollsystems.waiterrobot.mediator.app.Config
+import org.datepollsystems.waiterrobot.mediator.core.ID
+import org.datepollsystems.waiterrobot.mediator.printer.LocalPrinter
+import org.datepollsystems.waiterrobot.mediator.printer.PrinterWithIdNotFoundException
+import org.datepollsystems.waiterrobot.mediator.ws.WsClient
+import org.datepollsystems.waiterrobot.mediator.ws.messages.PrintPdfMessage
+import org.datepollsystems.waiterrobot.mediator.ws.messages.PrintedPdfMessage
+import org.datepollsystems.waiterrobot.mediator.ws.messages.RegisterPrinterMessage
 
-class PrinterService {
-    // Get all printers that support printing PDF's in ByteArray format
-    private val localPrinterMap: Map<String, LocalPrinter> = PrintServiceLookup
-        .lookupPrintServices(DocFlavor.BYTE_ARRAY.PDF, null)
-        .associate { LocalPrinter(it).let { it.localId to it } }
+class PrinterService(organisationId: ID, scope: CoroutineScope) {
 
-    val localPrinters: Collection<LocalPrinterInfo> get() = localPrinterMap.values
+    private val wsClient = WsClient(Config.WS_NETWORK_LOGGING, organisationId, scope)
 
     // Maps printerId from backend to a local printer
     private val idToPrinter = mutableMapOf<Long, LocalPrinter>()
 
-    suspend fun print(printerId: Long, base64data: String) {
-        idToPrinter[printerId]?.print(base64data) ?: throw PrinterWithIdNotFoundException(printerId)
+    init {
+        wsClient.connect()
+        wsClient.onReady {
+            idToPrinter.forEach {
+                // Register all printers which were added before wsClient was ready
+                registerPrinter(it.key)
+            }
+        }
+        registerHandlers()
     }
 
-    fun pair(localId: String, backendId: ID) {
-        idToPrinter[backendId] = localPrinterMap[localId]!!
-        // TODO should the PrinterService send the pairing to the be?
+    private suspend fun print(pdfId: ID, printerId: ID, base64data: String) {
+        idToPrinter[printerId]?.printPdf(pdfId, base64data) ?: throw PrinterWithIdNotFoundException(printerId)
+        wsClient.send(PrintedPdfMessage(pdfId = pdfId))
+    }
+
+    fun pair(backendId: ID, printer: LocalPrinter) {
+        idToPrinter[backendId] = printer
+        if (wsClient.isReady) {
+            registerPrinter(backendId)
+        }
+    }
+
+    private fun registerPrinter(id: ID) = wsClient.send(RegisterPrinterMessage(printerId = id))
+
+    private fun registerHandlers() {
+        wsClient.handle<PrintPdfMessage> {
+            print(it.body.id, it.body.printerId, it.body.file.data)
+        }
     }
 }
 

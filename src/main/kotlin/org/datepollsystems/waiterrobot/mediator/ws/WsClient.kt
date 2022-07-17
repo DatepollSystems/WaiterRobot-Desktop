@@ -1,6 +1,8 @@
 package org.datepollsystems.waiterrobot.mediator.ws
 
 import io.ktor.client.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.logging.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.serialization.*
 import io.ktor.serialization.kotlinx.*
@@ -16,9 +18,10 @@ import org.datepollsystems.waiterrobot.mediator.api.configureAuth
 import org.datepollsystems.waiterrobot.mediator.api.createClient
 import org.datepollsystems.waiterrobot.mediator.app.Config
 import org.datepollsystems.waiterrobot.mediator.app.Settings
+import org.datepollsystems.waiterrobot.mediator.core.ID
 import org.datepollsystems.waiterrobot.mediator.ws.messages.AbstractWsMessage
 import org.datepollsystems.waiterrobot.mediator.ws.messages.HelloMessage
-import org.datepollsystems.waiterrobot.mediator.ws.messages.PrintedPdfMessage
+import org.datepollsystems.waiterrobot.mediator.ws.messages.HelloMessageResponse
 import org.datepollsystems.waiterrobot.mediator.ws.messages.WsMessageBody
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.reflect.KClass
@@ -29,26 +32,33 @@ import kotlin.reflect.typeOf
 
 typealias WsMessageHandler<T> = suspend (AbstractWsMessage<T>) -> Unit
 
-class WsClient {
-    private val client by lazy { createWsClient() }
+class WsClient(private val enableNetworkLogs: Boolean, private val organisationId: ID, scope: CoroutineScope) {
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + Job(scope.coroutineContext.job))
+
+    private val _isReady: AtomicBoolean = AtomicBoolean(false)
+    val isReady: Boolean get() = _isReady.get()
+
+    private val client by lazy { createWsClient(enableNetworkLogs) }
     private val sendFlow by lazy { MutableSharedFlow<AbstractWsMessage<WsMessageBody>>() }
-    private val startUpJob: CompletableJob by lazy { Job() }
     private val isStarted: AtomicBoolean = AtomicBoolean(false)
     private val closed: AtomicBoolean = AtomicBoolean(false)
     private val handlers: MutableMap<KType, WsMessageHandler<WsMessageBody>> = mutableMapOf()
-    private val scope = CoroutineScope(Dispatchers.IO)
+    private val onStartedListeners: MutableList<() -> Unit> = mutableListOf()
     private var session: WebSocketSession? = null
 
-    suspend fun start() {
+    fun connect() {
+        if (isStarted.getAndSet(true)) return // Must be only called once
         if (closed.get()) throw IllegalStateException("WsClient was already closed")
-        if (isStarted.getAndSet(true)) throw IllegalStateException("WsClient must be started only once")
-
-        startUpJob.start() // Just needed for suspending the start till initialization is finished
 
         // Launch the websocket session and handling in the background and keep running
         scope.launch {
             // When testing with local server change ".wss" to ".ws" (as no TLS possible)
-            client.wss(Config.WS_URL) {
+            client.wss(Config.WS_URL,
+                request = {
+                    // Add additional required headers
+                    headers.append("organisationId", organisationId.toString())
+                }
+            ) {
                 println("Ws session started") // TODO logger
 
                 session = this
@@ -66,9 +76,13 @@ class WsClient {
                 stop()
             }
         }
+    }
 
-        // Wait and suspend till the send-flow is subscribed (-> websocket is ready)
-        startUpJob.join()
+    fun onReady(callback: () -> Unit) {
+        if (closed.get()) return
+        if (_isReady.get()) return callback()
+
+        onStartedListeners.add(callback)
     }
 
     suspend fun stop() {
@@ -78,20 +92,23 @@ class WsClient {
             session = null
             println("Ws session closed") // TODO logger
         }
-        client.close()
-        println("Ws Client closed") // TODO logger
+        if (isStarted.get()) {
+            // Only close if the client was already created
+            client.close()
+            println("Ws Client closed") // TODO logger
+        }
         scope.cancel()
     }
 
     fun <T : WsMessageBody> handle(clazz: KClass<out AbstractWsMessage<T>>, handler: WsMessageHandler<T>) {
-        @Suppress("UNCHECKED_CAST") // T mut be a subtype of WsMessageBody (see function signature)
+        @Suppress("UNCHECKED_CAST") // T must be a subtype of WsMessageBody (see function signature)
         handler as WsMessageHandler<WsMessageBody>
         @Suppress("DEPRECATION")
         handle(clazz.createType(), handler)
     }
 
     inline fun <reified T : AbstractWsMessage<WsMessageBody>> handle(noinline handler: suspend (T) -> Unit) {
-        @Suppress("UNCHECKED_CAST") // T mut be a subtype of WsMessageBody (see function signature)
+        @Suppress("UNCHECKED_CAST") // T must be a subtype of WsMessageBody (see function signature)
         handler as WsMessageHandler<WsMessageBody>
         @Suppress("DEPRECATION")
         handle(typeOf<T>(), handler)
@@ -108,6 +125,7 @@ class WsClient {
 
     fun <T : WsMessageBody> send(message: AbstractWsMessage<T>) {
         if (closed.get()) throw IllegalStateException("WsClient is already closed")
+        if (!_isReady.get()) throw IllegalStateException("Can not send before WsClient is not running")
         scope.launch { sendFlow.emit(message) }
     }
 
@@ -115,12 +133,28 @@ class WsClient {
         while (coroutineContext.isActive) { // Keep listening as long as the coroutine is active
             try {
                 val message = receiveDeserialized<AbstractWsMessage<WsMessageBody>>()
-                println("Got message: $message") // TODO logger
-                handlers[message::class.createType()]?.invoke(message)
-                    ?: throw IllegalArgumentException("No handler implemented for message type '${message::class}'")
+                if (enableNetworkLogs) println("Got message: $message") // TODO logger
+                val handler = handlers[message::class.createType()]
+                if (handler == null) {
+                    println("No handler for message type '${message::class}' found") // TODO logger
+                    continue
+                }
+                scope.launch(Dispatchers.Unconfined) {
+                    try {
+                        handler.invoke(message)
+                    } catch (e: CancellationException) {
+                        // Cancellation is fine and expected
+                        println("Canceled WebSocket message handler") // TODO logger
+                    } catch (e: Exception) {
+                        // TODO logger
+                        println("Unexpected exception in WebSocket message handler for type '${message::class}'. Handle exceptions directly in the handle block!\n$e")
+                        // TODO what should happen?
+                    }
+                }
             } catch (e: ClosedReceiveChannelException) {
-                // Cancellation is fine and expected
-                println("Canceled receiving") // TODO logger
+                // Ws channel was unexpectedly closed (probably) by the server (server side exception, connection loss)
+                // TODO probably this should throw and then re-initiate a new connection?
+                println("Websocket channel was closed") // TODO logger
                 coroutineContext.cancel()
             } catch (e: CancellationException) {
                 // Cancellation is fine and expected
@@ -139,9 +173,11 @@ class WsClient {
     private suspend fun DefaultClientWebSocketSession.handleSend() {
         try {
             sendFlow.onSubscription {
-                startUpJob.complete() // sendFlow has a subscriber -> client is ready
+                _isReady.set(true)
+                onStartedListeners.forEach { it.invoke() }
+                onStartedListeners.clear()
             }.collect {
-                println("Sending message: $it") // TODO logger
+                if (enableNetworkLogs) println("Sending message: $it") // TODO logger
                 sendSerialized(it)
             }
         } catch (e: CancellationException) {
@@ -158,21 +194,57 @@ class WsClient {
     }
 }
 
-private fun createWsClient() = HttpClient {
+private fun createWsClient(enableNetworkLogs: Boolean = false) = HttpClient {
     install(WebSockets) {
         contentConverter = KotlinxWebsocketSerializationConverter(Json { ignoreUnknownKeys = true })
         pingInterval = 60 * 1000
+        // Use compression (improve network usage especially for pdf transferring as internet connection may be very slow)
+        // TODO test if it really brings benefits
+        // TODO receiving does not work out of the box probably needs adaptions on the backend (how to tell spring to use compression for responses?)
+        //  Maybe we should then also add compressMinSize as a header so the server also respects this or how does ktor determine if it must decompress incoming messages
+        /*extensions {
+            install(WebSocketDeflateExtension) {
+                compressIfBiggerThan(500) // Do not compress very small messages as this would probably make them bigger
+                // TODO some benchmarking needed for which minSize makes most sense for our type of data
+            }
+        }*/
+    }
+    install(HttpTimeout) {
+        requestTimeoutMillis = 50000
+        socketTimeoutMillis =
+            5 * 60 * 1000 // There should be a ping message every minute, so timeout if did not get multiple pings
     }
     configureAuth()
+    if (enableNetworkLogs) {
+        install(Logging) {
+            // TODO use real logger
+            logger = object : Logger {
+                override fun log(message: String) {
+                    println(message)
+                }
+            }
+            level = LogLevel.ALL
+        }
+    }
 }
 
 
 // Sample usage
 fun main(): Unit = runBlocking {
-    val wsClient = WsClient()
+    val wsClient = WsClient(true, 3, this)
     // Register a Handler for a specific websocket message
-    wsClient.handle<PrintedPdfMessage> {
-        println("Handler for PrintedPdfMessage called with: $it")
+    wsClient.handle<HelloMessageResponse> {
+        println("Handler for HelloMessageResponse called with: $it")
+
+        if (it.body.text != "Hello second") {
+            delay(2000)
+            wsClient.send(
+                HelloMessage(
+                    httpStatus = 200,
+                    body = HelloMessage.Body(text = "second")
+                )
+            )
+        }
     }
 
     // Login
@@ -182,18 +254,19 @@ fun main(): Unit = runBlocking {
 
     // Connect to the websocket
     // Start suspends till the websocket is ready
-    wsClient.start()
-
-    try {
-        // Send a message to the server
-        wsClient.send(
-            HelloMessage(
-                httpStatus = 200,
-                body = HelloMessage.Body(text = "Test Message")
+    wsClient.connect()
+    wsClient.onReady {
+        try {
+            // Send a message to the server
+            wsClient.send(
+                HelloMessage(
+                    httpStatus = 200,
+                    body = HelloMessage.Body(text = "Test WsClient")
+                )
             )
-        )
-    } catch (e: Exception) {
-        println("Exception: $e")
+        } catch (e: Exception) {
+            println("Exception: $e")
+        }
     }
 
     launch {

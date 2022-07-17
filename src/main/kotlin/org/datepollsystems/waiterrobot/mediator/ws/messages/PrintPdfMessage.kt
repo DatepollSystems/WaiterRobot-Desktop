@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-@SerialName("PRINT_PDF") // Used as discriminator value
+@SerialName("BM_PRINT_PDF") // Used as discriminator value
 data class PrintPdfMessage(
     override val httpStatus: Int,
     override val body: Body,

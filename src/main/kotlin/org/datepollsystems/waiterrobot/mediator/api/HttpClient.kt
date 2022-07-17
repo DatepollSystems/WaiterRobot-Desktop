@@ -18,7 +18,7 @@ fun createClient(enableNetworkLogs: Boolean = false) = HttpClient {
         })
     }
     install(HttpTimeout) {
-        requestTimeoutMillis = 5000
+        requestTimeoutMillis = 5000 // TODO increase?
     }
     if (enableNetworkLogs) {
         install(Logging) {

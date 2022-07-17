@@ -8,8 +8,13 @@ import org.datepollsystems.waiterrobot.mediator.api.dto.GetEventDto
 import org.datepollsystems.waiterrobot.mediator.api.dto.GetOrganisationDto
 import org.datepollsystems.waiterrobot.mediator.api.dto.GetPrinterDto
 import org.datepollsystems.waiterrobot.mediator.app.MediatorConfiguration
-import org.datepollsystems.waiterrobot.mediator.core.*
+import org.datepollsystems.waiterrobot.mediator.core.ID
+import org.datepollsystems.waiterrobot.mediator.core.ScreenState
+import org.datepollsystems.waiterrobot.mediator.core.ViewModel
 import org.datepollsystems.waiterrobot.mediator.navigation.Navigator
+import org.datepollsystems.waiterrobot.mediator.navigation.Screen
+import org.datepollsystems.waiterrobot.mediator.printer.LocalPrinterInfo
+import org.datepollsystems.waiterrobot.mediator.printer.service.PrinterDiscoverService
 
 class ConfigurePrintersViewModel(
     navigator: Navigator,
@@ -17,7 +22,6 @@ class ConfigurePrintersViewModel(
     private val organisationApi: OrganisationApi,
     private val eventApi: EventApi,
     private val printerApi: PrinterApi,
-    private val printerService: PrinterService,
 ) : ViewModel<ConfigurePrintersState>(navigator, viewModelScope, ConfigurePrintersState()) {
 
     init {
@@ -32,7 +36,7 @@ class ConfigurePrintersViewModel(
 
                 val bePrinters = if (selectedEvent != null) loadEventPrinters(selectedEvent.id) else null
                 val backendIds = bePrinters?.map(GetPrinterDto::id) ?: emptyList()
-                val localIds = printerService.localPrinters.map(LocalPrinterInfo::localId)
+                val localIds = PrinterDiscoverService.localPrinters.map(LocalPrinterInfo::localId)
 
                 val pairings = if ( // Pairing can only be applied when all printers are present
                     bePrinters != null &&
@@ -40,7 +44,7 @@ class ConfigurePrintersViewModel(
                     initConfig.localToBackendPrinterId.keys.all { it in localIds }
                 ) {
                     initConfig.localToBackendPrinterId.map { (localId, backendId) ->
-                        bePrinters.first { it.id == backendId } to printerService.localPrinters.first { it.localId == localId }
+                        bePrinters.first { it.id == backendId } to PrinterDiscoverService.localPrinters.first { it.localId == localId }
                     }
                 } else {
                     emptyList()
@@ -54,7 +58,7 @@ class ConfigurePrintersViewModel(
                         selectedOrganisation = selectedOrg,
                         selectedEvent = selectedEvent,
                         pairings = pairings,
-                        unPairedLocalPrinters = printerService.localPrinters.filter { it.localId !in initConfig.localToBackendPrinterId.keys },
+                        unPairedLocalPrinters = PrinterDiscoverService.localPrinters.filter { it.localId !in initConfig.localToBackendPrinterId.keys },
                         unPairedBackendPrinters = bePrinters?.filter { it.id !in initConfig.localToBackendPrinterId.values }
                     )
                 }
@@ -63,7 +67,7 @@ class ConfigurePrintersViewModel(
                     copy(
                         screenState = ScreenState.Idle,
                         availableOrganisations = orgs,
-                        unPairedLocalPrinters = printerService.localPrinters.toList(),
+                        unPairedLocalPrinters = PrinterDiscoverService.localPrinters.toList(),
                     )
                 }
             }
@@ -97,18 +101,14 @@ class ConfigurePrintersViewModel(
         inVmScope {
             reduce { copy(screenState = ScreenState.Loading) }
 
-            MediatorConfiguration(
+            val config = MediatorConfiguration(
                 selectedOrganisationId = state.selectedOrganisation.id,
                 selectedEventId = state.selectedEvent.id,
                 localToBackendPrinterId = state.pairings.associate { (bePrinter, loPrinter) -> loPrinter.localId to bePrinter.id }
-            ).save()
+            )
+            config.save()
 
-            state.pairings.forEach { (bePrinter, loPrinter) ->
-                printerService.pair(loPrinter.localId, bePrinter.id)
-            }
-
-            // TODO go to next screen and pass printerService.
-            //  Next screen then initiates ws connection and registers all the printers in the backend (or should this be done by the printerService?)
+            navigator.navigate(Screen.MainScreen(config))
         }
     }
 
@@ -119,7 +119,7 @@ class ConfigurePrintersViewModel(
                 selectedEvent = null,
                 availableEvents = null,
                 unPairedBackendPrinters = null,
-                unPairedLocalPrinters = printerService.localPrinters.toList(),
+                unPairedLocalPrinters = PrinterDiscoverService.localPrinters.toList(),
                 pairings = emptyList()
             )
         }
@@ -131,7 +131,7 @@ class ConfigurePrintersViewModel(
             copy(
                 selectedEvent = event,
                 unPairedBackendPrinters = null,
-                unPairedLocalPrinters = printerService.localPrinters.toList(),
+                unPairedLocalPrinters = PrinterDiscoverService.localPrinters.toList(),
                 pairings = emptyList()
             )
         }

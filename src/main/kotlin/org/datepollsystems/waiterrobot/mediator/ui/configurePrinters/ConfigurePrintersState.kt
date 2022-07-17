@@ -3,9 +3,9 @@ package org.datepollsystems.waiterrobot.mediator.ui.configurePrinters
 import org.datepollsystems.waiterrobot.mediator.api.dto.GetEventDto
 import org.datepollsystems.waiterrobot.mediator.api.dto.GetOrganisationDto
 import org.datepollsystems.waiterrobot.mediator.api.dto.GetPrinterDto
-import org.datepollsystems.waiterrobot.mediator.core.LocalPrinterInfo
 import org.datepollsystems.waiterrobot.mediator.core.ScreenState
 import org.datepollsystems.waiterrobot.mediator.core.State
+import org.datepollsystems.waiterrobot.mediator.printer.LocalPrinterInfo
 
 data class ConfigurePrintersState(
     override val screenState: ScreenState = ScreenState.Loading,

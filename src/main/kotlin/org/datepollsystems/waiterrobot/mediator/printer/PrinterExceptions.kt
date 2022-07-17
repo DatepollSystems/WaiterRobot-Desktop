@@ -1,4 +1,4 @@
-package org.datepollsystems.waiterrobot.mediator.core
+package org.datepollsystems.waiterrobot.mediator.printer
 
 import javax.print.event.PrintJobEvent
 
