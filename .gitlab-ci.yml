@@ -13,6 +13,8 @@ stages:
 
 test:
   stage: test
+  variables:
+    env: "CI"
   script:
     - ./gradlew -v
     - ./gradlew test --stacktrace

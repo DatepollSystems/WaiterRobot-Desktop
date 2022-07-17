@@ -5,6 +5,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import org.datepollsystems.waiterrobot.mediator.api.AuthApi
 import org.datepollsystems.waiterrobot.mediator.api.createClient
+import org.datepollsystems.waiterrobot.mediator.app.Config
 import org.datepollsystems.waiterrobot.mediator.app.Settings
 import org.datepollsystems.waiterrobot.mediator.ws.messages.HelloMessage
 import org.datepollsystems.waiterrobot.mediator.ws.messages.HelloMessageResponse
@@ -12,10 +13,13 @@ import org.junit.Test
 import kotlin.random.Random
 import kotlin.test.assertEquals
 
-class WsClientTest {
+internal class WsClientTest {
 
     @Test
+            /** E2E test */
     fun basicFunctionalityTest(): Unit = runBlocking {
+        if (Config.isCI) return@runBlocking // Can not be executed by CI
+
         // Make sure that the client is exited as expected and the coroutine ends
         val response = withTimeoutOrNull(10000) {
             val wsClient = WsClient(true, 3, this)

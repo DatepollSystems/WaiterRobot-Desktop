@@ -9,7 +9,7 @@ import kotlin.reflect.full.createType
 import kotlin.reflect.typeOf
 import kotlin.test.assertEquals
 
-class SerializationTest {
+internal class SerializationTest {
 
     @Test
     fun `PrintPdfMessage De-Serialization as AbstractOutgoingWsMessage with WsMessageBody`() {
@@ -96,10 +96,13 @@ class SerializationTest {
     }
 
     @Test
-    fun `Test`() {
-        val string = """{"messageObjectId":"BM_HELLO","httpStatus":200,"body":{"text":"Hello Test Message"}}"""
+    fun `Test from String`() {
+        val text = "Hello Test Message"
+        val string = """{"messageObjectId":"BM_HELLO","httpStatus":200,"body":{"text":"$text"}}"""
         val decoded = Json.decodeFromString<AbstractWsMessage<WsMessageBody>>(string)
 
+        assertEquals(200, decoded.httpStatus)
         assertEquals(decoded::class.createType(), typeOf<HelloMessageResponse>())
+        assertEquals(text, (decoded as HelloMessageResponse).body.text)
     }
 }

@@ -10,4 +10,6 @@ object Config {
 
     const val API_NETWORK_LOGGING = true
     const val WS_NETWORK_LOGGING = true
+
+    val isCI = System.getenv("env") == "CI"
 }

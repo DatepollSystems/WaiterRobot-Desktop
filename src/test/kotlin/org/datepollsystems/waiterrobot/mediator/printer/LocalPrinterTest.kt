@@ -1,6 +1,7 @@
 package org.datepollsystems.waiterrobot.mediator.printer
 
 import kotlinx.coroutines.runBlocking
+import org.datepollsystems.waiterrobot.mediator.app.Config
 import java.io.File
 import java.util.*
 import javax.print.PrintServiceLookup
@@ -13,12 +14,15 @@ import kotlin.test.Test
 
 
 internal class LocalPrinterTest {
-    /**
+    /** E2E Test
+     *
      * Prints a test page on the default printer of the current device, must be verified manually
      * (at least by having a look if a job with the name "Mediator-TestPrint" was added to the print queue)
      */
     @Test
     fun testPrint() = runBlocking {
+        if (Config.isCI) return@runBlocking // Can not be executed by CI
+
         val printer = LocalPrinter(PrintServiceLookup.lookupDefaultPrintService())
         val file = File("src/test/resources/testPdf.pdf")
         val base64String = Base64.getEncoder().encodeToString(file.readBytes())
