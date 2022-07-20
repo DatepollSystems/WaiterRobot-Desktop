@@ -8,6 +8,7 @@ import org.datepollsystems.waiterrobot.mediator.api.dto.GetEventDto
 import org.datepollsystems.waiterrobot.mediator.api.dto.GetOrganisationDto
 import org.datepollsystems.waiterrobot.mediator.api.dto.GetPrinterDto
 import org.datepollsystems.waiterrobot.mediator.app.MediatorConfiguration
+import org.datepollsystems.waiterrobot.mediator.app.Settings
 import org.datepollsystems.waiterrobot.mediator.core.ID
 import org.datepollsystems.waiterrobot.mediator.core.ScreenState
 import org.datepollsystems.waiterrobot.mediator.core.ViewModel
@@ -108,6 +109,7 @@ class ConfigurePrintersViewModel(
             )
             config.save()
 
+            Settings.organisationId = config.selectedOrganisationId
             navigator.navigate(Screen.MainScreen(config))
         }
     }

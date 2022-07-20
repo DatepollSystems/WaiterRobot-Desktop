@@ -18,37 +18,34 @@ import org.datepollsystems.waiterrobot.mediator.api.configureAuth
 import org.datepollsystems.waiterrobot.mediator.api.createClient
 import org.datepollsystems.waiterrobot.mediator.app.Config
 import org.datepollsystems.waiterrobot.mediator.app.Settings
-import org.datepollsystems.waiterrobot.mediator.core.ID
 import org.datepollsystems.waiterrobot.mediator.ws.messages.AbstractWsMessage
 import org.datepollsystems.waiterrobot.mediator.ws.messages.HelloMessage
 import org.datepollsystems.waiterrobot.mediator.ws.messages.HelloMessageResponse
 import org.datepollsystems.waiterrobot.mediator.ws.messages.WsMessageBody
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.reflect.KClass
-import kotlin.reflect.KType
-import kotlin.reflect.full.createType
-import kotlin.reflect.full.isSubtypeOf
-import kotlin.reflect.typeOf
 
 typealias WsMessageHandler<T> = suspend (AbstractWsMessage<T>) -> Unit
 
-class WsClient(private val enableNetworkLogs: Boolean, private val organisationId: ID, scope: CoroutineScope) {
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + Job(scope.coroutineContext.job))
+// TODO how to reestablish connection
+object WsClient {
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 
     private val _isReady: AtomicBoolean = AtomicBoolean(false)
-    val isReady: Boolean get() = _isReady.get()
+    val isReady get() = _isReady.get()
 
-    private val client by lazy { createWsClient(enableNetworkLogs) }
+    private val client by lazy { createWsClient(Config.WS_NETWORK_LOGGING) }
     private val sendFlow by lazy { MutableSharedFlow<AbstractWsMessage<WsMessageBody>>() }
     private val isStarted: AtomicBoolean = AtomicBoolean(false)
     private val closed: AtomicBoolean = AtomicBoolean(false)
-    private val handlers: MutableMap<KType, WsMessageHandler<WsMessageBody>> = mutableMapOf()
+    private val handlers: MutableMap<KClass<out AbstractWsMessage<*>>, WsMessageHandler<out WsMessageBody>> =
+        mutableMapOf()
     private val onStartedListeners: MutableList<() -> Unit> = mutableListOf()
     private var session: WebSocketSession? = null
 
     fun connect() {
         if (isStarted.getAndSet(true)) return // Must be only called once
-        if (closed.get()) throw IllegalStateException("WsClient was already closed")
+        if (closed.get()) throw IllegalStateException("WsClient is already closed")
 
         // Launch the websocket session and handling in the background and keep running
         scope.launch {
@@ -56,7 +53,7 @@ class WsClient(private val enableNetworkLogs: Boolean, private val organisationI
             client.wss(Config.WS_URL,
                 request = {
                     // Add additional required headers
-                    headers.append("organisationId", organisationId.toString())
+                    headers.append("organisationId", Settings.organisationId.toString())
                 }
             ) {
                 println("Ws session started") // TODO logger
@@ -103,24 +100,16 @@ class WsClient(private val enableNetworkLogs: Boolean, private val organisationI
     fun <T : WsMessageBody> handle(clazz: KClass<out AbstractWsMessage<T>>, handler: WsMessageHandler<T>) {
         @Suppress("UNCHECKED_CAST") // T must be a subtype of WsMessageBody (see function signature)
         handler as WsMessageHandler<WsMessageBody>
-        @Suppress("DEPRECATION")
-        handle(clazz.createType(), handler)
+        if (handlers.put(clazz, handler) != null) {
+            // This is probably not what we want -> log it
+            println("Replaced handler for class ${clazz.simpleName}") // TODO logger
+        }
     }
 
     inline fun <reified T : AbstractWsMessage<WsMessageBody>> handle(noinline handler: suspend (T) -> Unit) {
         @Suppress("UNCHECKED_CAST") // T must be a subtype of WsMessageBody (see function signature)
         handler as WsMessageHandler<WsMessageBody>
-        @Suppress("DEPRECATION")
-        handle(typeOf<T>(), handler)
-    }
-
-    @Deprecated("Do not use this, use one of the other handle function") // To mark it as "do not use"
-    fun handle(type: KType, handler: WsMessageHandler<WsMessageBody>) {
-        if (!type.isSubtypeOf(typeOf<AbstractWsMessage<WsMessageBody>>())) {
-            // check this as handle has to be public, but we can't "put" a constraint on KType
-            throw IllegalArgumentException("Handle can only accept subtypes of AbstractWsMessage")
-        }
-        handlers[type] = handler
+        handle(T::class, handler)
     }
 
     fun <T : WsMessageBody> send(message: AbstractWsMessage<T>) {
@@ -133,13 +122,13 @@ class WsClient(private val enableNetworkLogs: Boolean, private val organisationI
         while (coroutineContext.isActive) { // Keep listening as long as the coroutine is active
             try {
                 val message = receiveDeserialized<AbstractWsMessage<WsMessageBody>>()
-                if (enableNetworkLogs) println("Got message: $message") // TODO logger
-                val handler = handlers[message::class.createType()]
+                if (Config.WS_NETWORK_LOGGING) println("Got message: $message") // TODO logger
+                val handler = handlers[message::class]
                 if (handler == null) {
                     println("No handler for message type '${message::class}' found") // TODO logger
                     continue
                 }
-                scope.launch(Dispatchers.Unconfined) {
+                scope.launch(Dispatchers.IO) {
                     try {
                         handler.invoke(message)
                     } catch (e: CancellationException) {
@@ -177,7 +166,7 @@ class WsClient(private val enableNetworkLogs: Boolean, private val organisationI
                 onStartedListeners.forEach { it.invoke() }
                 onStartedListeners.clear()
             }.collect {
-                if (enableNetworkLogs) println("Sending message: $it") // TODO logger
+                if (Config.WS_NETWORK_LOGGING) println("Sending message: $it") // TODO logger
                 sendSerialized(it)
             }
         } catch (e: CancellationException) {
@@ -231,14 +220,13 @@ private fun createWsClient(enableNetworkLogs: Boolean = false) = HttpClient {
 
 // Sample usage
 fun main(): Unit = runBlocking {
-    val wsClient = WsClient(true, 3, this)
     // Register a Handler for a specific websocket message
-    wsClient.handle<HelloMessageResponse> {
+    WsClient.handle<HelloMessageResponse> {
         println("Handler for HelloMessageResponse called with: $it")
 
         if (it.body.text != "Hello second") {
             delay(2000)
-            wsClient.send(
+            WsClient.send(
                 HelloMessage(
                     httpStatus = 200,
                     body = HelloMessage.Body(text = "second")
@@ -254,11 +242,11 @@ fun main(): Unit = runBlocking {
 
     // Connect to the websocket
     // Start suspends till the websocket is ready
-    wsClient.connect()
-    wsClient.onReady {
+    WsClient.connect()
+    WsClient.onReady {
         try {
             // Send a message to the server
-            wsClient.send(
+            WsClient.send(
                 HelloMessage(
                     httpStatus = 200,
                     body = HelloMessage.Body(text = "Test WsClient")
@@ -276,6 +264,6 @@ fun main(): Unit = runBlocking {
         }
     }.join() // Simulate some "application live time"
     println("Stopping client")
-    wsClient.stop() // WsClient keeps running and handles sending/receiving in background till the client is stopped
+    WsClient.stop() // WsClient keeps running and handles sending/receiving in background till the client is stopped
     println("finished")
 }

@@ -5,7 +5,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.job
 import org.datepollsystems.waiterrobot.mediator.api.*
 import org.datepollsystems.waiterrobot.mediator.app.Config
 import org.datepollsystems.waiterrobot.mediator.ui.configurePrinters.ConfigurePrintersScreen
@@ -24,8 +23,8 @@ fun Navigation() {
     val screenState = navigator.screenState.collectAsState().value
     // TODO proper dependency injection (use koin?)
     when (screenState) {
-        Screen.StartUpScreen -> WithCoroutineScope(screenState) { StartUpScreen(StartUpViewModel(navigator, it)) }
-        Screen.LoginScreen -> WithCoroutineScope(screenState) {
+        Screen.StartUpScreen -> WithCoroutineScope { StartUpScreen(StartUpViewModel(navigator, it)) }
+        Screen.LoginScreen -> WithCoroutineScope {
             LoginScreen(
                 LoginViewModel(
                     navigator,
@@ -34,7 +33,7 @@ fun Navigation() {
                 )
             )
         }
-        is Screen.MainScreen -> WithCoroutineScope(screenState) {
+        is Screen.MainScreen -> WithCoroutineScope {
             MainScreen(
                 MainScreenViewModel(
                     navigator,
@@ -43,7 +42,7 @@ fun Navigation() {
                 )
             )
         }
-        Screen.ConfigurePrintersScreen -> WithCoroutineScope(screenState) {
+        Screen.ConfigurePrintersScreen -> WithCoroutineScope {
             val client = createAuthenticatedClient(Config.API_NETWORK_LOGGING)
             ConfigurePrintersScreen(
                 ConfigurePrintersViewModel(
@@ -60,10 +59,7 @@ fun Navigation() {
 
 @Composable
 // Helper to get a screen scoped coroutineContext for the viewModel
-fun WithCoroutineScope(screenState: Screen, content: @Composable (CoroutineScope) -> Unit) {
+fun WithCoroutineScope(content: @Composable (CoroutineScope) -> Unit) {
     val scope = rememberCoroutineScope()
-    scope.coroutineContext.job.invokeOnCompletion {
-        println("[${screenState::class.simpleName}] ViewModelScope completed: $it")
-    }
     content(scope)
 }

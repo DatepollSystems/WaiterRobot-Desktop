@@ -1,18 +1,13 @@
 package org.datepollsystems.waiterrobot.mediator
 
-import kotlinx.coroutines.runBlocking
+import org.apache.pdfbox.Loader
+import org.apache.pdfbox.printing.PDFPageable
 import org.datepollsystems.waiterrobot.mediator.printer.LocalPrinter
 import org.datepollsystems.waiterrobot.mediator.printer.LocalPrinterInfo
 import org.datepollsystems.waiterrobot.mediator.printer.service.PrinterDiscoverService
-import org.datepollsystems.waiterrobot.mediator.utils.sha256
+import java.awt.print.PrinterJob
 import java.io.File
-import java.util.*
 import javax.print.PrintServiceLookup
-import javax.print.attribute.HashDocAttributeSet
-import javax.print.attribute.HashPrintRequestAttributeSet
-import javax.print.attribute.standard.DocumentName
-import javax.print.attribute.standard.JobName
-import javax.print.attribute.standard.MediaSizeName
 
 /** Some test function for local debugging */
 fun main() {
@@ -37,23 +32,24 @@ fun listPrinters() {
     println("-".repeat(longestName + 30))
 }
 
-fun printTestFile(printerName: String) {
-    val printer = PrinterDiscoverService.localPrinterMap[printerName.sha256()]
+fun listPrinterCapabilities(printerName: String) {
+    val printer = PrintServiceLookup.lookupPrintServices(null, null).find { it.name == printerName }
         ?: throw IllegalArgumentException("Printer with name $printerName not found.")
-    val file = File("src/test/resources/testPdf.pdf")
-    val base64String = Base64.getEncoder().encodeToString(file.readBytes())
 
-    runBlocking {
-        printer.printPdf(
-            123,
-            base64String,
-            docAttributes = HashDocAttributeSet(DocumentName("Mediator-TestPrint", null)),
-            printAttributes = HashPrintRequestAttributeSet(
-                arrayOf(
-                    MediaSizeName.ISO_A4,
-                    JobName("Mediator-TestPrint", null)
-                )
-            )
-        )
+    println("Supported attribute categories")
+    printer.supportedAttributeCategories.forEach {
+        println(it.name)
     }
+}
+
+fun printTestFile(printerName: String) {
+    val printer = PrintServiceLookup.lookupPrintServices(null, null).find { it.name == printerName }
+        ?: throw IllegalArgumentException("Printer with name $printerName not found.")
+    val file = File("src/test/resources/testBill.pdf")
+    val doc = Loader.loadPDF(file.readBytes()) // Use readBytes as the real printing will also use raw bytes
+
+    val job = PrinterJob.getPrinterJob()
+    job.setPageable(PDFPageable(doc))
+    job.printService = printer
+    job.print()
 }

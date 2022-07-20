@@ -1,7 +1,9 @@
 package org.datepollsystems.waiterrobot.mediator
 
+import kotlinx.coroutines.runBlocking
 import org.datepollsystems.waiterrobot.mediator.app.Settings
 import org.datepollsystems.waiterrobot.mediator.ui.startUI
+import org.datepollsystems.waiterrobot.mediator.ws.WsClient
 
 
 object App {
@@ -9,7 +11,11 @@ object App {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        startUI()
+        startUI(this::onClose)
+    }
+
+    private fun onClose() {
+        runBlocking { WsClient.stop() }
     }
 
     fun addLogoutListener(listener: () -> Unit) {

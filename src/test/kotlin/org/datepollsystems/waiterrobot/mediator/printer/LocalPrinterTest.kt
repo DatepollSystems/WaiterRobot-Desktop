@@ -4,11 +4,6 @@ import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.util.*
 import javax.print.PrintServiceLookup
-import javax.print.attribute.HashDocAttributeSet
-import javax.print.attribute.HashPrintRequestAttributeSet
-import javax.print.attribute.standard.DocumentName
-import javax.print.attribute.standard.JobName
-import javax.print.attribute.standard.MediaSizeName
 import kotlin.test.Ignore
 import kotlin.test.Test
 
@@ -23,19 +18,9 @@ internal class LocalPrinterTest {
     @Ignore // Queues a print should not be executed by default
     fun testPrint() = runBlocking {
         val printer = LocalPrinter(PrintServiceLookup.lookupDefaultPrintService())
-        val file = File("src/test/resources/testPdf.pdf")
+        val file = File("src/test/resources/testBill.pdf")
         val base64String = Base64.getEncoder().encodeToString(file.readBytes())
 
-        printer.printPdf(
-            123,
-            base64String,
-            docAttributes = HashDocAttributeSet(DocumentName("Mediator-TestPrint", null)),
-            printAttributes = HashPrintRequestAttributeSet(
-                arrayOf(
-                    MediaSizeName.ISO_A4,
-                    JobName("Mediator-TestPrint", null)
-                )
-            )
-        )
+        printer.printPdf(123, base64String)
     }
 }

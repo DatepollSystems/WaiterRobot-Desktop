@@ -13,13 +13,10 @@ class MainScreenViewModel(
     config: MediatorConfiguration,
 ) : ViewModel<MainScreenState>(navigator, viewModelScope, MainScreenState()) {
 
-    private val printerService: PrinterService
-
     init {
-        printerService = PrinterService(config.selectedOrganisationId, viewModelScope)
         config.localToBackendPrinterId.forEach { (localId, backendId) ->
             val localPrinter = PrinterDiscoverService.localPrinterMap[localId] ?: return@forEach
-            printerService.pair(backendId, localPrinter)
+            PrinterService.pair(backendId, localPrinter)
         }
     }
 }
