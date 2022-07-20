@@ -15,8 +15,8 @@ import kotlin.test.assertEquals
 
 internal class WsClientTest {
 
+    /** E2E test */
     @Test
-            /** E2E test */
     fun basicFunctionalityTest(): Unit = runBlocking {
         if (Config.isCI) return@runBlocking // Can not be executed by CI
 
