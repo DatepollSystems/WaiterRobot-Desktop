@@ -22,12 +22,11 @@ internal class WsClientTest {
 
         // Make sure that the client is exited as expected and the coroutine ends
         val response = withTimeoutOrNull(10000) {
-            val wsClient = WsClient(true, 3, this)
             val randomVerifier = Random.nextBytes(64).encodeBase64()
 
-            wsClient.handle<HelloMessageResponse> {
+            WsClient.handle<HelloMessageResponse> {
                 assertEquals("Hello $randomVerifier", it.body.text)
-                wsClient.stop()
+                WsClient.stop()
             }
 
             // Login
@@ -35,9 +34,9 @@ internal class WsClientTest {
             Settings.accessToken = tokens.accessToken
             Settings.refreshToken = tokens.refreshToken!!
 
-            wsClient.connect()
-            wsClient.onReady {
-                wsClient.send(
+            WsClient.connect()
+            WsClient.onReady {
+                WsClient.send(
                     HelloMessage(
                         httpStatus = 200,
                         body = HelloMessage.Body(text = randomVerifier)
