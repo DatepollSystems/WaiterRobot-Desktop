@@ -7,6 +7,6 @@ import org.datepollsystems.waiterrobot.mediator.core.ID
 data class GetPrinterDto(
     val id: ID,
     val name: String,
+    val printerName: String,
     val eventId: ID,
-    val productGroups: List<ID>
 )

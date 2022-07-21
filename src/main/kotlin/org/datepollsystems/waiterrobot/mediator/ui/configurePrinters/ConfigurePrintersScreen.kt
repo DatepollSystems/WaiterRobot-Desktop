@@ -3,12 +3,10 @@ package org.datepollsystems.waiterrobot.mediator.ui.configurePrinters
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Button
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -74,12 +72,16 @@ fun ConfigurePrintersScreen(vm: ConfigurePrintersViewModel) {
                         Text("Pairings")
                     }
                 }
+
                 Divider(modifier = Modifier.fillMaxWidth())
+
                 Column(
                     modifier = Modifier.fillMaxHeight(),
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     Row(modifier = Modifier.weight(1f)) {
+
+                        // Backend Printers
                         LazyColumn(modifier = Modifier.weight(1.5f)) {
                             items(state.unPairedBackendPrinters, key = GetPrinterDto::id) {
                                 PrinterListItem(
@@ -90,6 +92,7 @@ fun ConfigurePrintersScreen(vm: ConfigurePrintersViewModel) {
                             }
                         }
 
+                        // Local Printers
                         LazyColumn(modifier = Modifier.weight(1.5f)) {
                             items(state.unPairedLocalPrinters ?: emptyList(), key = LocalPrinterInfo::localId) {
                                 PrinterListItem(
@@ -100,12 +103,18 @@ fun ConfigurePrintersScreen(vm: ConfigurePrintersViewModel) {
                             }
                         }
 
+                        // Pairings
                         LazyColumn(modifier = Modifier.weight(1f)) {
                             items(state.pairings, key = { "${it.first.id}-${it.second.localId}" }) {
                                 Row(
                                     modifier = Modifier.padding(vertical = 10.dp, horizontal = 20.dp),
-                                    verticalAlignment = Alignment.CenterVertically
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
+                                    IconButton(
+                                        onClick = { vm.removePairing(it) }) {
+                                        Icon(Icons.Filled.Delete, "contentDescription")
+                                    }
                                     Text(it.first.name)
                                     Icon(
                                         modifier = Modifier.padding(horizontal = 10.dp),
@@ -113,7 +122,6 @@ fun ConfigurePrintersScreen(vm: ConfigurePrintersViewModel) {
                                         imageVector = Icons.Filled.ArrowForward
                                     )
                                     Text(it.second.name)
-                                    // TODO add remove button
                                 }
                             }
                         }

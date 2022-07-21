@@ -11,7 +11,9 @@ import org.datepollsystems.waiterrobot.mediator.ws.messages.RegisterPrinterMessa
 object PrinterService {
 
     // Maps printerId from backend to a local printer
-    private val idToPrinter = mutableMapOf<Long, LocalPrinter>()
+    private val idToPrinter = mutableMapOf<ID, LocalPrinter>()
+
+    val printers: List<Pair<ID, LocalPrinter>> get() = idToPrinter.toList()
 
     init {
         WsClient.connect()

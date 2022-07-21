@@ -16,6 +16,7 @@ import org.datepollsystems.waiterrobot.mediator.navigation.Navigator
 import org.datepollsystems.waiterrobot.mediator.navigation.Screen
 import org.datepollsystems.waiterrobot.mediator.printer.LocalPrinterInfo
 import org.datepollsystems.waiterrobot.mediator.printer.service.PrinterDiscoverService
+import org.datepollsystems.waiterrobot.mediator.printer.service.PrinterService
 
 class ConfigurePrintersViewModel(
     navigator: Navigator,
@@ -110,7 +111,13 @@ class ConfigurePrintersViewModel(
             config.save()
 
             Settings.organisationId = config.selectedOrganisationId
-            navigator.navigate(Screen.MainScreen(config))
+
+            config.localToBackendPrinterId.forEach { (localId, backendId) ->
+                val localPrinter = PrinterDiscoverService.localPrinterMap[localId] ?: return@forEach
+                PrinterService.pair(backendId, localPrinter)
+            }
+
+            navigator.navigate(Screen.MainScreen)
         }
     }
 

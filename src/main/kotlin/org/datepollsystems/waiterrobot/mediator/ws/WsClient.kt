@@ -94,6 +94,9 @@ object WsClient {
             client.close()
             println("Ws Client closed") // TODO logger
         }
+        // Release all handlers and listeners
+        handlers.clear()
+        onStartedListeners.clear()
         scope.cancel()
     }
 
@@ -143,7 +146,7 @@ object WsClient {
             } catch (e: ClosedReceiveChannelException) {
                 // Ws channel was unexpectedly closed (probably) by the server (server side exception, connection loss)
                 // TODO probably this should throw and then re-initiate a new connection?
-                println("Websocket channel was closed") // TODO logger
+                println("Websocket channel was closed $e") // TODO logger
                 coroutineContext.cancel()
             } catch (e: CancellationException) {
                 // Cancellation is fine and expected
