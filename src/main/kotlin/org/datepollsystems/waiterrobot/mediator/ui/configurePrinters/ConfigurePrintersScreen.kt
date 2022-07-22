@@ -144,6 +144,7 @@ fun ConfigurePrintersScreen(vm: ConfigurePrintersViewModel) {
 
                         Button(
                             onClick = vm::saveAndContinue,
+                            enabled = state.pairings.isNotEmpty()
                         ) {
                             Text("Continue")
                         }

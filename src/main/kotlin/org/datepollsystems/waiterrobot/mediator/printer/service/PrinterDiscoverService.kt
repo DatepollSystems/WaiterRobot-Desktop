@@ -8,7 +8,7 @@ import javax.print.PrintServiceLookup
 object PrinterDiscoverService {
     // Get all printers that support printing PDF's in ByteArray format
     val localPrinterMap: Map<String, LocalPrinter> = PrintServiceLookup
-        .lookupPrintServices(DocFlavor.BYTE_ARRAY.PDF, null)
+        .lookupPrintServices(DocFlavor.SERVICE_FORMATTED.PAGEABLE, null)
         .map { LocalPrinter(it) }
         .associateBy { it.localId }
 
