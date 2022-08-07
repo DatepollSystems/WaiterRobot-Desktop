@@ -11,8 +11,8 @@ data class PrintedPdfMessage(
     override val body: Body,
 ) : AbstractWsMessage<PrintedPdfMessage.Body>() {
     @Serializable
-    data class Body(val id: ID) : WsMessageBody
+    data class Body(val id: String) : WsMessageBody
 
-    constructor(httpStatus: Int = 200, pdfId: ID) : this(httpStatus, Body(pdfId))
+    constructor(httpStatus: Int = 200, pdfId: String) : this(httpStatus, Body(pdfId))
 }
 

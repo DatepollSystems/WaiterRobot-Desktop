@@ -26,10 +26,10 @@ object PrinterService {
         registerHandlers()
     }
 
-    private suspend fun print(pdfId: ID, printerId: ID, base64data: String) {
+    private suspend fun print(pdfId: String, printerId: ID, base64data: String) {
         idToPrinter[printerId]?.printPdf(pdfId, base64data) ?: throw PrinterWithIdNotFoundException(printerId)
-        // -1 is the id of the test pdf, no response expected by backend
-        if (pdfId != -1L) WsClient.send(PrintedPdfMessage(pdfId = pdfId))
+        // test is the id of the test pdf, no response expected by backend
+        if (pdfId != "test") WsClient.send(PrintedPdfMessage(pdfId = pdfId))
     }
 
     fun pair(backendId: ID, printer: LocalPrinter) {

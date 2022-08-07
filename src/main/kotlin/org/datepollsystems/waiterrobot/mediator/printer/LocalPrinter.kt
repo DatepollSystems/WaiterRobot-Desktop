@@ -27,7 +27,7 @@ class LocalPrinter(private val service: PrintService) : LocalPrinterInfo {
     override val name get() = service.name
 
     suspend fun printPdf(
-        pdfId: ID,
+        pdfId: String,
         base64data: String,
     ): Unit = coroutineScope {
         val decoded = Base64.getDecoder().decode(base64data)
@@ -35,7 +35,7 @@ class LocalPrinter(private val service: PrintService) : LocalPrinterInfo {
 
         val printJob = PrinterJob.getPrinterJob()
         printJob.printService = service
-        printJob.jobName = pdfId.toString()
+        printJob.jobName = pdfId
         printJob.setPageable(doc)
 
         // TODO can we somehow listen on the job?

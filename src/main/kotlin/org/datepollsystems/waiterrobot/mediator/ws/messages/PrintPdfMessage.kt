@@ -10,7 +10,7 @@ data class PrintPdfMessage(
     override val body: Body,
 ) : AbstractWsMessage<PrintPdfMessage.Body>() {
     @Serializable
-    data class Body(val id: Long, val printerId: Long, val file: File) : WsMessageBody {
+    data class Body(val id: String, val printerId: Long, val file: File) : WsMessageBody {
         @Serializable
         data class File(val mime: String, val data: String)
     }
