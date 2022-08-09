@@ -55,6 +55,8 @@ fun HttpClientConfig<*>.configureAuth() {
             } catch (e: Exception) {
                 // TODO improve request errors handling (-> try again, logout?, no connection info)
                 //  logging and logout
+                println("Error while refreshing token: ${e.message}")
+                e.printStackTrace()
                 null
             }
         }

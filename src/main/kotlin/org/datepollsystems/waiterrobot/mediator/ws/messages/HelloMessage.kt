@@ -11,4 +11,6 @@ data class HelloMessage(
 ) : AbstractWsMessage<HelloMessage.Body>() {
     @Serializable
     data class Body(val text: String) : WsMessageBody
+
+    constructor(text: String, httpStatus: Int = 200) : this(httpStatus, Body(text))
 }

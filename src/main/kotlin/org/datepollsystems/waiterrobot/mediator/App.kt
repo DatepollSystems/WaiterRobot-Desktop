@@ -1,13 +1,17 @@
 package org.datepollsystems.waiterrobot.mediator
 
-import kotlinx.coroutines.runBlocking
 import org.datepollsystems.waiterrobot.mediator.app.Settings
 import org.datepollsystems.waiterrobot.mediator.ui.startUI
-import org.datepollsystems.waiterrobot.mediator.ws.WsClient
+import org.datepollsystems.waiterrobot.mediator.utils.isLazyInitialized
+import org.datepollsystems.waiterrobot.mediator.ws.MediatorWebSocketManager
 
 
 object App {
     private val logoutListeners: MutableList<() -> Unit> = mutableListOf()
+
+    val socketManager: MediatorWebSocketManager by lazy {
+        MediatorWebSocketManager()
+    }
 
     @JvmStatic
     fun main(args: Array<String>) {
@@ -15,7 +19,9 @@ object App {
     }
 
     private fun onClose() {
-        runBlocking { WsClient.stop() }
+        if (App::socketManager.isLazyInitialized) {
+            socketManager.close()
+        }
     }
 
     fun addLogoutListener(listener: () -> Unit) {
