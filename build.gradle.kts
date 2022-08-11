@@ -17,6 +17,22 @@ repositories {
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
+tasks.withType(Jar::class) {
+    manifest {
+        attributes["Manifest-Version"] = "1.0.0" // TODO use version variable
+        attributes["Main-Class"] = "org.datepollsystems.waiterrobot.mediator.App"
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+
+    // To add all the dependencies
+    from(sourceSets.main.get().output)
+
+    dependsOn(configurations.runtimeClasspath)
+    from({
+        configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
+    })
+}
+
 dependencies {
     testImplementation(kotlin("test"))
     implementation(compose.desktop.currentOs)

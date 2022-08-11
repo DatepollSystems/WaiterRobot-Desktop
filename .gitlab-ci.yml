@@ -10,6 +10,19 @@ cache:
 
 stages:
   - test
+  - build
+
+build:
+  image: openjdk:18-jdk-slim
+  stage: build
+  only:
+    - tags
+  script:
+    - ./gradlew clean build
+  artifacts:
+    paths:
+      - build/libs/Mediator-*.jar
+    expire_in: 1 week
 
 test:
   stage: test
