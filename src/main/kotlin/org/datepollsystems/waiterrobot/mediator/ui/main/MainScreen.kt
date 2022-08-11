@@ -11,6 +11,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun MainScreen(vm: MainScreenViewModel) {
@@ -27,11 +28,24 @@ fun MainScreen(vm: MainScreenViewModel) {
             // Transaction log
             Column(modifier = Modifier.weight(2f)) {
                 // TODO show a transaction log
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
+                if (state.printTransactions.isEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                } else {
+                    LazyColumn {
+                        items(state.printTransactions.items, key = PrintTransaction::id) {
+                            Row(modifier = Modifier.padding(10.dp)) {
+                                Text(it.time.format(DateTimeFormatter.ofPattern("dd.MM.yyyy hh:mm:ss")))
+                                Spacer(modifier = Modifier.width(20.dp))
+                                Text(it.jobName)
+                            }
+                            Divider()
+                        }
+                    }
                 }
             }
 
@@ -48,6 +62,7 @@ fun MainScreen(vm: MainScreenViewModel) {
                             Icon(Icons.Filled.Print, "contentDescription")
                         }
                     }
+                    Divider()
                 }
             }
         }

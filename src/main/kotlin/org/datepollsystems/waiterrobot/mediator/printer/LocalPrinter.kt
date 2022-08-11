@@ -1,9 +1,7 @@
 package org.datepollsystems.waiterrobot.mediator.printer
 
-import kotlinx.coroutines.coroutineScope
 import org.apache.pdfbox.Loader
 import org.apache.pdfbox.printing.PDFPageable
-import org.datepollsystems.waiterrobot.mediator.core.ID
 import org.datepollsystems.waiterrobot.mediator.utils.sha256
 import java.awt.print.PrinterJob
 import java.util.*
@@ -26,10 +24,10 @@ class LocalPrinter(private val service: PrintService) : LocalPrinterInfo {
     override val localId = service.name.sha256() // Name should be unique (on a system level)
     override val name get() = service.name
 
-    suspend fun printPdf(
+    fun printPdf(
         pdfId: String,
         base64data: String,
-    ): Unit = coroutineScope {
+    ) {
         val decoded = Base64.getDecoder().decode(base64data)
         val doc = PDFPageable(Loader.loadPDF(decoded))
 

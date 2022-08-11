@@ -14,14 +14,17 @@ data class MediatorConfiguration(
     val localToBackendPrinterId: Map<String, ID>
 ) {
     fun save() {
-        val jsonConfig = Json.encodeToString(this)
-        val file = getFile()
-        file.parentFile.mkdirs()
-        file.createNewFile()
-        file.writeText(jsonConfig)
+        runCatching {
+            val jsonConfig = Json.encodeToString(this)
+            val file = getFile()
+            file.parentFile.mkdirs()
+            file.createNewFile()
+            file.writeText(jsonConfig)
+        }
     }
 
     companion object {
+        // TODO fix this location is not valid in prod
         private fun getFile(): File {
             val rootPath = MediatorConfiguration::class.java.getResource("/")!!.path
             return File(rootPath, "resources/cache/mediatorConfig.json")

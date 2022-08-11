@@ -15,7 +15,7 @@ internal class SerializationTest {
     fun `PrintPdfMessage De-Serialization as AbstractOutgoingWsMessage with WsMessageBody`() {
         val data: AbstractWsMessage<WsMessageBody> = PrintPdfMessage(
             httpStatus = 200,
-            body = PrintPdfMessage.Body(100L, 100L, PrintPdfMessage.Body.File("mime", "data/base64"))
+            body = PrintPdfMessage.Body("100", 100L, PrintPdfMessage.Body.File("mime", "data/base64"))
         )
 
         val string = Json.encodeToString(data)
@@ -29,7 +29,11 @@ internal class SerializationTest {
     fun `PrintPdfMessage De-Serialization as AbstractOutgoingWsMessage with PrintPdfBody`() {
         val data: AbstractWsMessage<PrintPdfMessage.Body> = PrintPdfMessage(
             httpStatus = 200,
-            body = PrintPdfMessage.Body(100L, 100L, PrintPdfMessage.Body.File("mime", "data/base64"))
+            body = PrintPdfMessage.Body(
+                "JKLjsl-fdjsafas-fjdsakfa",
+                100L,
+                PrintPdfMessage.Body.File("mime", "data/base64")
+            )
         )
 
         val string = Json.encodeToString(data)
@@ -71,7 +75,7 @@ internal class SerializationTest {
     fun `PrintedPdfMessage De-Serialization as AbstractIncomingWsMessage with WsMessageBody`() {
         val data: AbstractWsMessage<WsMessageBody> = PrintedPdfMessage(
             httpStatus = 200,
-            body = PrintedPdfMessage.Body(100L)
+            body = PrintedPdfMessage.Body("jfdlksa-fdsaf-fdsaf-fdsa")
         )
 
         val string = Json.encodeToString(data)
@@ -85,7 +89,7 @@ internal class SerializationTest {
     fun `PrintedPdfMessage De-Serialization as AbstractIncomingWsMessage with PrintedPdfBody`() {
         val data: AbstractWsMessage<PrintedPdfMessage.Body> = PrintedPdfMessage(
             httpStatus = 200,
-            body = PrintedPdfMessage.Body(100L)
+            body = PrintedPdfMessage.Body("fdsa98erq-efadsa94fea-f4fads")
         )
 
         val string = Json.encodeToString(data)

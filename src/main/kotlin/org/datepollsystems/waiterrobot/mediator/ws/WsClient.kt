@@ -5,10 +5,7 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.serialization.kotlinx.*
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import org.datepollsystems.waiterrobot.mediator.App
 import org.datepollsystems.waiterrobot.mediator.api.AuthApi
@@ -76,26 +73,27 @@ fun main(): Unit = runBlocking {
     App.socketManager.addRegisterMessage(HelloMessage(text = "Test Register"))
     App.socketManager.send(HelloMessage(text = "Test send"))
 
-    listOf(
-        launch {
-            repeat(120) {
-                println("I'm alive since $it sec.")
-                delay(1_000)
-            }
-        },
-        /*launch {
-            repeat(12) {
+    try {
+        listOf(
+            launch(CoroutineName("lauch1")) {
+                repeat(15) {
+                    println("I'm alive since $it sec.")
+                    delay(1_000)
+                }
+            },
+            launch(CoroutineName("lauch2")) {
                 delay(10_000)
                 App.socketManager.send(HelloMessage(text = "second"))
-            }
-        },
-        launch {
-            repeat(10) {
+            },
+            launch(CoroutineName("lauch3")) {
                 delay(12_000)
-                App.socketManager.send(HelloMessage2(text = "test crash"))
+                //App.socketManager.send(HelloMessage2(text = "test crash"))
+                //App.socketManager.close()
             }
-        }*/
-    ).joinAll() // Simulate some "application live time"
+        ).joinAll() // Simulate some "application live time"
+    } catch (e: Exception) {
+        println(e)
+    }
     println("Stopping client")
     App.socketManager.close()
     println("finished")

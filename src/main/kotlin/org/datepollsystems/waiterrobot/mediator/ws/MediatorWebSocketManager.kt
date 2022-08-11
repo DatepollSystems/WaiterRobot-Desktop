@@ -1,6 +1,10 @@
 package org.datepollsystems.waiterrobot.mediator.ws
 
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import org.datepollsystems.waiterrobot.mediator.app.Config
 import org.datepollsystems.waiterrobot.mediator.utils.SuspendingExponentialBackoff
 import org.datepollsystems.waiterrobot.mediator.ws.messages.AbstractWsMessage
@@ -34,7 +38,17 @@ class MediatorWebSocketManager {
             name = "WebSocket auto recovery"
         )
 
+    // TODO evaluate bufferSize
+    private val receiveChannel = Channel<AbstractWsMessage<WsMessageBody>>(10)
+    private val sendChannel = Channel<AbstractWsMessage<WsMessageBody>>(10) {
+        send(it) // Will be called when the session could not send the element -> queue it again
+    }
+
+    private val isActiveState = MutableStateFlow(false)
+    val isActive: StateFlow<Boolean> get() = isActiveState
+
     init {
+        handleMessages()
         startWatching()
     }
 
@@ -47,20 +61,27 @@ class MediatorWebSocketManager {
         } else {
             println("Starting WebSockeSession")
         }
-        session = MediatorWebSocketSession(wsClient, this::handleMessageThrowing)
+        session = MediatorWebSocketSession(wsClient, sendChannel, receiveChannel)
 
-        managerScope.launch {
+        managerScope.launch(CoroutineName("StartWsSession")) {
             suspendingBackoff.acquire()
-            session.start().invokeOnCompletion {
-                closeCurrentSession()
-                // Handle auto reconnect. This should only be triggered on Errors as ktor already handles connection loss internally
-                if (!closedIntentional.get()) {
-                    suspendingBackoff.backoff(it)
-                    startWatching()
+            try {
+                session.start().invokeOnCompletion { e ->
+                    println("WebSocket session completed" + (e?.let { " with exception: $it" } ?: ".")) // TODO logger
+                    e?.printStackTrace()
+                    closeCurrentSession()
+                    // Handle auto reconnect. This should only be triggered on Errors as ktor already handles connection loss internally
+                    if (!closedIntentional.get()) {
+                        suspendingBackoff.backoff(e)
+                        startWatching()
+                    }
                 }
+            } catch (e: Exception) {
+                suspendingBackoff.backoff(e)
+                return@launch startWatching()
             }
             synchronized(registerLock) {
-                registerMessages.forEach { session.send(it) }
+                registerMessages.forEach { send(it) }
                 registerCalled = true
             }
         }
@@ -70,6 +91,8 @@ class MediatorWebSocketManager {
         if (closed.getAndSet(true)) return
         closedIntentional.set(true)
         closeCurrentSession()
+        sendChannel.cancel()
+        receiveChannel.cancel()
         managerScope.cancel()
     }
 
@@ -105,7 +128,7 @@ class MediatorWebSocketManager {
      */
     fun <T : WsMessageBody> send(message: AbstractWsMessage<T>) {
         if (closed.get()) throw IllegalStateException("SocketManager is already closed")
-        session.send(message)
+        managerScope.launch(CoroutineName("WsSendMessage")) { sendChannel.send(message) }
     }
 
     /**
@@ -116,16 +139,28 @@ class MediatorWebSocketManager {
         if (closed.get()) return
         synchronized(registerLock) {
             registerMessages.add(message)
-            if (registerCalled) session.send(message)
+            if (registerCalled) send(message)
         }
     }
 
-    private suspend fun handleMessageThrowing(message: AbstractWsMessage<WsMessageBody>) {
-        val handler = handlers[message::class]
-        if (handler == null) {
-            println("No handler for message type '${message::class.simpleName}' found") // TODO logger
-            return
+    private fun handleMessages() {
+        managerScope.launch(CoroutineName("WsHandleMessage")) {
+            receiveChannel.consumeEach { message ->
+                val handler = handlers[message::class]
+                if (handler == null) {
+                    println("No handler for message type '${message::class.simpleName}' found") // TODO logger
+                } else {
+                    // Launch on managerScope (SuperVisorJob) so that a failing handler does not cancel the whole handler
+                    managerScope.launch(CoroutineName("WsMessageHandler")) {
+                        try {
+                            handler(message)
+                        } catch (e: Exception) {
+                            println("Handler for message: $message failed with: ${e.message}") // TODO logger
+                            e.printStackTrace()
+                        }
+                    }
+                }
+            }
         }
-        handler(message)
     }
 }

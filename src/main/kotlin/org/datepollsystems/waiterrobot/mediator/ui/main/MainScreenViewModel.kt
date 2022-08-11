@@ -1,6 +1,7 @@
 package org.datepollsystems.waiterrobot.mediator.ui.main
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.datepollsystems.waiterrobot.mediator.App
 import org.datepollsystems.waiterrobot.mediator.core.ID
 import org.datepollsystems.waiterrobot.mediator.core.ViewModel
@@ -15,6 +16,11 @@ class MainScreenViewModel(
 
     override suspend fun onCreate() {
         reduce { copy(printers = PrinterService.printers) }
+        viewModelScope.launch {
+            PrinterService.printQueueFlow.collect {
+                reduce { copy(printTransactions = printTransactions.add(it)) }
+            }
+        }
     }
 
     fun printTestPdf(printerId: ID) = App.socketManager.send(PrintTestPdfMessage(printerId = printerId))

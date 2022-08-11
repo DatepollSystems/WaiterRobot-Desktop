@@ -4,16 +4,16 @@ import io.ktor.client.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.http.*
 import io.ktor.serialization.*
-import io.ktor.utils.io.CancellationException
 import io.ktor.websocket.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.ClosedReceiveChannelException
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.channels.SendChannel
 import kotlinx.serialization.SerializationException
 import org.datepollsystems.waiterrobot.mediator.app.Config
 import org.datepollsystems.waiterrobot.mediator.app.Settings
 import org.datepollsystems.waiterrobot.mediator.ws.messages.AbstractWsMessage
 import org.datepollsystems.waiterrobot.mediator.ws.messages.WsMessageBody
+import kotlin.coroutines.coroutineContext
 
 /**
  * Ktor ws internally handles connection loss and reestablishes the connection without destroying the session.
@@ -22,11 +22,11 @@ import org.datepollsystems.waiterrobot.mediator.ws.messages.WsMessageBody
  */
 class MediatorWebSocketSession(
     private val client: HttpClient,
-    private val handleMessageThrowing: suspend (AbstractWsMessage<WsMessageBody>) -> Unit
+    private val outgoing: ReceiveChannel<AbstractWsMessage<WsMessageBody>>,
+    private val incoming: SendChannel<AbstractWsMessage<WsMessageBody>>
 ) {
     private lateinit var session: DefaultClientWebSocketSession
-    private val sessionScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
-    private val sendChannel: Channel<AbstractWsMessage<WsMessageBody>> = Channel()
+    private lateinit var sessionScope: CoroutineScope
 
     /**
      * Initiates the websocket connection and returns the session handing job.
@@ -37,60 +37,50 @@ class MediatorWebSocketSession(
             url.takeFrom(Config.WS_URL)
             headers.append("organisationId", Settings.organisationId.toString())
         }
-
-        return sessionScope.launch {
-            val sendJob = launch { session.handleSend() }
-            launch { session.handleIncomingMessage() }.join()
-            sendJob.cancel()
-        }
+        session.ensureActive()
+        sessionScope = CoroutineScope(Job(session.coroutineContext.job) + Dispatchers.IO)
+        sessionScope.launch(CoroutineName("WsSendHandler")) { handleSend() }
+        sessionScope.launch(CoroutineName("WsReceiveHandler")) { handleIncomingMessage() }
+        sessionScope.ensureActive()
+        return sessionScope.coroutineContext.job
     }
 
-    fun <T : WsMessageBody> send(message: AbstractWsMessage<T>) {
-        sessionScope.launch { sendChannel.send(message) }
-    }
-
-    private suspend fun DefaultClientWebSocketSession.handleSend() {
-        while (true) { // Keep listening as long as the coroutine is active
-            coroutineContext.ensureActive() // Cooperative  coroutine canceling
+    private suspend fun handleSend() {
+        while (coroutineContext.isActive) { // Keep listening as long as the coroutine is active
             try {
-                val message = sendChannel.receive()
+                val message = outgoing.receive()
                 println("Sending message: $message") // TODO logger
-                sendSerialized(message)
+                session.sendSerialized(message)
             } catch (e: ContentConvertException) {
                 println("Could not convert outgoing message: $e") // TODO logger
             } catch (e: SerializationException) {
                 println("Could not serialize outgoing message: $e") // TODO logger
+            } catch (e: Exception) {
+                sessionScope.cancel(
+                    e as? CancellationException ?: CancellationException("Incoming message handler failed", e)
+                )
             }
         }
+        println("Send handler finished")
     }
 
-    private suspend fun DefaultClientWebSocketSession.handleIncomingMessage() {
-        while (true) { // Keep listening as long as the coroutine is active
-            coroutineContext.ensureActive() // Cooperative  coroutine canceling
+    private suspend fun handleIncomingMessage() {
+        while (coroutineContext.isActive) { // Keep listening as long as the coroutine is active
             try {
-                val message = receiveDeserialized<AbstractWsMessage<WsMessageBody>>()
+                val message = session.receiveDeserialized<AbstractWsMessage<WsMessageBody>>()
                 if (Config.WS_NETWORK_LOGGING) println("Got message: $message") // TODO logger
-                sessionScope.launch(SupervisorJob()) {
-                    try {
-                        handleMessageThrowing(message)
-                    } catch (e: CancellationException) {
-                        throw e
-                    } catch (e: Exception) {
-                        println("Handler for message: $message failed with: ${e.message}") // TODO logger
-                        e.printStackTrace()
-                    }
-                }
-            } catch (e: ClosedReceiveChannelException) {
-                // Ws channel was unexpectedly closed (probably) by the server (server side exception, connection loss)
-                // TODO probably this should throw and then re-initiate a new connection?
-                println("Websocket channel was closed $e") // TODO logger
-                coroutineContext.cancel()
+                incoming.send(message)
             } catch (e: ContentConvertException) {
                 println("Could not convert incoming message: $e") // TODO logger
             } catch (e: SerializationException) {
                 println("Could not deserialize incoming message: $e") // TODO logger
+            } catch (e: Exception) {
+                coroutineContext.cancel(
+                    e as? CancellationException ?: CancellationException("Incoming message handler failed", e)
+                )
             }
         }
+        println("Receive handler finished")
     }
 
     suspend fun close() {

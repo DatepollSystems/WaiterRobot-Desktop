@@ -1,12 +1,16 @@
 package org.datepollsystems.waiterrobot.mediator.printer.service
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import org.datepollsystems.waiterrobot.mediator.App
 import org.datepollsystems.waiterrobot.mediator.core.ID
 import org.datepollsystems.waiterrobot.mediator.printer.LocalPrinter
 import org.datepollsystems.waiterrobot.mediator.printer.PrinterWithIdNotFoundException
+import org.datepollsystems.waiterrobot.mediator.ui.main.PrintTransaction
 import org.datepollsystems.waiterrobot.mediator.ws.messages.PrintPdfMessage
 import org.datepollsystems.waiterrobot.mediator.ws.messages.PrintedPdfMessage
 import org.datepollsystems.waiterrobot.mediator.ws.messages.RegisterPrinterMessage
+import java.time.LocalDateTime
 
 object PrinterService {
 
@@ -15,6 +19,9 @@ object PrinterService {
 
     val printers: List<Pair<ID, LocalPrinter>> get() = idToPrinter.toList()
 
+    private val printQueue = MutableSharedFlow<PrintTransaction>(replay = 15) // TODO replay needed?
+    val printQueueFlow: Flow<PrintTransaction> get() = printQueue
+
     init {
         App.socketManager // init the socketManager
         registerHandlers()
@@ -22,6 +29,7 @@ object PrinterService {
 
     private suspend fun print(pdfId: String, printerId: ID, base64data: String) {
         idToPrinter[printerId]?.printPdf(pdfId, base64data) ?: throw PrinterWithIdNotFoundException(printerId)
+        printQueue.emit(PrintTransaction(pdfId, LocalDateTime.now()))
         // test is the id of the test pdf, no response expected by backend
         if (pdfId != "test") App.socketManager.send(PrintedPdfMessage(pdfId = pdfId))
     }

@@ -21,6 +21,6 @@ internal class LocalPrinterTest {
         val file = File("src/test/resources/testBill.pdf")
         val base64String = Base64.getEncoder().encodeToString(file.readBytes())
 
-        printer.printPdf(123, base64String)
+        printer.printPdf("test", base64String)
     }
 }
