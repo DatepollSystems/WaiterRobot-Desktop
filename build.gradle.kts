@@ -35,7 +35,7 @@ tasks.withType(Jar::class) {
 
 dependencies {
     testImplementation(kotlin("test"))
-    implementation(compose.desktop.currentOs)
+    implementation(compose.desktop.currentOs) // TODO how to build for multiple platforms
     implementation("org.jetbrains.compose.material:material-icons-extended-desktop:1.1.1")
 
     val ktorVersion = "2.0.3"

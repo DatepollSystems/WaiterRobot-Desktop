@@ -14,3 +14,15 @@ data class HelloMessage(
 
     constructor(text: String, httpStatus: Int = 200) : this(httpStatus, Body(text))
 }
+
+@Serializable
+@SerialName("MB_HELLO2") // Used as discriminator value
+data class HelloMessage2(
+    override val httpStatus: Int,
+    override val body: Body,
+) : AbstractWsMessage<HelloMessage2.Body>() {
+    @Serializable
+    data class Body(val text: String) : WsMessageBody
+
+    constructor(text: String, httpStatus: Int = 200) : this(httpStatus, Body(text))
+}

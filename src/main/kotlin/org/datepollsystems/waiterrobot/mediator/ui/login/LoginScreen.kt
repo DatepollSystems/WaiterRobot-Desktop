@@ -18,7 +18,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.datepollsystems.waiterrobot.mediator.ui.common.LoadableScreen
-import org.datepollsystems.waiterrobot.mediator.ui.theme.Typography
 
 @Composable
 fun LoginScreen(vm: LoginViewModel) {
@@ -44,7 +43,7 @@ fun LoginScreen(vm: LoginViewModel) {
                     .aspectRatio(1f)
                     .padding(bottom = 20.dp)
             ) */
-            Text(text = "Mediator Login", style = Typography.h4)
+            Text(text = "Mediator Login", style = MaterialTheme.typography.h4)
             Text(
                 modifier = Modifier.padding(horizontal = 20.dp),
                 textAlign = TextAlign.Center,

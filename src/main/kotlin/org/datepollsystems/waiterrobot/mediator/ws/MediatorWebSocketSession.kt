@@ -13,6 +13,7 @@ import org.datepollsystems.waiterrobot.mediator.app.Config
 import org.datepollsystems.waiterrobot.mediator.app.Settings
 import org.datepollsystems.waiterrobot.mediator.ws.messages.AbstractWsMessage
 import org.datepollsystems.waiterrobot.mediator.ws.messages.WsMessageBody
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.coroutineContext
 
 /**
@@ -28,11 +29,15 @@ class MediatorWebSocketSession(
     private lateinit var session: DefaultClientWebSocketSession
     private lateinit var sessionScope: CoroutineScope
 
+    private val closed = AtomicBoolean(false)
+    private val started = AtomicBoolean(false)
+
     /**
      * Initiates the websocket connection and returns the session handing job.
      * Suspends till the connection is established. The returned job completes when the session is closed.
      */
     suspend fun start(): Job {
+        if (started.getAndSet(true)) throw IllegalStateException("Session already started")
         session = client.webSocketSession {
             url.takeFrom(Config.WS_URL)
             headers.append("organisationId", Settings.organisationId.toString())
@@ -62,6 +67,7 @@ class MediatorWebSocketSession(
             }
         }
         println("Send handler finished")
+        close()
     }
 
     private suspend fun handleIncomingMessage() {
@@ -81,10 +87,12 @@ class MediatorWebSocketSession(
             }
         }
         println("Receive handler finished")
+        close()
     }
 
     suspend fun close() {
         try {
+            if (closed.getAndSet(true)) return
             println("Closing WebSocket session")
             session.close()
             sessionScope.cancel()

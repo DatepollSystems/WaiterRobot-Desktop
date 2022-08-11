@@ -31,9 +31,10 @@ class MediatorWebSocketManager {
     private val handlers: MutableMap<KClass<out AbstractWsMessage<WsMessageBody>>, WsMessageHandler<out WsMessageBody>> =
         mutableMapOf()
     private val suspendingBackoff =
+        // InitialDelay and maxBackoffs choosen so that the Ws will max be backedoff for ~1min. Between 2 fails
         SuspendingExponentialBackoff(
-            initialDelay = Duration.ofSeconds(1),
-            maxBackoffs = 10,
+            initialDelay = Duration.ofMillis(500),
+            maxBackoffs = 7,
             resetAfter = Duration.ofMinutes(2),
             name = "WebSocket auto recovery"
         )

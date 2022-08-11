@@ -6,7 +6,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import org.datepollsystems.waiterrobot.android.ui.theme.Shapes
 
 @Composable
 fun WaiterRobotTheme(
@@ -21,8 +20,6 @@ fun WaiterRobotTheme(
 
     MaterialTheme(
         colors = colors,
-        typography = Typography,
-        shapes = Shapes
     ) {
         Surface(
             modifier = Modifier

@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import org.datepollsystems.waiterrobot.mediator.ui.theme.Typography
 
 @Composable
 fun PrinterListItem(title: String, subtitle: String, selected: Boolean, onSelect: () -> Unit) {
@@ -24,7 +23,7 @@ fun PrinterListItem(title: String, subtitle: String, selected: Boolean, onSelect
     ) {
         Column(modifier = Modifier.padding(vertical = 10.dp, horizontal = 20.dp)) {
             Text(text = title)
-            Text(text = subtitle, style = Typography.caption, color = Color.LightGray)
+            Text(text = subtitle, style = MaterialTheme.typography.caption, color = Color.LightGray)
         }
     }
 }
