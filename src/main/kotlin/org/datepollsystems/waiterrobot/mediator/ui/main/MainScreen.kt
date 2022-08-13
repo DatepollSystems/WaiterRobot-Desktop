@@ -6,22 +6,39 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Print
+import androidx.compose.material.icons.filled.Wifi
+import androidx.compose.material.icons.filled.WifiOff
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import org.datepollsystems.waiterrobot.mediator.App
 import java.time.format.DateTimeFormatter
 
 @Composable
 fun MainScreen(vm: MainScreenViewModel) {
     val state = vm.state.collectAsState().value
+    val isConnected = App.socketManager.isConnected.collectAsState(initial = false).value
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
+    Column {
+        Row(
             modifier = Modifier.padding(vertical = 20.dp),
-            text = "Running"
-        )
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Running...",
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Center,
+            )
+
+            Icon(
+                if (isConnected) Icons.Filled.Wifi else Icons.Filled.WifiOff,
+                contentDescription = "Socket Connected",
+                modifier = Modifier.padding(horizontal = 10.dp)
+            )
+        }
         Divider(thickness = 3.dp)
 
         Row {
@@ -59,7 +76,7 @@ fun MainScreen(vm: MainScreenViewModel) {
                     ) {
                         Text(it.second.name)
                         IconButton(onClick = { vm.printTestPdf(it.first) }) {
-                            Icon(Icons.Filled.Print, "contentDescription")
+                            Icon(Icons.Filled.Print, "Execute test print")
                         }
                     }
                     Divider()

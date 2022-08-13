@@ -21,7 +21,7 @@ typealias WsMessageHandler<T> = suspend (AbstractWsMessage<T>) -> Unit
 fun createWsClient(enableNetworkLogs: Boolean = false) = HttpClient {
     install(WebSockets) {
         contentConverter = KotlinxWebsocketSerializationConverter(Json { ignoreUnknownKeys = true })
-        pingInterval = 1_000 // TODO adapt?
+        pingInterval = 10_000 // TODO adapt?
         // Use compression (improve network usage especially for pdf transferring as internet connection may be very slow)
         // TODO test if it really brings benefits
         // TODO receiving does not work out of the box probably needs adaptions on the backend (how to tell spring to use compression for responses?)
@@ -36,7 +36,7 @@ fun createWsClient(enableNetworkLogs: Boolean = false) = HttpClient {
     install(HttpTimeout) {
         requestTimeoutMillis = 10_000
         // TODO figure out what this actually means (seems not to "close" the connection after the specified time of inactivity, also when set very low)
-        // socketTimeoutMillis = 3 * 60 * 1_000 // There should be a ping message every minute, so timeout if did not get multiple pings
+        //socketTimeoutMillis = 3 * 60 * 1_000 // There should be a ping message every minute, so timeout if did not get multiple pings
     }
     configureAuth()
     if (enableNetworkLogs) {

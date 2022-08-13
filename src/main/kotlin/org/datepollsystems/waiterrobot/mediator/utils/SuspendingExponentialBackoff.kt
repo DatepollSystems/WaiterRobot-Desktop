@@ -11,41 +11,54 @@ import kotlin.math.pow
  * Simple suspending exponential backoff handler
  *
  * @param initialDelay delay on first backoff next backoff will be twice, then four times, ... that long. Must be > 0
- * @param maxBackoffs maximum number of possible backoffs -1 for Unlimited
+ * @param maxBackoffs maximum number of possible backoffs null for unlimited. When reached an error is thrown.
  * @param resetAfter reset the backoff after a duration (starts then again with [initialDelay]) null for never. Must be > 0 or null
+ * @param maxBackoffTime maximum duration of backoff. null for no max time. Must be >= initialDelay or null
  * @param name for logging
  *
  * @author Fabian Schedler
  */
 class SuspendingExponentialBackoff(
     initialDelay: Duration,
-    private val maxBackoffs: Int = -1,
+    private val maxBackoffs: Int? = null,
     private val resetAfter: Duration? = null,
+    private val maxBackoffTime: Duration? = null,
     private val name: String,
 ) {
     private val backoffStage: AtomicInteger = AtomicInteger(0)
     private var lastBackoff: Instant = Instant.MIN
     private val resetScope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val initialDelay = initialDelay.toMillis().toDouble()
+    private var maxReached = false
 
     // TODO should we switch to a linear backoff from a specific stage (see https://images.app.goo.gl/UFGUPFcESLMRDbMx8)
     private val currentDelay: Duration
-        get() = Duration.ofMillis((initialDelay * 2f.pow(backoffStage.get())).toLong())
+        get() {
+            if (maxBackoffTime != null && maxReached) return maxBackoffTime
+            var delay = Duration.ofMillis((initialDelay * 2f.pow(backoffStage.get())).toLong())
+            if (maxBackoffTime != null && delay > maxBackoffTime) {
+                maxReached = true
+                delay = maxBackoffTime
+            }
+            return delay
+        }
 
     init {
-        require(!initialDelay.isNegative && !initialDelay.isZero) { "initialDelay must be greater than 0" }
-        if (resetAfter != null) {
-            require(!resetAfter.isNegative && !resetAfter.isZero) { "resetAfter must be greater than 0 or null" }
-        }
+        require(initialDelay > Duration.ZERO) { "initialDelay must be > 0" }
+        require(resetAfter == null || resetAfter > Duration.ZERO) { "resetAfter must be > 0 or null" }
+        require(maxBackoffTime == null || maxBackoffTime >= initialDelay) { "maxBackoffTime must be >= initialDelay or null" }
+        require(maxBackoffs == null || maxBackoffs > 0)
     }
 
     /**
-     * Call when the next execution should be "backoffed"
+     * Call when the next execution should be "backoffed".
+     * Rethrows the [errorOnLimit] or a [TimeoutException] if [maxBackoffs] is set reached
      */
     fun backoff(errorOnLimit: Throwable? = null) {
         resetScope.coroutineContext.cancelChildren()
 
-        if (backoffStage.incrementAndGet() > maxBackoffs) {
+        val currentStage = backoffStage.incrementAndGet()
+        if (maxBackoffs != null && currentStage > maxBackoffs) {
             throw errorOnLimit ?: TimeoutException("Reached backoff limit")
         }
 
@@ -70,7 +83,6 @@ class SuspendingExponentialBackoff(
     /**
      * Suspends exponentially
      * Call before "restarting" the task which should be "backoffed"
-     * CAUTION this function can suspend forever if [maxBackoffs] < 0 (infinite loop)
      */
     suspend fun acquire() {
         val nextExecution = lastBackoff + currentDelay
@@ -80,6 +92,5 @@ class SuspendingExponentialBackoff(
         val delayDuration = Duration.between(now, nextExecution)
         println("Backoff task \"$name\" for ${delayDuration.seconds}s")
         delay(delayDuration.toMillis())
-        acquire() // Ensure that there was not a new backoff while waiting
     }
 }

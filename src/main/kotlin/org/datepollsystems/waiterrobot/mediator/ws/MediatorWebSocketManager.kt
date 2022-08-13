@@ -31,11 +31,10 @@ class MediatorWebSocketManager {
     private val handlers: MutableMap<KClass<out AbstractWsMessage<WsMessageBody>>, WsMessageHandler<out WsMessageBody>> =
         mutableMapOf()
     private val suspendingBackoff =
-        // InitialDelay and maxBackoffs choosen so that the Ws will max be backedoff for ~1min. Between 2 fails
         SuspendingExponentialBackoff(
             initialDelay = Duration.ofMillis(500),
-            maxBackoffs = 7,
-            resetAfter = Duration.ofMinutes(2),
+            resetAfter = Duration.ofMinutes(2), // When a connection last for 2 minutes reset the backoff counter
+            maxBackoffTime = Duration.ofSeconds(5), // Wait a maximum of 5 seconds for a connection retry
             name = "WebSocket auto recovery"
         )
 
@@ -45,8 +44,9 @@ class MediatorWebSocketManager {
         send(it) // Will be called when the session could not send the element -> queue it again
     }
 
-    private val isActiveState = MutableStateFlow(false)
-    val isActive: StateFlow<Boolean> get() = isActiveState
+    private val isConnectedState = MutableStateFlow(false)
+    val isConnected: StateFlow<Boolean> get() = isConnectedState
+
 
     init {
         handleMessages()
@@ -77,7 +77,9 @@ class MediatorWebSocketManager {
                         startWatching()
                     }
                 }
+                setIsConnected(true)
             } catch (e: Exception) {
+                closeCurrentSession()
                 suspendingBackoff.backoff(e)
                 return@launch startWatching()
             }
@@ -97,9 +99,16 @@ class MediatorWebSocketManager {
         managerScope.cancel()
     }
 
+    private fun setIsConnected(isConnected: Boolean) {
+        managerScope.launch { isConnectedState.emit(isConnected) }
+    }
+
     private fun closeCurrentSession() {
+        setIsConnected(false)
         registerCalled = false
-        runBlocking(NonCancellable) { session.close() }
+        if (this::session.isInitialized) {
+            runBlocking(NonCancellable) { session.close() }
+        }
     }
 
     /**
