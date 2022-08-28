@@ -80,3 +80,10 @@ kotlin.sourceSets.all {
 }
 
 tasks.getByPath(":prepareKotlinBuildScriptModel").dependsOn("addKtlintFormatGitPreCommitHook")
+ktlint {
+    // Plugin currently uses ktlint version "0.43.2" but with "0.43.0" a bug was introduced that removes used wildcard imports.
+    // Bug was fixed with ktlint "0.45.0"
+    // -> Use the fixed ktlint version (0.46.0 introduces breaking changes)
+    // see https://github.com/pinterest/ktlint/issues/1256, https://github.com/pinterest/ktlint/issues/1277, https://github.com/pinterest/ktlint/issues/1393, https://github.com/pinterest/ktlint/pull/1402
+    version.set("0.45.2")
+}
