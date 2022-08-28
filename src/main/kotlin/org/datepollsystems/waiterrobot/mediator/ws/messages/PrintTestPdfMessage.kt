@@ -5,14 +5,13 @@ import kotlinx.serialization.Serializable
 import org.datepollsystems.waiterrobot.mediator.core.ID
 
 @Serializable
-@SerialName("MB_PRINTED_PDF") // Used as discriminator value
-data class PrintedPdfMessage(
+@SerialName("MB_PRINT_PDF_TEST") // Used as discriminator value
+data class PrintTestPdfMessage(
     override val httpStatus: Int,
     override val body: Body,
-) : AbstractWsMessage<PrintedPdfMessage.Body>() {
+) : AbstractWsMessage<PrintTestPdfMessage.Body>() {
     @Serializable
-    data class Body(val id: String) : WsMessageBody
+    data class Body(val printerId: ID) : WsMessageBody
 
-    constructor(httpStatus: Int = 200, pdfId: String) : this(httpStatus, Body(pdfId))
+    constructor(httpStatus: Int = 200, printerId: ID) : this(httpStatus, Body(printerId))
 }
-

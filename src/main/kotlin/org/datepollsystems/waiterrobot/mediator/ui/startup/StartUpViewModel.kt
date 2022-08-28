@@ -18,7 +18,7 @@ class StartUpViewModel(navigator: Navigator, viewModelScope: CoroutineScope) :
             val startScreen = if (Settings.refreshToken == null) {
                 Screen.LoginScreen
             } else {
-                Screen.MainScreen("You were already logged in!")
+                Screen.ConfigurePrintersScreen
             }
             navigator.navigate(startScreen)
         }

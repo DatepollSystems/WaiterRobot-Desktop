@@ -10,9 +10,25 @@ cache:
 
 stages:
   - test
+  - build
+
+# TODO fix build for all platforms
+build:
+  image: openjdk:18-jdk-slim
+  stage: build
+  only:
+    - tags
+  script:
+    - ./gradlew clean build -x test
+  artifacts:
+    paths:
+      - build/libs/Mediator-*.jar
+    expire_in: 1 week
 
 test:
   stage: test
+  variables:
+    env: "CI"
   script:
     - ./gradlew -v
     - ./gradlew test --stacktrace

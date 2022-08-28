@@ -1,6 +1,8 @@
 package org.datepollsystems.waiterrobot.mediator.app
 
+import org.datepollsystems.waiterrobot.mediator.core.ID
 import org.datepollsystems.waiterrobot.mediator.utils.emptyToNull
+import kotlin.properties.Delegates
 
 object Settings {
     private const val ACCESS_TOKEN = "accessToken"
@@ -19,4 +21,6 @@ object Settings {
             value.emptyToNull()?.also { System.setProperty(REFRESH_TOKEN, it) }
                 ?: System.clearProperty(REFRESH_TOKEN)
         }
+
+    var organisationId by Delegates.notNull<ID>()
 }

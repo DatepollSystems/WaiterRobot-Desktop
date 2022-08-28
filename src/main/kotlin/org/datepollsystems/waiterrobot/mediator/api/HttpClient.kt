@@ -18,7 +18,7 @@ fun createClient(enableNetworkLogs: Boolean = false) = HttpClient {
         })
     }
     install(HttpTimeout) {
-        requestTimeoutMillis = 5000
+        requestTimeoutMillis = 5000 // TODO increase?
     }
     if (enableNetworkLogs) {
         install(Logging) {
@@ -55,6 +55,8 @@ fun HttpClientConfig<*>.configureAuth() {
             } catch (e: Exception) {
                 // TODO improve request errors handling (-> try again, logout?, no connection info)
                 //  logging and logout
+                println("Error while refreshing token: ${e.message}")
+                e.printStackTrace()
                 null
             }
         }

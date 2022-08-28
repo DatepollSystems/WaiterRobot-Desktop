@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun StartUpScreen(vm: StartUpViewModel) {
-    // TODO show some fancy icon animation
+    // TODO show some fancy icon animation?
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
