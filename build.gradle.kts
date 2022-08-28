@@ -6,6 +6,7 @@ plugins {
     kotlin("jvm") version "1.6.10"
     kotlin("plugin.serialization") version "1.6.10"
     id("org.jetbrains.compose") version "1.1.1"
+    id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
 }
 
 group = "org.datepollsystems.waiterrobot.mediator"
@@ -77,3 +78,5 @@ tasks.withType(Jar::class) {
 kotlin.sourceSets.all {
     languageSettings.optIn("kotlin.RequiresOptIn")
 }
+
+tasks.getByPath(":prepareKotlinBuildScriptModel").dependsOn("addKtlintFormatGitPreCommitHook")
