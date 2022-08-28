@@ -18,7 +18,6 @@ class PrintTransaction(val jobName: String, val time: LocalDateTime) {
     val id: String = jobName + if (jobName == "test") Random.nextBytes(10).toHex() else ""
 }
 
-
 class CircularQueue<T : Any> private constructor(private val stack: ArrayDeque<T>, private val maxItems: Int) {
 
     constructor(maxItems: Int) : this(ArrayDeque(), maxItems)

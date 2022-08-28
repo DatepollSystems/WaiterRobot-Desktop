@@ -47,7 +47,6 @@ class MediatorWebSocketManager {
     private val isConnectedState = MutableStateFlow(false)
     val isConnected: StateFlow<Boolean> get() = isConnectedState
 
-
     init {
         handleMessages()
         startWatching()

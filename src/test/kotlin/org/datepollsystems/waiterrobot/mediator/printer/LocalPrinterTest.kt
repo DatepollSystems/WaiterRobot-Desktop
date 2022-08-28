@@ -7,7 +7,6 @@ import javax.print.PrintServiceLookup
 import kotlin.test.Ignore
 import kotlin.test.Test
 
-
 internal class LocalPrinterTest {
     /** E2E Test
      *

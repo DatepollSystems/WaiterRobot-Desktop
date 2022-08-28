@@ -36,7 +36,7 @@ fun createWsClient(enableNetworkLogs: Boolean = false) = HttpClient {
     install(HttpTimeout) {
         requestTimeoutMillis = 10_000
         // TODO figure out what this actually means (seems not to "close" the connection after the specified time of inactivity, also when set very low)
-        //socketTimeoutMillis = 3 * 60 * 1_000 // There should be a ping message every minute, so timeout if did not get multiple pings
+        // socketTimeoutMillis = 3 * 60 * 1_000 // There should be a ping message every minute, so timeout if did not get multiple pings
     }
     configureAuth()
     if (enableNetworkLogs) {
@@ -87,8 +87,8 @@ fun main(): Unit = runBlocking {
             },
             launch(CoroutineName("lauch3")) {
                 delay(12_000)
-                //App.socketManager.send(HelloMessage2(text = "test crash"))
-                //App.socketManager.close()
+                // App.socketManager.send(HelloMessage2(text = "test crash"))
+                // App.socketManager.close()
             }
         ).joinAll() // Simulate some "application live time"
     } catch (e: Exception) {

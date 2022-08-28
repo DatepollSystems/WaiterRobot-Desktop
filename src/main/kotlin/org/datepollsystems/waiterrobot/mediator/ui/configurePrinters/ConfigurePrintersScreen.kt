@@ -88,7 +88,8 @@ fun ConfigurePrintersScreen(vm: ConfigurePrintersViewModel) {
                                     title = it.name,
                                     subtitle = "Location?",
                                     selected = selectedBePrinter == it,
-                                    onSelect = { selectedBePrinter = it })
+                                    onSelect = { selectedBePrinter = it }
+                                )
                             }
                         }
 
@@ -99,7 +100,8 @@ fun ConfigurePrintersScreen(vm: ConfigurePrintersViewModel) {
                                     title = it.name,
                                     subtitle = "Brand?",
                                     selected = selectedLocalPrinter == it,
-                                    onSelect = { selectedLocalPrinter = it })
+                                    onSelect = { selectedLocalPrinter = it }
+                                )
                             }
                         }
 
@@ -112,7 +114,8 @@ fun ConfigurePrintersScreen(vm: ConfigurePrintersViewModel) {
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
                                     IconButton(
-                                        onClick = { vm.removePairing(it) }) {
+                                        onClick = { vm.removePairing(it) }
+                                    ) {
                                         Icon(Icons.Filled.Delete, "contentDescription")
                                     }
                                     Text(it.first.name)

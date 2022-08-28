@@ -5,7 +5,6 @@ import org.datepollsystems.waiterrobot.mediator.ui.startUI
 import org.datepollsystems.waiterrobot.mediator.utils.isLazyInitialized
 import org.datepollsystems.waiterrobot.mediator.ws.MediatorWebSocketManager
 
-
 object App {
     private val logoutListeners: MutableList<() -> Unit> = mutableListOf()
 
