@@ -13,9 +13,11 @@ import org.datepollsystems.waiterrobot.mediator.app.Settings
 
 fun createClient(enableNetworkLogs: Boolean = false) = HttpClient {
     install(ContentNegotiation) {
-        json(Json {
-            ignoreUnknownKeys = true
-        })
+        json(
+            Json {
+                ignoreUnknownKeys = true
+            }
+        )
     }
     install(HttpTimeout) {
         requestTimeoutMillis = 5000 // TODO increase?

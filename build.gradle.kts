@@ -6,6 +6,7 @@ plugins {
     kotlin("jvm") version "1.6.10"
     kotlin("plugin.serialization") version "1.6.10"
     id("org.jetbrains.compose") version "1.1.1"
+    id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
 }
 
 group = "org.datepollsystems.waiterrobot.mediator"
@@ -76,4 +77,13 @@ tasks.withType(Jar::class) {
 
 kotlin.sourceSets.all {
     languageSettings.optIn("kotlin.RequiresOptIn")
+}
+
+tasks.getByPath(":prepareKotlinBuildScriptModel").dependsOn("addKtlintFormatGitPreCommitHook")
+ktlint {
+    // Plugin currently uses ktlint version "0.43.2" but with "0.43.0" a bug was introduced that removes used wildcard imports.
+    // Bug was fixed with ktlint "0.45.0"
+    // -> Use the fixed ktlint version (0.46.0 introduces breaking changes)
+    // see https://github.com/pinterest/ktlint/issues/1256, https://github.com/pinterest/ktlint/issues/1277, https://github.com/pinterest/ktlint/issues/1393, https://github.com/pinterest/ktlint/pull/1402
+    version.set("0.45.2")
 }

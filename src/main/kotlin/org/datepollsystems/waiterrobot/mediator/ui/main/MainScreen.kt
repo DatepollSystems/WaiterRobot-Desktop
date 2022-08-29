@@ -66,7 +66,7 @@ fun MainScreen(vm: MainScreenViewModel) {
                 }
             }
 
-            //Printer list
+            // Printer list
             LazyColumn(modifier = Modifier.weight(1f)) {
                 items(state.printers, key = { it.second.localId }) {
                     Row(

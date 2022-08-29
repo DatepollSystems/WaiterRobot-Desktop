@@ -11,8 +11,8 @@ import javax.print.PrintServiceLookup
 
 /** Some test function for local debugging */
 fun main() {
-    //listPrinters()
-    //printTestFile("")
+    // listPrinters()
+    // printTestFile("")
 }
 
 fun listPrinters() {
@@ -26,8 +26,9 @@ fun listPrinters() {
     allLocalPrinters.forEach { printer ->
         println(
             "${printer.name.padEnd(longestName, ' ')} BYTE_ARRAY.PDF ${
-                localPdfPrinters.find { printer.localId == it.localId }?.let { "" } ?: "not "
-            }supported")
+            localPdfPrinters.find { printer.localId == it.localId }?.let { "" } ?: "not "
+            }supported"
+        )
     }
     println("-".repeat(longestName + 30))
 }
