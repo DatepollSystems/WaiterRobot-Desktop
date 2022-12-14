@@ -1,4 +1,4 @@
-image: openjdk:17-jdk
+image: openjdk:21-jdk
 
 variables:
   GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
@@ -14,7 +14,7 @@ stages:
 
 # TODO fix build for all platforms
 build:
-  image: openjdk:18-jdk-slim
+  image: openjdk:21-jdk-slim
   stage: build
   only:
     - tags
