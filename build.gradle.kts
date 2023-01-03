@@ -3,9 +3,9 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.6.10"
-    kotlin("plugin.serialization") version "1.6.10"
-    id("org.jetbrains.compose") version "1.1.1"
+    kotlin("jvm") version "1.8.0"
+    kotlin("plugin.serialization") version "1.8.0"
+    id("org.jetbrains.compose") version "1.2.2"
     id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
 }
 
@@ -23,7 +23,7 @@ dependencies {
     implementation(compose.desktop.currentOs) // TODO how to build for multiple platforms
     implementation(compose.materialIconsExtended)
 
-    val ktorVersion = "2.0.3"
+    val ktorVersion = "2.2.2"
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
@@ -32,9 +32,9 @@ dependencies {
     implementation("io.ktor:ktor-client-logging:$ktorVersion")
     implementation("io.ktor:ktor-client-websockets:$ktorVersion")
 
-    implementation("org.apache.pdfbox:pdfbox:3.0.0-alpha3")
+    implementation("org.apache.pdfbox:pdfbox:3.0.0-RC1")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
     implementation(kotlin("reflect"))
 }
 
