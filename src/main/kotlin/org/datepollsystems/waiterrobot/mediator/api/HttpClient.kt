@@ -41,10 +41,10 @@ fun createAuthenticatedClient(enableNetworkLogs: Boolean = false) = createClient
 
 fun HttpClientConfig<*>.configureAuth() {
     install(Auth) {
-        suspend fun refreshTokens(sessionToken: String): BearerTokens? {
+        suspend fun refreshTokens(refreshToken: String): BearerTokens? {
             val authApi = AuthApi(createClient())
             return try {
-                val tokenInfo = authApi.refresh(sessionToken)
+                val tokenInfo = authApi.refresh(refreshToken)
 
                 Settings.accessToken = tokenInfo.accessToken
                 // Only override when got a new sessionToken
@@ -52,7 +52,7 @@ fun HttpClientConfig<*>.configureAuth() {
 
                 BearerTokens(
                     accessToken = tokenInfo.accessToken,
-                    refreshToken = tokenInfo.refreshToken ?: sessionToken
+                    refreshToken = tokenInfo.refreshToken ?: refreshToken
                 )
             } catch (e: Exception) {
                 // TODO improve request errors handling (-> try again, logout?, no connection info)
