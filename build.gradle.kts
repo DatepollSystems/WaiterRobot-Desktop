@@ -3,9 +3,10 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.6.10"
-    kotlin("plugin.serialization") version "1.6.10"
-    id("org.jetbrains.compose") version "1.1.1"
+    val kotlinVersion = "1.8.0"
+    kotlin("jvm") version kotlinVersion
+    kotlin("plugin.serialization") version kotlinVersion
+    id("org.jetbrains.compose") version "1.3.0"
     id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
 }
 
@@ -15,7 +16,6 @@ version = "1.0.0"
 repositories {
     google()
     mavenCentral()
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
 dependencies {
