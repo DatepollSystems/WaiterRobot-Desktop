@@ -31,7 +31,7 @@ dependencies {
     implementation("io.ktor:ktor-client-logging:$ktorVersion")
     implementation("io.ktor:ktor-client-websockets:$ktorVersion")
 
-    implementation("org.apache.pdfbox:pdfbox:3.0.0-alpha3")
+    implementation("org.apache.pdfbox:pdfbox:3.0.0-RC1")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
     implementation(kotlin("reflect"))
