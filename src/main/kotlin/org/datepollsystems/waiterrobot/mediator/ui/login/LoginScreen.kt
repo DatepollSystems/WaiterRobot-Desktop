@@ -3,6 +3,7 @@ package org.datepollsystems.waiterrobot.mediator.ui.login
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -18,6 +19,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.datepollsystems.waiterrobot.mediator.ui.common.LoadableScreen
+import org.datepollsystems.waiterrobot.mediator.ui.common.onEnterKeyDown
 
 @Composable
 fun LoginScreen(vm: LoginViewModel) {
@@ -65,17 +67,25 @@ fun LoginScreen(vm: LoginViewModel) {
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = mail,
+                isError = state.loginErrorMessage != null,
+                singleLine = true,
                 onValueChange = { mail = it },
                 label = { Text(text = "Email") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             )
+
             OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onEnterKeyDown { vm.doLogin(mail, password) },
                 value = password,
+                singleLine = true,
+                isError = state.loginErrorMessage != null,
                 onValueChange = { password = it },
                 label = { Text(text = "Password") },
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                keyboardActions = KeyboardActions(onDone = { vm.doLogin(mail, password) }),
                 trailingIcon = {
                     val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
 
@@ -86,7 +96,10 @@ fun LoginScreen(vm: LoginViewModel) {
                     }
                 }
             )
-            OutlinedButton(onClick = { vm.doLogin(mail, password) }) {
+
+            OutlinedButton(
+                onClick = { vm.doLogin(mail, password) }
+            ) {
                 Text(text = "Login")
             }
         }
