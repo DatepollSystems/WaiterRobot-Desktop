@@ -1,4 +1,3 @@
-import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -23,7 +22,7 @@ dependencies {
     implementation(compose.desktop.currentOs) // TODO how to build for multiple platforms
     implementation(compose.materialIconsExtended)
 
-    val ktorVersion = "2.0.3"
+    val ktorVersion = "2.2.3"
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
