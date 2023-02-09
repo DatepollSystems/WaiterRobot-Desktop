@@ -33,7 +33,7 @@ dependencies {
 
     implementation("org.apache.pdfbox:pdfbox:3.0.0-RC1")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
     implementation(kotlin("reflect"))
 }
 
