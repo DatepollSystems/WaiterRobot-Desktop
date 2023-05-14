@@ -47,4 +47,4 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true # Matrix strategy -> executed multiple times
-          artifacts: "build/compose/binaries/main/${{ matrix.pkg }}/Mediator*"
+          artifacts: "build/compose/binaries/main/${{ matrix.pkg }}/*"
