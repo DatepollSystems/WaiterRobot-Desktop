@@ -29,13 +29,30 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      # TODO run tests?
+
       - name: Create distributable
-        run: ./gradlew createDistributable # TODO use "createReleaseDistributable" as this also uses Pro-Guard (but there needs to be more configuration)
+        run: ./gradlew packageDistributionForCurrentOS # TODO use "packageReleaseDistributionForCurrentOS" as this also uses Pro-Guard (but there needs to be more configuration)
         env:
           GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx3g"
 
-      - name: Release
+      - name: Release Linux
+        if: matrix.os == 'ubuntu-latest'
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true # Matrix strategy -> executed multiple times
-          artifacts: "build/compose/binaries/main/app/Mediator.*"
+          artifacts: "build/compose/binaries/main/deb/Mediator*"
+
+      - name: Release Mac
+        if: matrix.os == 'macos-latest'
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true # Matrix strategy -> executed multiple times
+          artifacts: "build/compose/binaries/main/dmg/Mediator*"
+
+      - name: Release Windows
+        if: matrix.os == 'windows-latest'
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true # Matrix strategy -> executed multiple times
+          artifacts: "build\compose\binaries\main\exe\Mediator*"
