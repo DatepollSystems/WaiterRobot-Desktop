@@ -9,6 +9,13 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
+        include:
+          - os: ubuntu-latest
+            pkg: deb
+          - os: windows-latest
+            pkg: exe
+          - os: macos-latest
+            pkg: dmg
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repo
@@ -36,23 +43,8 @@ jobs:
         env:
           GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx3g"
 
-      - name: Release Linux
-        if: matrix.os == 'ubuntu-latest'
+      - name: Release
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true # Matrix strategy -> executed multiple times
-          artifacts: "build/compose/binaries/main/deb/Mediator*"
-
-      - name: Release Mac
-        if: matrix.os == 'macos-latest'
-        uses: ncipollo/release-action@v1
-        with:
-          allowUpdates: true # Matrix strategy -> executed multiple times
-          artifacts: "build/compose/binaries/main/dmg/Mediator*"
-
-      - name: Release Windows
-        if: matrix.os == 'windows-latest'
-        uses: ncipollo/release-action@v1
-        with:
-          allowUpdates: true # Matrix strategy -> executed multiple times
-          artifacts: "build\compose\binaries\main\exe\Mediator*"
+          artifacts: "build/compose/binaries/main/${{ matrix.pkg }}/Mediator*"
