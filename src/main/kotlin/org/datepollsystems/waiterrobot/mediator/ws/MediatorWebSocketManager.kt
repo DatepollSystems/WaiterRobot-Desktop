@@ -5,7 +5,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import org.datepollsystems.waiterrobot.mediator.app.Config
 import org.datepollsystems.waiterrobot.mediator.utils.SuspendingExponentialBackoff
 import org.datepollsystems.waiterrobot.mediator.ws.messages.AbstractWsMessage
 import org.datepollsystems.waiterrobot.mediator.ws.messages.WsMessageBody
@@ -21,7 +20,7 @@ import kotlin.reflect.KClass
 class MediatorWebSocketManager {
     private lateinit var session: MediatorWebSocketSession
 
-    private val wsClient = createWsClient(Config.WS_NETWORK_LOGGING)
+    private val wsClient = createWsClient()
     private val managerScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val closedIntentional = AtomicBoolean(false)
     private val closed = AtomicBoolean(false)

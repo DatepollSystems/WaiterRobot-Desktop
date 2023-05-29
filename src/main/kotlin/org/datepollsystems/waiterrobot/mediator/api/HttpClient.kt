@@ -9,10 +9,9 @@ import io.ktor.client.plugins.logging.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import org.datepollsystems.waiterrobot.mediator.App
-import org.datepollsystems.waiterrobot.mediator.app.Config
 import org.datepollsystems.waiterrobot.mediator.app.Settings
 
-fun createClient(enableNetworkLogs: Boolean = false) = HttpClient {
+fun createClient(enableNetworkLogs: Boolean = App.config.enableNetworkLogging) = HttpClient {
     install(ContentNegotiation) {
         json(
             Json {
@@ -43,7 +42,7 @@ fun createAuthenticatedClient(enableNetworkLogs: Boolean = false) = createClient
 fun HttpClientConfig<*>.configureAuth() {
     install(Auth) {
         suspend fun refreshTokens(refreshToken: String): BearerTokens? {
-            val authApi = AuthApi(createClient(Config.API_NETWORK_LOGGING))
+            val authApi = AuthApi(createClient())
             return try {
                 val tokenInfo = authApi.refresh(refreshToken)
 

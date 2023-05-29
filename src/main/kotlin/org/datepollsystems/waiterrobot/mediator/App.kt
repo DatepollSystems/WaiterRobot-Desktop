@@ -1,16 +1,19 @@
 package org.datepollsystems.waiterrobot.mediator
 
+import org.datepollsystems.waiterrobot.mediator.app.Config
 import org.datepollsystems.waiterrobot.mediator.app.Settings
 import org.datepollsystems.waiterrobot.mediator.ui.startUI
 import org.datepollsystems.waiterrobot.mediator.utils.isLazyInitialized
 import org.datepollsystems.waiterrobot.mediator.ws.MediatorWebSocketManager
 
 object App {
-    private val logoutListeners: MutableList<() -> Unit> = mutableListOf()
+    lateinit var config: Config
 
     val socketManager: MediatorWebSocketManager by lazy {
         MediatorWebSocketManager()
     }
+
+    private val logoutListeners: MutableList<() -> Unit> = mutableListOf()
 
     @JvmStatic
     fun main(args: Array<String>) {

@@ -1,27 +1,29 @@
 package org.datepollsystems.waiterrobot.mediator.app
 
-object Config {
-    private val VARIANT = Variant.PROD
+sealed class Config(baseUrl: String) {
+    val baseUrl: String
+    val apiBase: String
+    val wsUrl: String
 
-    private val DOMAIN = when (VARIANT) {
-        Variant.LOCAL_DEV -> "localhost:8181"
-        Variant.DEV -> "lava.kellner.team"
-        Variant.PROD -> "my.kellner.team"
+    val enableNetworkLogging = System.getenv("ENABLE_NETWORK_LOG") == "true"
+
+    init {
+        this.baseUrl = baseUrl.removeSuffix("/") + "/"
+        this.wsUrl = "${this.baseUrl}api/mediator"
+        this.apiBase = "${this.baseUrl}api/v1/"
     }
 
-    val BASE_URL = (if (VARIANT == Variant.LOCAL_DEV) "http" else "https") + "://$DOMAIN/"
-    val API_BASE = "${BASE_URL}api/v1/"
+    private object Local : Config(baseUrl = "http://localhost:8080")
+    private object Lava : Config(baseUrl = "https://lava.kellner.team")
+    private object Prod : Config(baseUrl = "https://my.kellner.team")
 
-    val WS_URL = (if (VARIANT == Variant.LOCAL_DEV) "ws" else "wss") + "://$DOMAIN/api/mediator"
-
-    val API_NETWORK_LOGGING = VARIANT != Variant.PROD
-    val WS_NETWORK_LOGGING = VARIANT != Variant.PROD
-
-    val isCI = System.getenv("env") == "CI"
+    companion object {
+        fun getFromLoginIdentifier(username: String): Config = when {
+            username.startsWith("local://") -> Local
+            username.startsWith("lava://") -> Lava
+            else -> Prod
+        }
+    }
 }
 
-enum class Variant {
-    LOCAL_DEV,
-    DEV,
-    PROD,
-}
+fun String.removeLoginIdentifierEnvPrefix(): String = this.removePrefix("local://").removePrefix("lava://")

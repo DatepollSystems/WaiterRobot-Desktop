@@ -7,10 +7,10 @@ import kotlinx.coroutines.withTimeoutOrNull
 import org.datepollsystems.waiterrobot.mediator.App
 import org.datepollsystems.waiterrobot.mediator.api.AuthApi
 import org.datepollsystems.waiterrobot.mediator.api.createClient
-import org.datepollsystems.waiterrobot.mediator.app.Config
 import org.datepollsystems.waiterrobot.mediator.app.Settings
 import org.datepollsystems.waiterrobot.mediator.ws.messages.HelloMessage
 import org.datepollsystems.waiterrobot.mediator.ws.messages.HelloMessageResponse
+import org.junit.Ignore
 import org.junit.Test
 import kotlin.random.Random
 import kotlin.test.assertEquals
@@ -19,16 +19,18 @@ internal class WsClientTest {
 
     /** E2E test */
     @Test
+    @Ignore
     fun basicFunctionalityTest(): Unit = runBlocking {
-        if (Config.isCI) return@runBlocking // Can not be executed by CI
-
         val successJob = Job()
         // Make sure that the client is exited as expected and the coroutine ends
         val response = withTimeoutOrNull(10000) {
             val randomVerifier = Random.nextBytes(64).encodeBase64()
 
             // Login
-            val tokens = AuthApi(createClient()).login("admin@admin.org", "admin")
+            val tokens = AuthApi(createClient(enableNetworkLogs = false)).login(
+                "admin@admin.org",
+                "admin"
+            ) // TODO replace credentials to run tests
             Settings.accessToken = tokens.accessToken
             Settings.refreshToken = tokens.refreshToken!!
             Settings.organisationId = 1
