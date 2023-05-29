@@ -1,21 +1,19 @@
 package org.datepollsystems.waiterrobot.mediator.app
 
-sealed class Config(baseUrl: String) {
-    val baseUrl: String
+sealed class Config(domain: String, secure: Boolean) {
     val apiBase: String
     val wsUrl: String
 
     val enableNetworkLogging = System.getenv("ENABLE_NETWORK_LOG") == "true"
 
     init {
-        this.baseUrl = baseUrl.removeSuffix("/") + "/"
-        this.wsUrl = "${this.baseUrl}api/mediator"
-        this.apiBase = "${this.baseUrl}api/v1/"
+        this.apiBase = "${if (secure) "https" else "http"}://$domain/api/v1/"
+        this.wsUrl = "${if (secure) "wss" else "ws"}://$domain/api/mediator"
     }
 
-    private object Local : Config(baseUrl = "http://localhost:8080")
-    private object Lava : Config(baseUrl = "https://lava.kellner.team")
-    private object Prod : Config(baseUrl = "https://my.kellner.team")
+    private object Local : Config(domain = "localhost:8080", secure = false)
+    private object Lava : Config(domain = "lava.kellner.team", secure = true)
+    private object Prod : Config(domain = "my.kellner.team", secure = true)
 
     companion object {
         fun getFromLoginIdentifier(username: String): Config = when {
