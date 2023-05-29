@@ -22,6 +22,7 @@ class LoginViewModel(navigator: Navigator, viewModelScope: CoroutineScope, priva
 
             navigator.navigate(Screen.ConfigurePrintersScreen)
         } catch (e: Exception) {
+            println(e) // TODO logger
             reduce { copy(screenState = ScreenState.Idle, loginErrorMessage = "Wrong credentials. Please try again!") }
         }
     }

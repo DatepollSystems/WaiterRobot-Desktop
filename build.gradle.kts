@@ -2,10 +2,10 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    val kotlinVersion = "1.8.0"
+    val kotlinVersion = "1.8.20"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.serialization") version kotlinVersion
-    id("org.jetbrains.compose") version "1.3.0"
+    id("org.jetbrains.compose") version "1.4.0"
 }
 
 group = "org.datepollsystems.waiterrobot.mediator"
@@ -18,7 +18,7 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test"))
-    implementation(compose.desktop.currentOs) // TODO how to build for multiple platforms
+    implementation(compose.desktop.currentOs)
     implementation(compose.materialIconsExtended)
 
     val ktorVersion = "2.2.3"
@@ -32,7 +32,7 @@ dependencies {
 
     implementation("org.apache.pdfbox:pdfbox:3.0.0-RC1")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     implementation(kotlin("reflect"))
 }
 
@@ -49,28 +49,23 @@ compose.desktop {
     application {
         mainClass = "org.datepollsystems.waiterrobot.mediator.App"
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "Mediator"
+            targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.Deb)
+            packageName = "WaiterRobot Desktop"
             packageVersion = "1.0.0"
+
+            macOS {
+                iconFile.set(project.file("icon.icns"))
+            }
+            windows {
+                iconFile.set(project.file("icon.ico"))
+            }
+            linux {
+                iconFile.set(project.file("icon.png"))
+            }
+
+            includeAllModules = true // TODO figure out which modules are really needed -> reduces app size
         }
     }
-}
-
-// TODO probably can be removed when cross-compilation is supported
-tasks.withType(Jar::class) {
-    manifest {
-        attributes["Manifest-Version"] = "1.0.0" // TODO use version variable
-        attributes["Main-Class"] = "org.datepollsystems.waiterrobot.mediator.App"
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    }
-
-    // To add all the dependencies
-    from(sourceSets.main.get().output)
-
-    dependsOn(configurations.runtimeClasspath)
-    from({
-        configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
-    })
 }
 
 kotlin.sourceSets.all {

@@ -1,20 +1,11 @@
 # WaiterRobot-Mediator
 
-## Build
+## Create Release
 
-At the moment compose for desktop does not support cross-compilation. Therefor we currently distribute "bundled jars".
-It's also required to have one jar per platform and architecture.
-
-1. Change `implementation(compose.desktop.currentOs)` to use the dependency for the platform you want to create a jar
-   for.
-2. Do a gradle sync and run `./gradlew build`
-3. You will find the jar at `build/libs/Mediator-*.jar`
-
-### Native executables
-
-[see](https://github.com/JetBrains/compose-jb/blob/master/tutorials/Native_distributions_and_local_execution/README.md)
-(Currently no cross-compilation support.)
-TODO create CI which builds for all platforms when cross-compilation is supported.
+Releases are created by CI and are published to GitHub releases. There are executables for Windows, Mac and Linux
+created. To create a new release just push a tag in the form of `vmajor.minor.patch` (e.g. `v1.0.0`) to GitHub. This
+will start the CI. After a few minutes the artifacts can be downloaded
+from [Releases](https://github.com/DatepollSystems/waiterrobot-desktop/releases).
 
 ## Recommendations
 
