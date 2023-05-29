@@ -50,7 +50,7 @@ compose.desktop {
         mainClass = "org.datepollsystems.waiterrobot.mediator.App"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.Deb)
-            packageName = "Mediator"
+            packageName = "WaiterRobot Desktop"
             packageVersion = "1.0.0"
 
             macOS {
