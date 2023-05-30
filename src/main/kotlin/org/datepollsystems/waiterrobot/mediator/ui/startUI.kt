@@ -8,7 +8,7 @@ import org.datepollsystems.waiterrobot.mediator.ui.theme.WaiterRobotTheme
 fun startUI(onClose: () -> Unit = {}) {
     application {
         Window(
-            title = "WaiterRobot Mediator",
+            title = "WaiterRobot Desktop",
             icon = null, // TODO
             onCloseRequest = {
                 onClose()

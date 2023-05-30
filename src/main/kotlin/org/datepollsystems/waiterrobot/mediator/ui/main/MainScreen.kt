@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.datepollsystems.waiterrobot.mediator.App
+import org.datepollsystems.waiterrobot.mediator.ui.common.SelectedEnvironmentInfo
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -23,6 +24,7 @@ fun MainScreen(vm: MainScreenViewModel) {
     val isConnected = App.socketManager.isConnected.collectAsState(initial = false).value
 
     Column {
+        SelectedEnvironmentInfo()
         Row(
             modifier = Modifier.padding(vertical = 20.dp),
             verticalAlignment = Alignment.CenterVertically

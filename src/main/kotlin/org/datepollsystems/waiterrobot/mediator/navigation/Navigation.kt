@@ -6,8 +6,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import org.datepollsystems.waiterrobot.mediator.api.*
-import org.datepollsystems.waiterrobot.mediator.app.Config
+import org.datepollsystems.waiterrobot.mediator.api.EventApi
+import org.datepollsystems.waiterrobot.mediator.api.OrganisationApi
+import org.datepollsystems.waiterrobot.mediator.api.PrinterApi
+import org.datepollsystems.waiterrobot.mediator.api.createAuthenticatedClient
 import org.datepollsystems.waiterrobot.mediator.ui.configurePrinters.ConfigurePrintersScreen
 import org.datepollsystems.waiterrobot.mediator.ui.configurePrinters.ConfigurePrintersViewModel
 import org.datepollsystems.waiterrobot.mediator.ui.login.LoginScreen
@@ -27,18 +29,14 @@ fun Navigation() {
         Screen.StartUpScreen -> WithCoroutineScope { StartUpScreen(StartUpViewModel(navigator, it)) }
         Screen.LoginScreen -> WithCoroutineScope {
             LoginScreen(
-                LoginViewModel(
-                    navigator,
-                    it,
-                    AuthApi(createClient(Config.API_NETWORK_LOGGING))
-                )
+                LoginViewModel(navigator, it)
             )
         }
         is Screen.MainScreen -> WithCoroutineScope {
             MainScreen(MainScreenViewModel(navigator, it))
         }
         Screen.ConfigurePrintersScreen -> WithCoroutineScope {
-            val client = createAuthenticatedClient(Config.API_NETWORK_LOGGING)
+            val client = createAuthenticatedClient()
             ConfigurePrintersScreen(
                 ConfigurePrintersViewModel(
                     navigator,

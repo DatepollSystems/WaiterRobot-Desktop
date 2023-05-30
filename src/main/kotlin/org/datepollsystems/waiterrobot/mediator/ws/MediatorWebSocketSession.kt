@@ -9,7 +9,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.serialization.SerializationException
-import org.datepollsystems.waiterrobot.mediator.app.Config
+import org.datepollsystems.waiterrobot.mediator.App
 import org.datepollsystems.waiterrobot.mediator.app.Settings
 import org.datepollsystems.waiterrobot.mediator.ws.messages.AbstractWsMessage
 import org.datepollsystems.waiterrobot.mediator.ws.messages.WsMessageBody
@@ -39,7 +39,7 @@ class MediatorWebSocketSession(
     suspend fun start(): Job {
         if (started.getAndSet(true)) throw IllegalStateException("Session already started")
         session = client.webSocketSession {
-            url.takeFrom(Config.WS_URL)
+            url.takeFrom(App.config.wsUrl)
             headers.append("organisationId", Settings.organisationId.toString())
         }
         session.ensureActive()
@@ -74,7 +74,7 @@ class MediatorWebSocketSession(
         while (coroutineContext.isActive) { // Keep listening as long as the coroutine is active
             try {
                 val message = session.receiveDeserialized<AbstractWsMessage<WsMessageBody>>()
-                if (Config.WS_NETWORK_LOGGING) println("Got message: $message") // TODO logger
+                println("Got message: $message") // TODO logger
                 incoming.send(message)
             } catch (e: ContentConvertException) {
                 println("Could not convert incoming message: $e") // TODO logger

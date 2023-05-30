@@ -15,6 +15,7 @@ import org.datepollsystems.waiterrobot.mediator.api.dto.GetPrinterDto
 import org.datepollsystems.waiterrobot.mediator.printer.LocalPrinterInfo
 import org.datepollsystems.waiterrobot.mediator.ui.common.DropDownInput
 import org.datepollsystems.waiterrobot.mediator.ui.common.LoadableScreen
+import org.datepollsystems.waiterrobot.mediator.ui.common.SelectedEnvironmentInfo
 
 @Composable
 fun ConfigurePrintersScreen(vm: ConfigurePrintersViewModel) {
@@ -22,6 +23,7 @@ fun ConfigurePrintersScreen(vm: ConfigurePrintersViewModel) {
 
     LoadableScreen(state.screenState) {
         Column {
+            SelectedEnvironmentInfo()
             Row {
                 DropDownInput(
                     modifier = Modifier

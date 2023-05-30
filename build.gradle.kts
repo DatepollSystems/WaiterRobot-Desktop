@@ -49,9 +49,9 @@ compose.desktop {
     application {
         mainClass = "org.datepollsystems.waiterrobot.mediator.App"
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.Deb)
+            targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.Deb) // TODO add more?
             packageName = "WaiterRobot Desktop"
-            packageVersion = "1.0.0"
+            packageVersion = project.findProperty("versionString") as? String
 
             macOS {
                 iconFile.set(project.file("icon.icns"))

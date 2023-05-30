@@ -1,5 +1,8 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="App" type="JetRunConfigurationType">
+    <envs>
+      <env name="ENABLE_NETWORK_LOG" value="true" />
+    </envs>
     <option name="MAIN_CLASS_NAME" value="org.datepollsystems.waiterrobot.mediator.App" />
     <module name="Mediator.main" />
     <shortenClasspath name="NONE" />
