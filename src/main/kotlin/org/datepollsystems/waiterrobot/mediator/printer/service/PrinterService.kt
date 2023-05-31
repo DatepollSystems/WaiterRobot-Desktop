@@ -3,9 +3,11 @@ package org.datepollsystems.waiterrobot.mediator.printer.service
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import org.datepollsystems.waiterrobot.mediator.App
+import org.datepollsystems.waiterrobot.mediator.api.dto.GetPrinterDto
 import org.datepollsystems.waiterrobot.mediator.core.ID
 import org.datepollsystems.waiterrobot.mediator.printer.LocalPrinter
 import org.datepollsystems.waiterrobot.mediator.printer.PrinterWithIdNotFoundException
+import org.datepollsystems.waiterrobot.mediator.ui.configurePrinters.ConfigurePrintersState
 import org.datepollsystems.waiterrobot.mediator.ui.main.PrintTransaction
 import org.datepollsystems.waiterrobot.mediator.ws.messages.PrintPdfMessage
 import org.datepollsystems.waiterrobot.mediator.ws.messages.PrintedPdfMessage
@@ -14,10 +16,13 @@ import java.time.LocalDateTime
 
 object PrinterService {
 
-    // Maps printerId from backend to a local printer
-    private val idToPrinter = mutableMapOf<ID, LocalPrinter>()
+    // Maps printerId from backend to a local printer pairing
+    private val backendIdToPairing = mutableMapOf<ID, PrinterPairing>()
 
-    val printers: List<Pair<ID, LocalPrinter>> get() = idToPrinter.toList()
+    val printers: List<Pair<ID, ConfigurePrintersState.PrinterPairing>>
+        get() = backendIdToPairing.map { (id, pairing) ->
+            id to ConfigurePrintersState.PrinterPairing(pairing.bePrinter, pairing.loPrinter)
+        }
 
     private val printQueue = MutableSharedFlow<PrintTransaction>(replay = 15) // TODO replay needed?
     val printQueueFlow: Flow<PrintTransaction> get() = printQueue
@@ -29,15 +34,18 @@ object PrinterService {
 
     private suspend fun print(pdfId: String, printerId: ID, base64data: String) {
         // TODO handle printer is not registered on this mediator (info to BE)
-        idToPrinter[printerId]?.printPdf(pdfId, base64data) ?: throw PrinterWithIdNotFoundException(printerId)
-        printQueue.emit(PrintTransaction(pdfId, LocalDateTime.now()))
+        val printerPairing = backendIdToPairing[printerId] ?: throw PrinterWithIdNotFoundException(printerId)
+        printerPairing.loPrinter.printPdf(pdfId, base64data)
+
+
+        printQueue.emit(PrintTransaction(pdfId, LocalDateTime.now(), printerPairing.bePrinter.name))
         // test is the id of the test pdf, no response expected by backend
         if (pdfId != "test") App.socketManager.send(PrintedPdfMessage(pdfId = pdfId))
     }
 
-    fun pair(backendId: ID, printer: LocalPrinter) {
-        idToPrinter[backendId] = printer
-        App.socketManager.addRegisterMessage(RegisterPrinterMessage(printerId = backendId))
+    fun pair(bePrinter: GetPrinterDto, loPrinter: LocalPrinter) {
+        backendIdToPairing[bePrinter.id] = PrinterPairing(bePrinter, loPrinter)
+        App.socketManager.addRegisterMessage(RegisterPrinterMessage(printerId = bePrinter.id))
     }
 
     private fun registerHandlers() {
@@ -46,3 +54,5 @@ object PrinterService {
         }
     }
 }
+
+class PrinterPairing(val bePrinter: GetPrinterDto, val loPrinter: LocalPrinter)

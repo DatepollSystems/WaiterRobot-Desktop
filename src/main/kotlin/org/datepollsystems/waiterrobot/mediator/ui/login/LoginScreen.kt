@@ -32,7 +32,7 @@ fun LoginScreen(vm: LoginViewModel) {
         var passwordVisible by remember { mutableStateOf(false) }
 
         Column(
-            modifier = Modifier.fillMaxSize().padding(50.dp),
+            modifier = Modifier.padding(50.dp).requiredWidthIn(max = 500.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(25.dp, Alignment.CenterVertically)
         ) {

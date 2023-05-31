@@ -13,6 +13,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.datepollsystems.waiterrobot.mediator.App
 import org.datepollsystems.waiterrobot.mediator.ui.common.SelectedEnvironmentInfo
@@ -58,9 +59,19 @@ fun MainScreen(vm: MainScreenViewModel) {
                     LazyColumn {
                         items(state.printTransactions.items, key = PrintTransaction::id) {
                             Row(modifier = Modifier.padding(10.dp)) {
-                                Text(it.time.format(DateTimeFormatter.ofPattern("dd.MM.yyyy hh:mm:ss")))
+                                Text(it.time.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")))
                                 Spacer(modifier = Modifier.width(20.dp))
-                                Text(it.jobName)
+                                Text(
+                                    text = it.jobName,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                Spacer(modifier = Modifier.width(20.dp))
+                                Text(
+                                    text = it.printer,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
                             }
                             Divider()
                         }
@@ -70,14 +81,19 @@ fun MainScreen(vm: MainScreenViewModel) {
 
             // Printer list
             LazyColumn(modifier = Modifier.weight(1f)) {
-                items(state.printers, key = { it.second.localId }) {
+                items(state.printers, key = { it.first }) { (_, pairing) ->
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp, horizontal = 20.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(it.second.name)
-                        IconButton(onClick = { vm.printTestPdf(it.first) }) {
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = "${pairing.bePrinter.name} (${pairing.loPrinter.name})",
+                            maxLines = 3,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        IconButton(onClick = { vm.printTestPdf(pairing.bePrinter.id) }) {
                             Icon(Icons.Filled.Print, "Execute test print")
                         }
                     }

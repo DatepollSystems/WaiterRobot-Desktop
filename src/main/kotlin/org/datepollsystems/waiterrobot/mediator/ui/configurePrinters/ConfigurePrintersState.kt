@@ -14,6 +14,8 @@ data class ConfigurePrintersState(
     val availableEvents: List<GetEventDto>? = null,
     val selectedEvent: GetEventDto? = null,
     val unPairedBackendPrinters: List<GetPrinterDto>? = null,
-    val unPairedLocalPrinters: List<LocalPrinterInfo>? = null,
-    val pairings: List<Pair<GetPrinterDto, LocalPrinterInfo>> = emptyList()
-) : State
+    val localPrinters: List<LocalPrinterInfo>? = null,
+    val pairings: List<PrinterPairing> = emptyList()
+) : State {
+    data class PrinterPairing(val bePrinter: GetPrinterDto, val loPrinter: LocalPrinterInfo)
+}

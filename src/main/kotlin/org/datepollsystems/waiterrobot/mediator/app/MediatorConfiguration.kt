@@ -1,7 +1,6 @@
 package org.datepollsystems.waiterrobot.mediator.app
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.datepollsystems.waiterrobot.mediator.core.ID
@@ -11,8 +10,11 @@ import java.io.File
 data class MediatorConfiguration(
     val selectedOrganisationId: ID,
     val selectedEventId: ID,
-    val localToBackendPrinterId: Map<String, ID>
+    val printerPairings: List<PrinterPairing>
 ) {
+    @Serializable
+    data class PrinterPairing(val localPrinterId: String, val backendPrinterId: ID)
+
     fun save() {
         runCatching {
             val jsonConfig = Json.encodeToString(this)

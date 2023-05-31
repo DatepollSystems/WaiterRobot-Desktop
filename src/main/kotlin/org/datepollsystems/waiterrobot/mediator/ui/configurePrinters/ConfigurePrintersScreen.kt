@@ -64,10 +64,10 @@ fun ConfigurePrintersScreen(vm: ConfigurePrintersViewModel) {
                     modifier = Modifier.padding(vertical = 20.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Box(modifier = Modifier.padding(horizontal = 20.dp).weight(1.5f)) {
+                    Box(modifier = Modifier.padding(horizontal = 20.dp).weight(1f)) {
                         Text("Backend Printers") // TODO better naming for user
                     }
-                    Box(modifier = Modifier.padding(horizontal = 20.dp).weight(1.5f)) {
+                    Box(modifier = Modifier.padding(horizontal = 20.dp).weight(1f)) {
                         Text("Local Printers")
                     }
                     Box(modifier = Modifier.padding(horizontal = 20.dp).weight(1f)) {
@@ -84,7 +84,7 @@ fun ConfigurePrintersScreen(vm: ConfigurePrintersViewModel) {
                     Row(modifier = Modifier.weight(1f)) {
 
                         // Backend Printers
-                        LazyColumn(modifier = Modifier.weight(1.5f)) {
+                        LazyColumn(modifier = Modifier.weight(1f)) {
                             items(state.unPairedBackendPrinters, key = GetPrinterDto::id) {
                                 PrinterListItem(
                                     title = it.name,
@@ -96,8 +96,8 @@ fun ConfigurePrintersScreen(vm: ConfigurePrintersViewModel) {
                         }
 
                         // Local Printers
-                        LazyColumn(modifier = Modifier.weight(1.5f)) {
-                            items(state.unPairedLocalPrinters ?: emptyList(), key = LocalPrinterInfo::localId) {
+                        LazyColumn(modifier = Modifier.weight(1f)) {
+                            items(state.localPrinters ?: emptyList(), key = LocalPrinterInfo::localId) {
                                 PrinterListItem(
                                     title = it.name,
                                     subtitle = "Brand?",
@@ -109,24 +109,24 @@ fun ConfigurePrintersScreen(vm: ConfigurePrintersViewModel) {
 
                         // Pairings
                         LazyColumn(modifier = Modifier.weight(1f)) {
-                            items(state.pairings, key = { "${it.first.id}-${it.second.localId}" }) {
+                            items(state.pairings, key = { "${it.bePrinter.id}-${it.loPrinter.localId}" }) { pairing ->
                                 Row(
                                     modifier = Modifier.padding(vertical = 10.dp, horizontal = 20.dp),
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
                                     IconButton(
-                                        onClick = { vm.removePairing(it) }
+                                        onClick = { vm.removePairing(pairing) }
                                     ) {
                                         Icon(Icons.Filled.Delete, "contentDescription")
                                     }
-                                    Text(it.first.name)
+                                    Text(pairing.bePrinter.name)
                                     Icon(
                                         modifier = Modifier.padding(horizontal = 10.dp),
                                         contentDescription = "contentDescription",
                                         imageVector = Icons.Filled.ArrowForward
                                     )
-                                    Text(it.second.name)
+                                    Text(pairing.loPrinter.name)
                                 }
                             }
                         }
