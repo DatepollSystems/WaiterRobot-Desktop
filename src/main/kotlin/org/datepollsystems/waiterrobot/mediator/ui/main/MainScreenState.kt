@@ -3,7 +3,7 @@ package org.datepollsystems.waiterrobot.mediator.ui.main
 import org.datepollsystems.waiterrobot.mediator.core.ID
 import org.datepollsystems.waiterrobot.mediator.core.ScreenState
 import org.datepollsystems.waiterrobot.mediator.core.State
-import org.datepollsystems.waiterrobot.mediator.printer.LocalPrinterInfo
+import org.datepollsystems.waiterrobot.mediator.ui.configurePrinters.ConfigurePrintersState
 import org.datepollsystems.waiterrobot.mediator.utils.toHex
 import java.time.LocalDateTime
 import kotlin.random.Random
@@ -11,10 +11,10 @@ import kotlin.random.Random
 data class MainScreenState(
     override val screenState: ScreenState = ScreenState.Idle,
     val printTransactions: CircularQueue<PrintTransaction> = CircularQueue(100),
-    val printers: List<Pair<ID, LocalPrinterInfo>> = emptyList()
+    val printers: List<Pair<ID, ConfigurePrintersState.PrinterPairing>> = emptyList(),
 ) : State
 
-class PrintTransaction(val jobName: String, val time: LocalDateTime) {
+class PrintTransaction(val jobName: String, val time: LocalDateTime, val printer: String) {
     val id: String = jobName + if (jobName == "test") Random.nextBytes(10).toHex() else ""
 }
 

@@ -45,4 +45,11 @@ class LocalPrinter(private val service: PrintService) : LocalPrinterInfo {
     fun checkOnline(): Boolean {
         TODO("Implement ping or any check if the printer is still available")
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is LocalPrinter) return false
+        return this.localId == other.localId
+    }
+
+    override fun hashCode(): Int = this.localId.hashCode()
 }
