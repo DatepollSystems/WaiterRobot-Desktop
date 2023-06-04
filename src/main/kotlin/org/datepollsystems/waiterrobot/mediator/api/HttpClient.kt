@@ -6,6 +6,7 @@ import io.ktor.client.plugins.auth.*
 import io.ktor.client.plugins.auth.providers.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
+import io.ktor.client.request.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import org.datepollsystems.waiterrobot.mediator.App
@@ -19,9 +20,17 @@ fun createClient(enableNetworkLogs: Boolean = App.config.enableNetworkLogging) =
             }
         )
     }
+
     install(HttpTimeout) {
         requestTimeoutMillis = 5000 // TODO increase?
     }
+
+    defaultRequest {
+        header("X-App-Version", TODO())
+        header("X-App-Os", TODO())
+        header("X-App-Name", "WR-Desktop")
+    }
+
     if (enableNetworkLogs) {
         install(Logging) {
             // TODO use real logger
