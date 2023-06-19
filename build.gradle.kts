@@ -51,7 +51,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.Deb) // TODO add more?
             packageName = "WaiterRobot Desktop"
-            packageVersion = project.findProperty("versionString") as? String
+            packageVersion = (project.findProperty("versionString") as? String)?.removePrefix("v")
 
             macOS {
                 iconFile.set(project.file("icon.icns"))
