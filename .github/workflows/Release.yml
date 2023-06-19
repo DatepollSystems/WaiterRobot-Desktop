@@ -39,7 +39,7 @@ jobs:
       # TODO run tests?
 
       - name: Create distributable
-        run: ./gradlew packageDistributionForCurrentOS -PversionString=${{ github.ref_name }} # TODO use "packageReleaseDistributionForCurrentOS" as this also uses Pro-Guard (but there needs to be more configuration)
+        run: ./gradlew packageDistributionForCurrentOS -PversionString="${{ github.ref_name }}" # TODO use "packageReleaseDistributionForCurrentOS" as this also uses Pro-Guard (but there needs to be more configuration)
         env:
           GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx3g"
 
