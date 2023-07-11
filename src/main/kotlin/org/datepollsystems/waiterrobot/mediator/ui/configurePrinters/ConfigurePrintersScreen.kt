@@ -88,7 +88,7 @@ fun ConfigurePrintersScreen(vm: ConfigurePrintersViewModel) {
                             items(state.unPairedBackendPrinters, key = GetPrinterDto::id) {
                                 PrinterListItem(
                                     title = it.name,
-                                    subtitle = "Location?",
+                                    subtitle = "", // TODO Location?
                                     selected = selectedBePrinter == it,
                                     onSelect = { selectedBePrinter = it }
                                 )
@@ -100,7 +100,7 @@ fun ConfigurePrintersScreen(vm: ConfigurePrintersViewModel) {
                             items(state.localPrinters ?: emptyList(), key = LocalPrinterInfo::localId) {
                                 PrinterListItem(
                                     title = it.name,
-                                    subtitle = "Brand?",
+                                    subtitle = "", // TODO Brand?
                                     selected = selectedLocalPrinter == it,
                                     onSelect = { selectedLocalPrinter = it }
                                 )
