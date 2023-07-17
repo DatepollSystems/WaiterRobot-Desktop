@@ -1,7 +1,10 @@
 package org.datepollsystems.waiterrobot.mediator.navigation
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import org.datepollsystems.waiterrobot.mediator.App
 
 /**
@@ -13,12 +16,16 @@ class Navigator(startScreen: Screen) {
     val screenState: StateFlow<Screen>
         get() = screenStateFlow
 
+    private val scope = CoroutineScope(SupervisorJob())
+
     init {
         App.addLogoutListener { navigate(Screen.LoginScreen) }
     }
 
     fun navigate(screen: Screen) {
         println("Navigate to: $screen") // TODO logger
-        screenStateFlow.value = screen
+        scope.launch {
+            screenStateFlow.emit(screen)
+        }
     }
 }

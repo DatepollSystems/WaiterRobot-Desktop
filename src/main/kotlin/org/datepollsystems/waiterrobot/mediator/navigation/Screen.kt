@@ -5,4 +5,5 @@ sealed class Screen {
     object LoginScreen : Screen()
     object ConfigurePrintersScreen : Screen()
     object MainScreen : Screen()
+    object AppVersionTooOld : Screen()
 }

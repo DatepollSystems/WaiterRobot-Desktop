@@ -30,7 +30,12 @@ dependencies {
     implementation("io.ktor:ktor-client-logging:$ktorVersion")
     implementation("io.ktor:ktor-client-websockets:$ktorVersion")
 
+    val mokoMvvmVersion = "0.16.1"
+    implementation("dev.icerock.moko:mvvm-core:${mokoMvvmVersion}")
+    implementation("dev.icerock.moko:mvvm-compose:${mokoMvvmVersion}")
+
     implementation("org.apache.pdfbox:pdfbox:3.0.0-RC1")
+    runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.2") // Adds a Main Dispatcher for Desktop
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     implementation(kotlin("reflect"))

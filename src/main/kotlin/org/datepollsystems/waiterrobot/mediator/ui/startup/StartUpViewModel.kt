@@ -1,16 +1,15 @@
 package org.datepollsystems.waiterrobot.mediator.ui.startup
 
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.datepollsystems.waiterrobot.mediator.app.Settings
+import org.datepollsystems.waiterrobot.mediator.core.AbstractViewModel
 import org.datepollsystems.waiterrobot.mediator.core.EmptyState
-import org.datepollsystems.waiterrobot.mediator.core.ViewModel
 import org.datepollsystems.waiterrobot.mediator.navigation.Navigator
 import org.datepollsystems.waiterrobot.mediator.navigation.Screen
 
-class StartUpViewModel(navigator: Navigator, viewModelScope: CoroutineScope) :
-    ViewModel<EmptyState>(navigator, viewModelScope, EmptyState) {
+class StartUpViewModel(navigator: Navigator) :
+    AbstractViewModel<EmptyState>(navigator, EmptyState) {
 
     init {
         viewModelScope.launch {

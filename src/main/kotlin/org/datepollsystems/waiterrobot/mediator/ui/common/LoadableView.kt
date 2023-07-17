@@ -25,5 +25,9 @@ fun LoadableScreen(
         } else {
             content()
         }
+
+        if (screenState is ScreenState.Error) {
+            ErrorDialog(screenState)
+        }
     }
 }

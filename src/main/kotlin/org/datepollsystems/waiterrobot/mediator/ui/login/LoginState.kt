@@ -6,4 +6,6 @@ import org.datepollsystems.waiterrobot.mediator.core.State
 data class LoginState(
     override val screenState: ScreenState = ScreenState.Idle,
     val loginErrorMessage: String? = null
-) : State
+) : State<LoginState> {
+    override fun withScreenState(screenState: ScreenState): LoginState = copy(screenState = screenState)
+}
