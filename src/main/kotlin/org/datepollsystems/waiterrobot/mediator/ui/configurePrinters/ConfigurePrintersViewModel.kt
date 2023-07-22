@@ -1,6 +1,5 @@
 package org.datepollsystems.waiterrobot.mediator.ui.configurePrinters
 
-import kotlinx.coroutines.CoroutineScope
 import org.datepollsystems.waiterrobot.mediator.api.EventApi
 import org.datepollsystems.waiterrobot.mediator.api.OrganisationApi
 import org.datepollsystems.waiterrobot.mediator.api.PrinterApi
@@ -9,9 +8,9 @@ import org.datepollsystems.waiterrobot.mediator.api.dto.GetOrganisationDto
 import org.datepollsystems.waiterrobot.mediator.api.dto.GetPrinterDto
 import org.datepollsystems.waiterrobot.mediator.app.MediatorConfiguration
 import org.datepollsystems.waiterrobot.mediator.app.Settings
+import org.datepollsystems.waiterrobot.mediator.core.AbstractViewModel
 import org.datepollsystems.waiterrobot.mediator.core.ID
 import org.datepollsystems.waiterrobot.mediator.core.ScreenState
-import org.datepollsystems.waiterrobot.mediator.core.ViewModel
 import org.datepollsystems.waiterrobot.mediator.navigation.Navigator
 import org.datepollsystems.waiterrobot.mediator.navigation.Screen
 import org.datepollsystems.waiterrobot.mediator.printer.LocalPrinterInfo
@@ -20,11 +19,10 @@ import org.datepollsystems.waiterrobot.mediator.printer.service.PrinterService
 
 class ConfigurePrintersViewModel(
     navigator: Navigator,
-    viewModelScope: CoroutineScope,
     private val organisationApi: OrganisationApi,
     private val eventApi: EventApi,
     private val printerApi: PrinterApi,
-) : ViewModel<ConfigurePrintersState>(navigator, viewModelScope, ConfigurePrintersState()) {
+) : AbstractViewModel<ConfigurePrintersState>(navigator, ConfigurePrintersState()) {
 
     init {
         val initConfig = MediatorConfiguration.createFromStore()

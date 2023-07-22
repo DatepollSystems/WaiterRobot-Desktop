@@ -12,7 +12,9 @@ data class MainScreenState(
     override val screenState: ScreenState = ScreenState.Idle,
     val printTransactions: CircularQueue<PrintTransaction> = CircularQueue(100),
     val printers: List<Pair<ID, ConfigurePrintersState.PrinterPairing>> = emptyList(),
-) : State
+) : State<MainScreenState> {
+    override fun withScreenState(screenState: ScreenState): MainScreenState = copy(screenState = screenState)
+}
 
 class PrintTransaction(val jobName: String, val time: LocalDateTime, val printer: String) {
     val id: String = jobName + if (jobName == "test") Random.nextBytes(10).toHex() else ""

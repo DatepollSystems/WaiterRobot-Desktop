@@ -16,6 +16,8 @@ data class ConfigurePrintersState(
     val unPairedBackendPrinters: List<GetPrinterDto>? = null,
     val localPrinters: List<LocalPrinterInfo>? = null,
     val pairings: List<PrinterPairing> = emptyList()
-) : State {
+) : State<ConfigurePrintersState> {
     data class PrinterPairing(val bePrinter: GetPrinterDto, val loPrinter: LocalPrinterInfo)
+
+    override fun withScreenState(screenState: ScreenState): ConfigurePrintersState = copy(screenState = screenState)
 }

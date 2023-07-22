@@ -3,15 +3,15 @@ package org.datepollsystems.waiterrobot.mediator.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import dev.icerock.moko.mvvm.compose.getViewModel
+import dev.icerock.moko.mvvm.compose.viewModelFactory
 import org.datepollsystems.waiterrobot.mediator.api.EventApi
 import org.datepollsystems.waiterrobot.mediator.api.OrganisationApi
 import org.datepollsystems.waiterrobot.mediator.api.PrinterApi
 import org.datepollsystems.waiterrobot.mediator.api.createAuthenticatedClient
 import org.datepollsystems.waiterrobot.mediator.ui.configurePrinters.ConfigurePrintersScreen
 import org.datepollsystems.waiterrobot.mediator.ui.configurePrinters.ConfigurePrintersViewModel
+import org.datepollsystems.waiterrobot.mediator.ui.forceUpdate.ForceUpdateScreen
 import org.datepollsystems.waiterrobot.mediator.ui.login.LoginScreen
 import org.datepollsystems.waiterrobot.mediator.ui.login.LoginViewModel
 import org.datepollsystems.waiterrobot.mediator.ui.main.MainScreen
@@ -26,33 +26,52 @@ fun Navigation() {
     val screenState = navigator.screenState.collectAsState().value
     // TODO proper dependency injection (use koin?)
     when (screenState) {
-        Screen.StartUpScreen -> WithCoroutineScope { StartUpScreen(StartUpViewModel(navigator, it)) }
-        Screen.LoginScreen -> WithCoroutineScope {
-            LoginScreen(
-                LoginViewModel(navigator, it)
+        Screen.StartUpScreen -> {
+            val viewModel = getViewModel(
+                key = "startUp-screen",
+                factory = viewModelFactory {
+                    StartUpViewModel(navigator)
+                }
             )
+            StartUpScreen(viewModel)
         }
-        is Screen.MainScreen -> WithCoroutineScope {
-            MainScreen(MainScreenViewModel(navigator, it))
-        }
-        Screen.ConfigurePrintersScreen -> WithCoroutineScope {
-            val client = createAuthenticatedClient()
-            ConfigurePrintersScreen(
-                ConfigurePrintersViewModel(
-                    navigator,
-                    it,
-                    OrganisationApi(client),
-                    EventApi(client),
-                    PrinterApi(client),
-                )
-            )
-        }
-    }.let {} // Force exhaustive
-}
 
-@Composable
-// Helper to get a screen scoped coroutineContext for the viewModel
-fun WithCoroutineScope(content: @Composable (CoroutineScope) -> Unit) {
-    val scope = rememberCoroutineScope { Dispatchers.Default }
-    content(scope)
+        Screen.LoginScreen -> {
+            val viewModel = getViewModel(
+                key = "login-screen",
+                factory = viewModelFactory {
+                    LoginViewModel(navigator)
+                }
+            )
+            LoginScreen(viewModel)
+        }
+
+        Screen.MainScreen -> {
+            val viewModel = getViewModel(
+                key = "main-screen",
+                factory = viewModelFactory {
+                    MainScreenViewModel(navigator)
+                }
+            )
+            MainScreen(viewModel)
+        }
+
+        Screen.ConfigurePrintersScreen -> {
+            val viewModel = getViewModel(
+                key = "configure-printers-screen",
+                factory = viewModelFactory {
+                    val client = createAuthenticatedClient()
+                    ConfigurePrintersViewModel(
+                        navigator,
+                        OrganisationApi(client),
+                        EventApi(client),
+                        PrinterApi(client),
+                    )
+                }
+            )
+            ConfigurePrintersScreen(viewModel)
+        }
+
+        Screen.AppVersionTooOld -> ForceUpdateScreen()
+    }.let {} // Force exhaustive
 }
