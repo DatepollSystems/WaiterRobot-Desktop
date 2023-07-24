@@ -12,6 +12,7 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import org.datepollsystems.waiterrobot.mediator.App
+import org.datepollsystems.waiterrobot.mediator.app.AppVersion
 import org.datepollsystems.waiterrobot.mediator.app.Settings
 
 fun createClient(enableNetworkLogs: Boolean = App.config.enableNetworkLogging) = HttpClient {
@@ -28,7 +29,7 @@ fun createClient(enableNetworkLogs: Boolean = App.config.enableNetworkLogging) =
     }
 
     defaultRequest {
-        header("X-App-Version", System.getProperty("jpackage.app-version"))
+        header("X-App-Version", AppVersion.current.toString())
         header("X-App-Os", System.getProperty("os.name"))
         header("X-App-Name", "desktop")
     }

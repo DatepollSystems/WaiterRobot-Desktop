@@ -7,7 +7,7 @@ import org.datepollsystems.waiterrobot.mediator.utils.isLazyInitialized
 import org.datepollsystems.waiterrobot.mediator.ws.MediatorWebSocketManager
 
 object App {
-    lateinit var config: Config
+    var config: Config = Config.Prod // Use prod config for start and change then to the "right" at login
 
     val socketManager: MediatorWebSocketManager by lazy {
         MediatorWebSocketManager()

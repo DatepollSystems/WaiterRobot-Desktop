@@ -5,10 +5,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
-import org.datepollsystems.waiterrobot.mediator.api.EventApi
-import org.datepollsystems.waiterrobot.mediator.api.OrganisationApi
-import org.datepollsystems.waiterrobot.mediator.api.PrinterApi
-import org.datepollsystems.waiterrobot.mediator.api.createAuthenticatedClient
+import org.datepollsystems.waiterrobot.mediator.api.*
 import org.datepollsystems.waiterrobot.mediator.ui.configurePrinters.ConfigurePrintersScreen
 import org.datepollsystems.waiterrobot.mediator.ui.configurePrinters.ConfigurePrintersViewModel
 import org.datepollsystems.waiterrobot.mediator.ui.forceUpdate.ForceUpdateScreen
@@ -30,7 +27,11 @@ fun Navigation() {
             val viewModel = getViewModel(
                 key = "startUp-screen",
                 factory = viewModelFactory {
-                    StartUpViewModel(navigator)
+                    val client = createClient()
+                    StartUpViewModel(
+                        GitHubApi(client),
+                        navigator
+                    )
                 }
             )
             StartUpScreen(viewModel)

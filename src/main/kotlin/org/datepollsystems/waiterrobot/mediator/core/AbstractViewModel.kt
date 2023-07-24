@@ -24,6 +24,7 @@ abstract class AbstractViewModel<T : State<T>>(
 
             else -> {
                 println("Unhandled exception in intent. Exceptions should be handled directly in the intent!") // TODO use logger
+                exception.printStackTrace()
                 reduceError("Fehler", "Etwas ist schief gelaufen. Bitte versuche es erneut.")
             }
         }
