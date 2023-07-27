@@ -6,6 +6,7 @@
     <option name="MAIN_CLASS_NAME" value="org.datepollsystems.waiterrobot.mediator.App" />
     <module name="Mediator.main" />
     <shortenClasspath name="NONE" />
+    <option name="VM_PARAMETERS" value="-Djpackage.app-version=&quot;99.0.0&quot;" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

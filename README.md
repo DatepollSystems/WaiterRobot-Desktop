@@ -1,5 +1,17 @@
 # WaiterRobot-Mediator
 
+## Run
+
+To run the development version you have to supply the app version. This can be done in two ways:
+
+- supply as system property / vm-option `-Djpackage.app-version="99.0.0"`
+- run the distributable and supply as gradle property: `./gradlew runDistributable -PversionString=99.0.0`
+
+> Use `99.0.0` as version so that the backend knows that all features are available or supply a specific version if you
+> have checked out an old release or want to test with a "real" version string.
+
+The pre-configured IntelliJ run configurations already include this config.
+
 ## Create Release
 
 Releases are created by CI and are published to GitHub releases. There are executables for Windows, Mac and Linux

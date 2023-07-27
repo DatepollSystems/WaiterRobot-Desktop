@@ -40,6 +40,13 @@ abstract class AbstractApi(baseUrl: String) {
 
         block?.invoke(this)
     }
+
+    protected suspend fun head(
+        endpoint: String = "",
+        block: (HttpRequestBuilder.() -> Unit)? = null
+    ): HttpResponse = client.head(endpoint.toFullUrl()) {
+        block?.invoke(this)
+    }
 }
 
 // Marker interface
