@@ -8,10 +8,10 @@ import io.ktor.serialization.kotlinx.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import org.datepollsystems.waiterrobot.mediator.App
-import org.datepollsystems.waiterrobot.mediator.api.AuthApi
-import org.datepollsystems.waiterrobot.mediator.api.configureAuth
-import org.datepollsystems.waiterrobot.mediator.api.createClient
 import org.datepollsystems.waiterrobot.mediator.app.Settings
+import org.datepollsystems.waiterrobot.mediator.core.api.configureAuth
+import org.datepollsystems.waiterrobot.mediator.core.api.createClient
+import org.datepollsystems.waiterrobot.mediator.data.api.AuthApi
 import org.datepollsystems.waiterrobot.mediator.ws.messages.AbstractWsMessage
 import org.datepollsystems.waiterrobot.mediator.ws.messages.HelloMessage
 import org.datepollsystems.waiterrobot.mediator.ws.messages.HelloMessageResponse

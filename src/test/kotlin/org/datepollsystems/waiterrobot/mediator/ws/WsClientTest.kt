@@ -5,9 +5,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import org.datepollsystems.waiterrobot.mediator.App
-import org.datepollsystems.waiterrobot.mediator.api.AuthApi
-import org.datepollsystems.waiterrobot.mediator.api.createClient
 import org.datepollsystems.waiterrobot.mediator.app.Settings
+import org.datepollsystems.waiterrobot.mediator.core.api.createClient
+import org.datepollsystems.waiterrobot.mediator.data.api.AuthApi
 import org.datepollsystems.waiterrobot.mediator.ws.messages.HelloMessage
 import org.datepollsystems.waiterrobot.mediator.ws.messages.HelloMessageResponse
 import org.junit.Ignore

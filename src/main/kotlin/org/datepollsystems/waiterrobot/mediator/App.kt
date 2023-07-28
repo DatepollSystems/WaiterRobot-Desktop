@@ -2,6 +2,7 @@ package org.datepollsystems.waiterrobot.mediator
 
 import org.datepollsystems.waiterrobot.mediator.app.Config
 import org.datepollsystems.waiterrobot.mediator.app.Settings
+import org.datepollsystems.waiterrobot.mediator.core.di.initKoin
 import org.datepollsystems.waiterrobot.mediator.ui.startUI
 import org.datepollsystems.waiterrobot.mediator.utils.isLazyInitialized
 import org.datepollsystems.waiterrobot.mediator.ws.MediatorWebSocketManager
@@ -17,6 +18,7 @@ object App {
 
     @JvmStatic
     fun main(args: Array<String>) {
+        initKoin()
         startUI(this::onClose)
     }
 

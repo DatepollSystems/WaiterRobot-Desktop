@@ -1,16 +1,16 @@
 package org.datepollsystems.waiterrobot.mediator.ui.configurePrinters
 
-import org.datepollsystems.waiterrobot.mediator.api.EventApi
-import org.datepollsystems.waiterrobot.mediator.api.OrganisationApi
-import org.datepollsystems.waiterrobot.mediator.api.PrinterApi
-import org.datepollsystems.waiterrobot.mediator.api.dto.GetEventDto
-import org.datepollsystems.waiterrobot.mediator.api.dto.GetOrganisationDto
-import org.datepollsystems.waiterrobot.mediator.api.dto.GetPrinterDto
 import org.datepollsystems.waiterrobot.mediator.app.MediatorConfiguration
 import org.datepollsystems.waiterrobot.mediator.app.Settings
 import org.datepollsystems.waiterrobot.mediator.core.AbstractViewModel
 import org.datepollsystems.waiterrobot.mediator.core.ID
 import org.datepollsystems.waiterrobot.mediator.core.ScreenState
+import org.datepollsystems.waiterrobot.mediator.data.api.EventApi
+import org.datepollsystems.waiterrobot.mediator.data.api.OrganisationApi
+import org.datepollsystems.waiterrobot.mediator.data.api.PrinterApi
+import org.datepollsystems.waiterrobot.mediator.data.api.dto.GetEventDto
+import org.datepollsystems.waiterrobot.mediator.data.api.dto.GetOrganisationDto
+import org.datepollsystems.waiterrobot.mediator.data.api.dto.GetPrinterDto
 import org.datepollsystems.waiterrobot.mediator.navigation.Navigator
 import org.datepollsystems.waiterrobot.mediator.navigation.Screen
 import org.datepollsystems.waiterrobot.mediator.printer.LocalPrinterInfo

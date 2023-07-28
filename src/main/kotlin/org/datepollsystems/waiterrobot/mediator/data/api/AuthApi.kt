@@ -1,16 +1,17 @@
-package org.datepollsystems.waiterrobot.mediator.api
+package org.datepollsystems.waiterrobot.mediator.data.api
 
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.http.*
 import org.datepollsystems.waiterrobot.mediator.App
-import org.datepollsystems.waiterrobot.mediator.api.dto.LoginDto
-import org.datepollsystems.waiterrobot.mediator.api.dto.LogoutDto
-import org.datepollsystems.waiterrobot.mediator.api.dto.RefreshDto
-import org.datepollsystems.waiterrobot.mediator.api.dto.TokenDto
+import org.datepollsystems.waiterrobot.mediator.core.api.AbstractApi
+import org.datepollsystems.waiterrobot.mediator.data.api.dto.LoginDto
+import org.datepollsystems.waiterrobot.mediator.data.api.dto.LogoutDto
+import org.datepollsystems.waiterrobot.mediator.data.api.dto.RefreshDto
+import org.datepollsystems.waiterrobot.mediator.data.api.dto.TokenDto
 
 // TODO add better session information (version, os, ...)
-class AuthApi(override val client: HttpClient) : AbstractApi("${App.config.apiBase}auth/") {
+class AuthApi(client: HttpClient) : AbstractApi("${App.config.apiBase}auth/", client) {
 
     suspend fun login(email: String, password: String, stayLoggedIn: Boolean = true) =
         post(
