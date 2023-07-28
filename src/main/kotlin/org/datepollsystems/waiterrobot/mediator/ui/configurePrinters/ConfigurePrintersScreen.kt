@@ -7,10 +7,12 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.datepollsystems.waiterrobot.mediator.App
 import org.datepollsystems.waiterrobot.mediator.data.api.dto.GetPrinterDto
 import org.datepollsystems.waiterrobot.mediator.printer.LocalPrinterInfo
 import org.datepollsystems.waiterrobot.mediator.ui.common.DropDownInput
@@ -24,7 +26,10 @@ fun ConfigurePrintersScreen(vm: ConfigurePrintersViewModel) {
     LoadableScreen(state.screenState) {
         Column {
             SelectedEnvironmentInfo()
-            Row {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 DropDownInput(
                     modifier = Modifier
                         .padding(10.dp)
@@ -52,6 +57,10 @@ fun ConfigurePrintersScreen(vm: ConfigurePrintersViewModel) {
                     }
                 } else {
                     Spacer(modifier = Modifier.weight(1f))
+                }
+
+                IconButton(onClick = { App.logout() }) {
+                    Icon(Icons.Filled.Logout, contentDescription = null)
                 }
             }
             Divider(modifier = Modifier.fillMaxWidth())

@@ -22,21 +22,22 @@ data class MediatorConfiguration(
             file.parentFile.mkdirs()
             file.createNewFile()
             file.writeText(jsonConfig)
+        }.onFailure {
+            // TODO log
         }
     }
 
     companion object {
         // TODO fix this location is not valid in prod
         private fun getFile(): File {
-            val rootPath = MediatorConfiguration::class.java.getResource("/")!!.path
-            return File(rootPath, "resources/cache/mediatorConfig.json")
+            val rootPath = System.getProperty("user.dir")
+            return File(rootPath, "WaiterRobot/config/mediatorConfig.json")
         }
 
-        fun createFromStore(): MediatorConfiguration? = try {
-            Json.decodeFromString(getFile().readText())
-        } catch (e: Exception) {
-            // TODO log (some errors are expected)
-            null
-        }
+        fun createFromStore(): MediatorConfiguration? = runCatching {
+            Json.decodeFromString<MediatorConfiguration>(getFile().readText())
+        }.onFailure {
+            // TODO log
+        }.getOrNull()
     }
 }

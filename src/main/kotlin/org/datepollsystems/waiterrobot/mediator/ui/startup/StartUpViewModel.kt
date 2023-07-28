@@ -1,6 +1,8 @@
 package org.datepollsystems.waiterrobot.mediator.ui.startup
 
+import org.datepollsystems.waiterrobot.mediator.App
 import org.datepollsystems.waiterrobot.mediator.app.AppVersion
+import org.datepollsystems.waiterrobot.mediator.app.Config
 import org.datepollsystems.waiterrobot.mediator.app.Settings
 import org.datepollsystems.waiterrobot.mediator.core.AbstractViewModel
 import org.datepollsystems.waiterrobot.mediator.core.ScreenState
@@ -32,9 +34,14 @@ class StartUpViewModel(
     }
 
     fun goToStartScreen() {
+        val loginPrefix = Settings.loginPrefix
         val startScreen = if (Settings.refreshToken == null) {
             Screen.LoginScreen
+        } else if (loginPrefix == null) {
+            App.logout()
+            Screen.LoginScreen
         } else {
+            App.config = Config.getFromLoginIdentifier(loginPrefix)
             Screen.ConfigurePrintersScreen
         }
         navigator.navigate(startScreen)

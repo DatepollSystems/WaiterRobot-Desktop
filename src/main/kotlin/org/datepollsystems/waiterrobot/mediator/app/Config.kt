@@ -4,6 +4,7 @@ sealed class Config(domain: String, secure: Boolean) {
     val apiBase: String
     val wsUrl: String
     val displayName: String = this::class.simpleName!!
+    abstract val loginPrefix: String
 
     val enableNetworkLogging = System.getenv("ENABLE_NETWORK_LOG") == "true"
 
@@ -12,14 +13,22 @@ sealed class Config(domain: String, secure: Boolean) {
         this.wsUrl = "${if (secure) "wss" else "ws"}://$domain/api/mediator"
     }
 
-    object Local : Config(domain = "localhost:8080", secure = false)
-    object Lava : Config(domain = "lava.kellner.team", secure = true)
-    object Prod : Config(domain = "my.kellner.team", secure = true)
+    object Local : Config(domain = "localhost:8080", secure = false) {
+        override val loginPrefix = "local://"
+    }
+
+    object Lava : Config(domain = "lava.kellner.team", secure = true) {
+        override val loginPrefix: String = "lava://"
+    }
+
+    object Prod : Config(domain = "my.kellner.team", secure = true) {
+        override val loginPrefix: String = ""
+    }
 
     companion object {
         fun getFromLoginIdentifier(username: String): Config = when {
-            username.startsWith("local://") -> Local
-            username.startsWith("lava://") -> Lava
+            username.startsWith(Local.loginPrefix) -> Local
+            username.startsWith(Lava.loginPrefix) -> Lava
             else -> Prod
         }
     }
