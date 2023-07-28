@@ -1,4 +1,4 @@
-package org.datepollsystems.waiterrobot.mediator.api.dto
+package org.datepollsystems.waiterrobot.mediator.data.api.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

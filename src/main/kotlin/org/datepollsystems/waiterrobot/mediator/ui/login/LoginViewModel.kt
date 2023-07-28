@@ -3,14 +3,14 @@ package org.datepollsystems.waiterrobot.mediator.ui.login
 import io.ktor.client.*
 import io.ktor.http.*
 import org.datepollsystems.waiterrobot.mediator.App
-import org.datepollsystems.waiterrobot.mediator.api.ApiException
-import org.datepollsystems.waiterrobot.mediator.api.AuthApi
-import org.datepollsystems.waiterrobot.mediator.api.createClient
 import org.datepollsystems.waiterrobot.mediator.app.Config
 import org.datepollsystems.waiterrobot.mediator.app.Settings
 import org.datepollsystems.waiterrobot.mediator.app.removeLoginIdentifierEnvPrefix
 import org.datepollsystems.waiterrobot.mediator.core.AbstractViewModel
 import org.datepollsystems.waiterrobot.mediator.core.ScreenState
+import org.datepollsystems.waiterrobot.mediator.core.api.createClient
+import org.datepollsystems.waiterrobot.mediator.data.api.ApiException
+import org.datepollsystems.waiterrobot.mediator.data.api.AuthApi
 import org.datepollsystems.waiterrobot.mediator.navigation.Navigator
 import org.datepollsystems.waiterrobot.mediator.navigation.Screen
 

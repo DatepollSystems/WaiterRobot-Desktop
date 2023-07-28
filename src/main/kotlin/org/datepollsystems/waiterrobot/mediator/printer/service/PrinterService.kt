@@ -3,8 +3,8 @@ package org.datepollsystems.waiterrobot.mediator.printer.service
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import org.datepollsystems.waiterrobot.mediator.App
-import org.datepollsystems.waiterrobot.mediator.api.dto.GetPrinterDto
 import org.datepollsystems.waiterrobot.mediator.core.ID
+import org.datepollsystems.waiterrobot.mediator.data.api.dto.GetPrinterDto
 import org.datepollsystems.waiterrobot.mediator.printer.LocalPrinter
 import org.datepollsystems.waiterrobot.mediator.printer.PrinterWithIdNotFoundException
 import org.datepollsystems.waiterrobot.mediator.ui.configurePrinters.ConfigurePrintersState

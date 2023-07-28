@@ -1,12 +1,11 @@
-package org.datepollsystems.waiterrobot.mediator.api
+package org.datepollsystems.waiterrobot.mediator.core.api
 
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 
-abstract class AbstractApi(baseUrl: String) {
-    protected abstract val client: HttpClient
+abstract class AbstractApi(baseUrl: String, private val client: HttpClient) {
 
     // Make sure that the baseUrl ends with a "/"
     private val baseUrl = if (baseUrl.endsWith("/")) baseUrl else "$baseUrl/"

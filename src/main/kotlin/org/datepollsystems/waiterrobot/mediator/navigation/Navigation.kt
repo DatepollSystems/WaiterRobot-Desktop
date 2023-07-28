@@ -3,9 +3,7 @@ package org.datepollsystems.waiterrobot.mediator.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
-import dev.icerock.moko.mvvm.compose.getViewModel
-import dev.icerock.moko.mvvm.compose.viewModelFactory
-import org.datepollsystems.waiterrobot.mediator.api.*
+import org.datepollsystems.waiterrobot.mediator.core.di.getViewModel
 import org.datepollsystems.waiterrobot.mediator.ui.configurePrinters.ConfigurePrintersScreen
 import org.datepollsystems.waiterrobot.mediator.ui.configurePrinters.ConfigurePrintersViewModel
 import org.datepollsystems.waiterrobot.mediator.ui.forceUpdate.ForceUpdateScreen
@@ -21,55 +19,26 @@ fun Navigation() {
     val navigator = remember { Navigator(Screen.StartUpScreen) }
 
     val screenState = navigator.screenState.collectAsState().value
-    // TODO proper dependency injection (use koin?)
     when (screenState) {
         Screen.StartUpScreen -> {
-            val viewModel = getViewModel(
-                key = "startUp-screen",
-                factory = viewModelFactory {
-                    val client = createClient()
-                    StartUpViewModel(
-                        GitHubApi(client),
-                        navigator
-                    )
-                }
-            )
+            val viewModel = getViewModel { StartUpViewModel(navigator, get()) }
             StartUpScreen(viewModel)
         }
 
         Screen.LoginScreen -> {
-            val viewModel = getViewModel(
-                key = "login-screen",
-                factory = viewModelFactory {
-                    LoginViewModel(navigator)
-                }
-            )
+            val viewModel = getViewModel { LoginViewModel(navigator) }
             LoginScreen(viewModel)
         }
 
         Screen.MainScreen -> {
-            val viewModel = getViewModel(
-                key = "main-screen",
-                factory = viewModelFactory {
-                    MainScreenViewModel(navigator)
-                }
-            )
+            val viewModel = getViewModel { MainScreenViewModel(navigator) }
             MainScreen(viewModel)
         }
 
         Screen.ConfigurePrintersScreen -> {
-            val viewModel = getViewModel(
-                key = "configure-printers-screen",
-                factory = viewModelFactory {
-                    val client = createAuthenticatedClient()
-                    ConfigurePrintersViewModel(
-                        navigator,
-                        OrganisationApi(client),
-                        EventApi(client),
-                        PrinterApi(client),
-                    )
-                }
-            )
+            val viewModel = getViewModel {
+                ConfigurePrintersViewModel(navigator, get(), get(), get())
+            }
             ConfigurePrintersScreen(viewModel)
         }
 

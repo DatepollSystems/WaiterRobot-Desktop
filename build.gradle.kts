@@ -34,6 +34,9 @@ dependencies {
     implementation("dev.icerock.moko:mvvm-core:${mokoMvvmVersion}")
     implementation("dev.icerock.moko:mvvm-compose:${mokoMvvmVersion}")
 
+    implementation("io.insert-koin:koin-core:3.4.2")
+    implementation("io.insert-koin:koin-compose:1.0.3")
+
     implementation("org.apache.pdfbox:pdfbox:3.0.0-RC1")
     runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.2") // Adds a Main Dispatcher for Desktop
 
