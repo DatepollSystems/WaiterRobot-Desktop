@@ -8,6 +8,7 @@ import org.datepollsystems.waiterrobot.mediator.App
 import org.datepollsystems.waiterrobot.mediator.app.Settings
 import org.datepollsystems.waiterrobot.mediator.core.api.createClient
 import org.datepollsystems.waiterrobot.mediator.data.api.AuthApi
+import org.datepollsystems.waiterrobot.mediator.testLogger
 import org.datepollsystems.waiterrobot.mediator.ws.messages.HelloMessage
 import org.datepollsystems.waiterrobot.mediator.ws.messages.HelloMessageResponse
 import org.junit.Ignore
@@ -16,7 +17,6 @@ import kotlin.random.Random
 import kotlin.test.assertEquals
 
 internal class WsClientTest {
-
     /** E2E test */
     @Test
     @Ignore
@@ -27,7 +27,7 @@ internal class WsClientTest {
             val randomVerifier = Random.nextBytes(64).encodeBase64()
 
             // Login
-            val tokens = AuthApi(createClient(enableNetworkLogs = false)).login(
+            val tokens = AuthApi(createClient(enableNetworkLogs = false, testLogger)).login(
                 "admin@admin.org",
                 "admin"
             ) // TODO replace credentials to run tests

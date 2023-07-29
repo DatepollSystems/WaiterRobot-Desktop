@@ -17,7 +17,6 @@ repositories {
 }
 
 dependencies {
-    testImplementation(kotlin("test"))
     implementation(compose.desktop.currentOs)
     implementation(compose.materialIconsExtended)
 
@@ -37,7 +36,8 @@ dependencies {
     implementation("io.insert-koin:koin-core:3.4.2")
     implementation("io.insert-koin:koin-compose:1.0.3")
 
-    implementation("co.touchlab:kermit:2.0.0-RC5")
+    val kermitVersion = "2.0.0-RC5"
+    implementation("co.touchlab:kermit:$kermitVersion")
     implementation("io.sentry:sentry:6.27.0")
 
     implementation("org.apache.pdfbox:pdfbox:3.0.0-RC1")
@@ -45,6 +45,9 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     implementation(kotlin("reflect"))
+
+    testImplementation(kotlin("test"))
+    testImplementation("co.touchlab:kermit-test:$kermitVersion")
 }
 
 tasks.withType<KotlinCompile> {
