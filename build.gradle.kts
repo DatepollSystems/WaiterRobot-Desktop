@@ -2,10 +2,10 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    val kotlinVersion = "1.8.20"
+    val kotlinVersion = "1.9.0"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.serialization") version kotlinVersion
-    id("org.jetbrains.compose") version "1.4.0"
+    id("org.jetbrains.compose") version "1.4.3"
 }
 
 group = "org.datepollsystems.waiterrobot.mediator"
@@ -21,7 +21,7 @@ dependencies {
     implementation(compose.desktop.currentOs)
     implementation(compose.materialIconsExtended)
 
-    val ktorVersion = "2.2.3"
+    val ktorVersion = "2.3.2"
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
@@ -34,11 +34,11 @@ dependencies {
     implementation("dev.icerock.moko:mvvm-core:${mokoMvvmVersion}")
     implementation("dev.icerock.moko:mvvm-compose:${mokoMvvmVersion}")
 
-    implementation("io.insert-koin:koin-core:3.4.2")
-    implementation("io.insert-koin:koin-compose:1.0.3")
+    implementation("io.insert-koin:koin-core:3.4.3")
+    implementation("io.insert-koin:koin-compose:1.0.4")
 
     implementation("org.apache.pdfbox:pdfbox:3.0.0-RC1")
-    runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.2") // Adds a Main Dispatcher for Desktop
+    runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.3") // Adds a Main Dispatcher for Desktop
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     implementation(kotlin("reflect"))
