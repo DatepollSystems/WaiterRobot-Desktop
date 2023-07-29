@@ -5,7 +5,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 
-abstract class AbstractApi(baseUrl: String, private val client: HttpClient) {
+abstract class AbstractApi(baseUrl: String, protected val client: HttpClient) {
 
     // Make sure that the baseUrl ends with a "/"
     private val baseUrl = if (baseUrl.endsWith("/")) baseUrl else "$baseUrl/"
@@ -13,7 +13,7 @@ abstract class AbstractApi(baseUrl: String, private val client: HttpClient) {
     /**
      * prepend string (endpoint) with base and make sure that endpoint does not start with "/"
      */
-    private fun String.toFullUrl() = (baseUrl + this.removePrefix("/")).removeSuffix("/")
+    protected fun String.toFullUrl() = (baseUrl + this.removePrefix("/")).removeSuffix("/")
 
     protected suspend fun get(
         endpoint: String = "",
@@ -27,10 +27,10 @@ abstract class AbstractApi(baseUrl: String, private val client: HttpClient) {
         block?.invoke(this)
     }
 
-    protected suspend fun post(
+    protected suspend inline fun <reified B : RequestBodyDto> post(
         endpoint: String = "",
-        body: RequestBodyDto? = null,
-        block: (HttpRequestBuilder.() -> Unit)? = null
+        body: B? = null,
+        noinline block: (HttpRequestBuilder.() -> Unit)? = null
     ): HttpResponse = client.post(endpoint.toFullUrl()) {
         if (body != null) {
             contentType(ContentType.Application.Json)
