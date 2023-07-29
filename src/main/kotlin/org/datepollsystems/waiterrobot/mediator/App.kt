@@ -39,6 +39,7 @@ object App {
     fun logout() {
         Settings.accessToken = null
         Settings.refreshToken = null
+        Settings.loginPrefix = null
         logoutListeners.forEach { it.invoke() }
     }
 }

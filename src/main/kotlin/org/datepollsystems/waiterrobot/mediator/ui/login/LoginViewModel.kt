@@ -23,6 +23,7 @@ class LoginViewModel(navigator: Navigator) :
         reduce { copy(screenState = ScreenState.Loading, loginErrorMessage = null) }
 
         App.config = Config.getFromLoginIdentifier(email)
+        Settings.loginPrefix = App.config.loginPrefix
         val authApi = AuthApi(authClient)
 
         try {

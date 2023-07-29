@@ -1,26 +1,16 @@
 package org.datepollsystems.waiterrobot.mediator.app
 
 import org.datepollsystems.waiterrobot.mediator.core.ID
-import org.datepollsystems.waiterrobot.mediator.utils.emptyToNull
+import java.util.prefs.Preferences
 import kotlin.properties.Delegates
 
 object Settings {
-    private const val ACCESS_TOKEN = "accessToken"
-    private const val REFRESH_TOKEN = "refreshToken"
+    private const val SETTINGS_NODE_NAME = "org.datepollsystems.waiterrobot.mediator.settings"
+    private val preferences = Preferences.userRoot().node(SETTINGS_NODE_NAME)
 
-    var accessToken: String?
-        get() = System.getProperty(ACCESS_TOKEN, null).emptyToNull()
-        set(value) {
-            value.emptyToNull()?.also { System.setProperty(ACCESS_TOKEN, it) }
-                ?: System.clearProperty(ACCESS_TOKEN)
-        }
-
-    var refreshToken: String?
-        get() = System.getProperty(REFRESH_TOKEN, null).emptyToNull()
-        set(value) {
-            value.emptyToNull()?.also { System.setProperty(REFRESH_TOKEN, it) }
-                ?: System.clearProperty(REFRESH_TOKEN)
-        }
+    var accessToken: String? by preferences.nullableString()
+    var refreshToken: String? by preferences.nullableString()
+    var loginPrefix: String? by preferences.nullableString()
 
     var organisationId by Delegates.notNull<ID>()
 }
