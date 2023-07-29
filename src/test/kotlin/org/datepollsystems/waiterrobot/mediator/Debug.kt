@@ -1,10 +1,17 @@
 package org.datepollsystems.waiterrobot.mediator
 
+import co.touchlab.kermit.Logger
+import kotlinx.coroutines.*
 import org.apache.pdfbox.Loader
 import org.apache.pdfbox.printing.PDFPageable
+import org.datepollsystems.waiterrobot.mediator.app.Settings
+import org.datepollsystems.waiterrobot.mediator.core.api.createClient
+import org.datepollsystems.waiterrobot.mediator.data.api.AuthApi
 import org.datepollsystems.waiterrobot.mediator.printer.LocalPrinter
 import org.datepollsystems.waiterrobot.mediator.printer.LocalPrinterInfo
 import org.datepollsystems.waiterrobot.mediator.printer.service.PrinterDiscoverService
+import org.datepollsystems.waiterrobot.mediator.ws.messages.HelloMessage
+import org.datepollsystems.waiterrobot.mediator.ws.messages.HelloMessageResponse
 import java.awt.print.PrinterJob
 import java.io.File
 import javax.print.PrintServiceLookup
@@ -53,4 +60,51 @@ fun printTestFile(printerName: String) {
     job.setPageable(PDFPageable(doc))
     job.printService = printer
     job.print()
+}
+
+// WebSocket debug/test example (credentials must be replaced)
+fun websocket(): Unit = runBlocking {
+    // Login
+    val tokens = AuthApi(createClient(logger = Logger.withTag("Test"))).login("admin@admin.org", "admin")
+    Settings.accessToken = tokens.accessToken
+    Settings.refreshToken = tokens.refreshToken!!
+    Settings.organisationId = 1L
+
+    // Register a Handler for a specific websocket message
+    App.socketManager.handle<HelloMessageResponse> {
+        println("Handler for HelloMessageResponse called with: $it")
+
+        if (it.body.text != "Hello second") {
+            delay(2000)
+            App.socketManager.send(HelloMessage(text = "second"))
+        }
+    }
+
+    App.socketManager.addRegisterMessage(HelloMessage(text = "Test Register"))
+    App.socketManager.send(HelloMessage(text = "Test send"))
+
+    try {
+        listOf(
+            launch(CoroutineName("lauch1")) {
+                repeat(15) {
+                    println("I'm alive since $it sec.")
+                    delay(1_000)
+                }
+            },
+            launch(CoroutineName("lauch2")) {
+                delay(10_000)
+                App.socketManager.send(HelloMessage(text = "second"))
+            },
+            launch(CoroutineName("lauch3")) {
+                delay(12_000)
+                // App.socketManager.send(HelloMessage2(text = "test crash"))
+                // App.socketManager.close()
+            }
+        ).joinAll() // Simulate some "application live time"
+    } catch (e: Exception) {
+        println(e)
+    }
+    println("Stopping client")
+    App.socketManager.close()
+    println("finished")
 }

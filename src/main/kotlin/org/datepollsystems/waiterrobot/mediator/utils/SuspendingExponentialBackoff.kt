@@ -1,6 +1,8 @@
 package org.datepollsystems.waiterrobot.mediator.utils
 
 import kotlinx.coroutines.*
+import org.datepollsystems.waiterrobot.mediator.core.di.injectLoggerForClass
+import org.koin.core.component.KoinComponent
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.TimeoutException
@@ -24,7 +26,8 @@ class SuspendingExponentialBackoff(
     private val resetAfter: Duration? = null,
     private val maxBackoffTime: Duration? = null,
     private val name: String,
-) {
+) : KoinComponent {
+    private val logger by injectLoggerForClass()
     private val backoffStage: AtomicInteger = AtomicInteger(0)
     private var lastBackoff: Instant = Instant.MIN
     private val resetScope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -90,7 +93,7 @@ class SuspendingExponentialBackoff(
         if (now.isAfter(nextExecution)) return
 
         val delayDuration = Duration.between(now, nextExecution)
-        println("Backoff task \"$name\" for ${delayDuration.seconds}s")
+        logger.d("Backoff task \"$name\" for ${delayDuration.seconds}s")
         delay(delayDuration.toMillis())
     }
 }

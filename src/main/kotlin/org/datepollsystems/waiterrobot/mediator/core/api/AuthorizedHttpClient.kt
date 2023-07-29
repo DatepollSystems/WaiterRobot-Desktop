@@ -1,5 +1,6 @@
 package org.datepollsystems.waiterrobot.mediator.core.api
 
+import co.touchlab.kermit.Logger
 import io.ktor.client.*
 import io.ktor.client.plugins.auth.*
 import io.ktor.client.plugins.auth.providers.*
@@ -8,18 +9,18 @@ import org.datepollsystems.waiterrobot.mediator.app.Settings
 import org.datepollsystems.waiterrobot.mediator.data.api.AuthApi
 
 
-fun createAuthorizedClient(enableNetworkLogs: Boolean = false): AuthorizedClient = AuthorizedClient(
-    createClient(enableNetworkLogs).config {
-        configureAuth()
+fun createAuthorizedClient(enableNetworkLogs: Boolean = false, logger: Logger): AuthorizedClient = AuthorizedClient(
+    createClient(enableNetworkLogs, logger).config {
+        configureAuth(enableNetworkLogs, logger)
     }
 )
 
 class AuthorizedClient(val delegate: HttpClient)
 
-fun HttpClientConfig<*>.configureAuth() {
+fun HttpClientConfig<*>.configureAuth(enableNetworkLogs: Boolean, logger: Logger) {
     install(Auth) {
         suspend fun refreshTokens(refreshToken: String): BearerTokens? {
-            val authApi = AuthApi(createClient())
+            val authApi = AuthApi(createClient(enableNetworkLogs, logger))
             return try {
                 val tokenInfo = authApi.refresh(refreshToken)
 
@@ -33,16 +34,13 @@ fun HttpClientConfig<*>.configureAuth() {
                 )
             } catch (e: Exception) {
                 // TODO improve request errors handling (-> try again, logout?, no connection info)
-                //  logging and logout
-                println("Error while refreshing token: ${e.message}")
-                e.printStackTrace()
+                logger.e(e) { "Error while refreshing token: ${e.message}" }
                 null
             }
         }
 
         bearer {
             loadTokens {
-                // TODO use other storage?
                 val accessToken: String? = Settings.accessToken
                 val sessionToken: String? = Settings.refreshToken
 

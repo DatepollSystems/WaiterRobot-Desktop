@@ -7,14 +7,17 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.datepollsystems.waiterrobot.mediator.core.di.injectLoggerForClass
 import org.datepollsystems.waiterrobot.mediator.data.api.ApiException
 import org.datepollsystems.waiterrobot.mediator.navigation.Navigator
 import org.datepollsystems.waiterrobot.mediator.navigation.Screen
+import org.koin.core.component.KoinComponent
 
 abstract class AbstractViewModel<T : State<T>>(
     protected val navigator: Navigator,
     init: T
-) : ViewModel() {
+) : KoinComponent, ViewModel() {
+    protected val logger by injectLoggerForClass()
     private val _stateFlow = MutableStateFlow(init)
     val state: StateFlow<T> = _stateFlow
 
@@ -23,8 +26,9 @@ abstract class AbstractViewModel<T : State<T>>(
             is ApiException.AppVersionTooOld -> navigator.navigate(Screen.AppVersionTooOld)
 
             else -> {
-                println("Unhandled exception in intent. Exceptions should be handled directly in the intent!") // TODO use logger
-                exception.printStackTrace()
+                logger.e(exception) {
+                    "Unhandled exception in intent. Exceptions should be handled directly in the intent!"
+                }
                 reduceError("Fehler", "Etwas ist schief gelaufen. Bitte versuche es erneut.")
             }
         }

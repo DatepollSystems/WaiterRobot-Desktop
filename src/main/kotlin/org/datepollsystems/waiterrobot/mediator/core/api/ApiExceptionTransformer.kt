@@ -1,5 +1,6 @@
 package org.datepollsystems.waiterrobot.mediator.core.api
 
+import co.touchlab.kermit.Logger
 import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.client.statement.*
@@ -7,7 +8,7 @@ import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import org.datepollsystems.waiterrobot.mediator.data.api.ApiException
 
-fun HttpClientConfig<*>.installApiClientExceptionTransformer(json: Json) {
+fun HttpClientConfig<*>.installApiClientExceptionTransformer(json: Json, logger: Logger) {
     expectSuccess = true
     HttpResponseValidator {
         handleResponseExceptionWithRequest { exception, _ ->
@@ -20,11 +21,11 @@ fun HttpClientConfig<*>.installApiClientExceptionTransformer(json: Json) {
             throw try {
                 json.decodeFromString<ApiException>(jsonString)
             } catch (e: SerializationException) {
-                // TODO log "Could not serialize ClientError using fallback"
+                logger.w(e) { "Could not serialize ClientError using fallback" }
                 try {
                     json.decodeFromString<ApiException.Generic>(jsonString)
                 } catch (_: SerializationException) {
-                    // TODO log "Fallback ClientError Serialization failed"
+                    logger.e(e) { "Fallback ClientError Serialization failed" }
                     ApiException.Generic(
                         message = "Unknown error",
                         httpCode = exception.response.status.value,

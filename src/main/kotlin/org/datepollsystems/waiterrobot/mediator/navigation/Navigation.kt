@@ -26,7 +26,7 @@ fun Navigation() {
         }
 
         Screen.LoginScreen -> {
-            val viewModel = getViewModel { LoginViewModel(navigator) }
+            val viewModel = getViewModel { LoginViewModel(navigator, get()) }
             LoginScreen(viewModel)
         }
 
