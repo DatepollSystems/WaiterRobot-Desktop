@@ -1,12 +1,14 @@
 package org.datepollsystems.waiterrobot.mediator.ui.login
 
 import io.ktor.http.*
+import io.sentry.Sentry
 import org.datepollsystems.waiterrobot.mediator.App
 import org.datepollsystems.waiterrobot.mediator.app.Config
 import org.datepollsystems.waiterrobot.mediator.app.Settings
 import org.datepollsystems.waiterrobot.mediator.app.removeLoginIdentifierEnvPrefix
 import org.datepollsystems.waiterrobot.mediator.core.AbstractViewModel
 import org.datepollsystems.waiterrobot.mediator.core.ScreenState
+import org.datepollsystems.waiterrobot.mediator.core.sentry.SentryTagKeys
 import org.datepollsystems.waiterrobot.mediator.data.api.ApiException
 import org.datepollsystems.waiterrobot.mediator.data.api.AuthApi
 import org.datepollsystems.waiterrobot.mediator.navigation.Navigator
@@ -22,6 +24,7 @@ class LoginViewModel(
 
         App.config = Config.getFromLoginIdentifier(email)
         Settings.loginPrefix = App.config.loginPrefix
+        Sentry.setTag(SentryTagKeys.environment, App.config.displayName)
 
         try {
             val tokens = authApi.login(email.removeLoginIdentifierEnvPrefix(), password)
