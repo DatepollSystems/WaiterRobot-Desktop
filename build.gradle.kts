@@ -37,6 +37,9 @@ dependencies {
     implementation("io.insert-koin:koin-core:3.4.2")
     implementation("io.insert-koin:koin-compose:1.0.3")
 
+    implementation("co.touchlab:kermit:2.0.0-RC5")
+    implementation("io.sentry:sentry:6.27.0")
+
     implementation("org.apache.pdfbox:pdfbox:3.0.0-RC1")
     runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.2") // Adds a Main Dispatcher for Desktop
 

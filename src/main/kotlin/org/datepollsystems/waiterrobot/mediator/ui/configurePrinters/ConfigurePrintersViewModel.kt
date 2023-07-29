@@ -1,5 +1,6 @@
 package org.datepollsystems.waiterrobot.mediator.ui.configurePrinters
 
+import io.sentry.Sentry
 import org.datepollsystems.waiterrobot.mediator.app.MediatorConfiguration
 import org.datepollsystems.waiterrobot.mediator.app.Settings
 import org.datepollsystems.waiterrobot.mediator.core.AbstractViewModel
@@ -101,6 +102,8 @@ class ConfigurePrintersViewModel(
     fun saveAndContinue() {
         val state = state.value
         if (state.selectedOrganisation == null || state.selectedEvent == null) return
+        Sentry.setTag("organizationId", state.selectedOrganisation.id.toString())
+        Sentry.setTag("eventId", state.selectedEvent.id.toString())
 
         inVmScope {
             reduce { copy(screenState = ScreenState.Loading) }

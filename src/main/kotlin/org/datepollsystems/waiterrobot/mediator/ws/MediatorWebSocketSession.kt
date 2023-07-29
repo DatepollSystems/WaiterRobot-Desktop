@@ -11,23 +11,27 @@ import kotlinx.coroutines.channels.SendChannel
 import kotlinx.serialization.SerializationException
 import org.datepollsystems.waiterrobot.mediator.App
 import org.datepollsystems.waiterrobot.mediator.app.Settings
+import org.datepollsystems.waiterrobot.mediator.core.di.injectLoggerForClass
 import org.datepollsystems.waiterrobot.mediator.ws.messages.AbstractWsMessage
 import org.datepollsystems.waiterrobot.mediator.ws.messages.WsMessageBody
+import org.koin.core.component.KoinComponent
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.coroutineContext
 
 /**
  * Ktor ws internally handles connection loss and reestablishes the connection without destroying the session.
- * When there is no connection messages are queued. TODO check how spring handles this
+ * When there is no connection messages are queued.
  * @author Fabian Schedler
  */
 class MediatorWebSocketSession(
     private val client: HttpClient,
     private val outgoing: ReceiveChannel<AbstractWsMessage<WsMessageBody>>,
     private val incoming: SendChannel<AbstractWsMessage<WsMessageBody>>
-) {
+) : KoinComponent {
     private lateinit var session: DefaultClientWebSocketSession
     private lateinit var sessionScope: CoroutineScope
+
+    private val logger by injectLoggerForClass()
 
     private val closed = AtomicBoolean(false)
     private val started = AtomicBoolean(false)
@@ -54,19 +58,19 @@ class MediatorWebSocketSession(
         while (coroutineContext.isActive) { // Keep listening as long as the coroutine is active
             try {
                 val message = outgoing.receive()
-                println("Sending message: $message") // TODO logger
+                logger.d("Sending message: $message")
                 session.sendSerialized(message)
             } catch (e: ContentConvertException) {
-                println("Could not convert outgoing message: $e") // TODO logger
+                logger.e(e) { "Could not convert outgoing message: $e" }
             } catch (e: SerializationException) {
-                println("Could not serialize outgoing message: $e") // TODO logger
+                logger.e(e) { "Could not serialize outgoing message: $e" }
             } catch (e: Exception) {
                 sessionScope.cancel(
                     e as? CancellationException ?: CancellationException("Incoming message handler failed", e)
                 )
             }
         }
-        println("Send handler finished")
+        logger.d("Send handler finished")
         close()
     }
 
@@ -74,26 +78,26 @@ class MediatorWebSocketSession(
         while (coroutineContext.isActive) { // Keep listening as long as the coroutine is active
             try {
                 val message = session.receiveDeserialized<AbstractWsMessage<WsMessageBody>>()
-                println("Got message: $message") // TODO logger
+                logger.d("Got message: $message")
                 incoming.send(message)
             } catch (e: ContentConvertException) {
-                println("Could not convert incoming message: $e") // TODO logger
+                logger.e(e) { "Could not convert incoming message: $e" }
             } catch (e: SerializationException) {
-                println("Could not deserialize incoming message: $e") // TODO logger
+                logger.e(e) { "Could not deserialize incoming message: $e" }
             } catch (e: Exception) {
                 coroutineContext.cancel(
                     e as? CancellationException ?: CancellationException("Incoming message handler failed", e)
                 )
             }
         }
-        println("Receive handler finished")
+        logger.d("Receive handler finished")
         close()
     }
 
     suspend fun close() {
         try {
             if (closed.getAndSet(true)) return
-            println("Closing WebSocket session")
+            logger.i("Closing WebSocket session")
             session.close()
             sessionScope.cancel()
         } catch (_: Exception) {

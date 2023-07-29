@@ -1,25 +1,21 @@
 package org.datepollsystems.waiterrobot.mediator.ws
 
+import co.touchlab.kermit.Logger
 import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.serialization.kotlinx.*
-import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import org.datepollsystems.waiterrobot.mediator.App
-import org.datepollsystems.waiterrobot.mediator.app.Settings
+import org.datepollsystems.waiterrobot.mediator.core.api.CustomKtorLogger
 import org.datepollsystems.waiterrobot.mediator.core.api.configureAuth
-import org.datepollsystems.waiterrobot.mediator.core.api.createClient
-import org.datepollsystems.waiterrobot.mediator.data.api.AuthApi
 import org.datepollsystems.waiterrobot.mediator.ws.messages.AbstractWsMessage
-import org.datepollsystems.waiterrobot.mediator.ws.messages.HelloMessage
-import org.datepollsystems.waiterrobot.mediator.ws.messages.HelloMessageResponse
 import kotlin.time.Duration.Companion.seconds
 
 typealias WsMessageHandler<T> = suspend (AbstractWsMessage<T>) -> Unit
 
-fun createWsClient(enableNetworkLogs: Boolean = App.config.enableNetworkLogging) = HttpClient {
+fun createWsClient(enableNetworkLogs: Boolean = App.config.enableNetworkLogging, logger: Logger) = HttpClient {
     install(WebSockets) {
         contentConverter = KotlinxWebsocketSerializationConverter(Json { ignoreUnknownKeys = true })
         pingInterval = 10.seconds.inWholeMilliseconds // TODO adapt?
@@ -37,63 +33,11 @@ fun createWsClient(enableNetworkLogs: Boolean = App.config.enableNetworkLogging)
     install(HttpTimeout) {
         requestTimeoutMillis = 10.seconds.inWholeMilliseconds
     }
-    configureAuth()
+    configureAuth(enableNetworkLogs, logger)
     if (enableNetworkLogs) {
         install(Logging) {
-            // TODO use real logger
-            logger = object : Logger {
-                override fun log(message: String) {
-                    println(message)
-                }
-            }
-            level = LogLevel.ALL
+            this.logger = CustomKtorLogger(logger.tag)
+            this.level = LogLevel.ALL
         }
     }
-}
-
-// WebSocket debug/test example (credentials must be replaced)
-fun main(): Unit = runBlocking {
-    // Login
-    val tokens = AuthApi(createClient()).login("admin@admin.org", "admin")
-    Settings.accessToken = tokens.accessToken
-    Settings.refreshToken = tokens.refreshToken!!
-    Settings.organisationId = 1L
-
-    // Register a Handler for a specific websocket message
-    App.socketManager.handle<HelloMessageResponse> {
-        println("Handler for HelloMessageResponse called with: $it")
-
-        if (it.body.text != "Hello second") {
-            delay(2000)
-            App.socketManager.send(HelloMessage(text = "second"))
-        }
-    }
-
-    App.socketManager.addRegisterMessage(HelloMessage(text = "Test Register"))
-    App.socketManager.send(HelloMessage(text = "Test send"))
-
-    try {
-        listOf(
-            launch(CoroutineName("lauch1")) {
-                repeat(15) {
-                    println("I'm alive since $it sec.")
-                    delay(1_000)
-                }
-            },
-            launch(CoroutineName("lauch2")) {
-                delay(10_000)
-                App.socketManager.send(HelloMessage(text = "second"))
-            },
-            launch(CoroutineName("lauch3")) {
-                delay(12_000)
-                // App.socketManager.send(HelloMessage2(text = "test crash"))
-                // App.socketManager.close()
-            }
-        ).joinAll() // Simulate some "application live time"
-    } catch (e: Exception) {
-        println(e)
-    }
-    println("Stopping client")
-    App.socketManager.close()
-    println("finished")
 }

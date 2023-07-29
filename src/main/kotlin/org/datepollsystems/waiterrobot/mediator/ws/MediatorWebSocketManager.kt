@@ -5,9 +5,11 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import org.datepollsystems.waiterrobot.mediator.core.di.injectLoggerForClass
 import org.datepollsystems.waiterrobot.mediator.utils.SuspendingExponentialBackoff
 import org.datepollsystems.waiterrobot.mediator.ws.messages.AbstractWsMessage
 import org.datepollsystems.waiterrobot.mediator.ws.messages.WsMessageBody
+import org.koin.core.component.KoinComponent
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.reflect.KClass
@@ -17,10 +19,11 @@ import kotlin.reflect.KClass
  * For auto recover an exponential backoff is used.
  * @author Fabian Schedler
  */
-class MediatorWebSocketManager {
+class MediatorWebSocketManager : KoinComponent {
     private lateinit var session: MediatorWebSocketSession
 
-    private val wsClient = createWsClient()
+    private val logger by injectLoggerForClass()
+    private val wsClient = createWsClient(logger = logger)
     private val managerScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val closedIntentional = AtomicBoolean(false)
     private val closed = AtomicBoolean(false)
@@ -54,11 +57,10 @@ class MediatorWebSocketManager {
     private fun startWatching() {
         if (closed.get()) return
 
-        // TODO logger
         if (this::session.isInitialized) {
-            println("Auto Restarting WebSocketSession")
+            logger.i("Auto Restarting WebSocketSession")
         } else {
-            println("Starting WebSockeSession")
+            logger.i("Starting WebSockeSession")
         }
         session = MediatorWebSocketSession(wsClient, sendChannel, receiveChannel)
 
@@ -66,13 +68,15 @@ class MediatorWebSocketManager {
             suspendingBackoff.acquire()
             try {
                 session.start().invokeOnCompletion { e ->
-                    println("WebSocket session completed" + (e?.let { " with exception: $it" } ?: ".")) // TODO logger
-                    e?.printStackTrace()
                     closeCurrentSession()
-                    // Handle auto reconnect. This should only be triggered on Errors as ktor already handles connection loss internally
+                    // Handle auto reconnect.
+                    // This should only be triggered on Errors as ktor already handles connection loss internally
                     if (!closedIntentional.get()) {
+                        logger.w(e) { "WebSocket session completed" }
                         suspendingBackoff.backoff(e)
                         startWatching()
+                    } else {
+                        logger.d(e) { "WebSocket session completed" }
                     }
                 }
                 setIsConnected(true)
@@ -117,7 +121,7 @@ class MediatorWebSocketManager {
         handler as WsMessageHandler<WsMessageBody>
         if (handlers.put(clazz, handler) != null) {
             // This is probably not what we want -> log it
-            println("Replaced handler for class ${clazz.simpleName}") // TODO logger
+            logger.w("Replaced handler for class ${clazz.simpleName}")
         }
     }
 
@@ -156,15 +160,14 @@ class MediatorWebSocketManager {
             receiveChannel.consumeEach { message ->
                 val handler = handlers[message::class]
                 if (handler == null) {
-                    println("No handler for message type '${message::class.simpleName}' found") // TODO logger
+                    logger.w("No handler for message type '${message::class.simpleName}' found")
                 } else {
                     // Launch on managerScope (SuperVisorJob) so that a failing handler does not cancel the whole handler
                     managerScope.launch(CoroutineName("WsMessageHandler")) {
                         try {
                             handler(message)
                         } catch (e: Exception) {
-                            println("Handler for message: $message failed with: ${e.message}") // TODO logger
-                            e.printStackTrace()
+                            logger.e(e) { "Handler for message: $message failed with: ${e.message}" }
                         }
                     }
                 }
