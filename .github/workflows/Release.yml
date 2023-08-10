@@ -48,3 +48,19 @@ jobs:
         with:
           allowUpdates: true # Matrix strategy -> executed multiple times
           artifacts: "build/compose/binaries/main/${{ matrix.pkg }}/*"
+          
+      - name: Create latest and move files in place
+        run: |
+          mkdir binary_files
+          mv build/compose/binaries/main/${{ matrix.pkg }}/* binary_files
+          cp "$(ls -1 binary_files | head -n 1)" binary_files/WaiterRobot-Desktop-latest.${{ matrix.pkg}}
+      
+      - name: Move to release server
+        uses: garygrossgarten/github-action-scp@release
+        with:
+          local: binary_files
+          remote: /var/www/datepoll-share/WaiterRobot/Desktop-Releases/${{ matrix.pkg}}
+          host: ${{ secrets.RELEASES_SSH_HOST }}
+          port: ${{ secrets.RELEASES_SSH_PORT }}
+          username: ${{ secrets.RELEASES_SSH_USER }}
+          privateKey: ${{ secrets.RELEASES_SSH_PRIVATE_KEY }}
