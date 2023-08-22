@@ -1,6 +1,5 @@
 package org.datepollsystems.waiterrobot.mediator.ws
 
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.datepollsystems.waiterrobot.mediator.ws.messages.*

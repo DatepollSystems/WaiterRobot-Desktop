@@ -2,9 +2,9 @@
 root = true
 
 [*.{kt,kts}]
-ktlint_code_style = official
 indent_style = space
 indent_size = 4
-insert_final_newline = false
+insert_final_newline = true
 trim_trailing_whitespace = true
 charset = utf-8
+ij_continuation_indent_size = 4

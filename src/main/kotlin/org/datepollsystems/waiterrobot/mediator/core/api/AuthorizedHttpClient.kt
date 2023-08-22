@@ -8,7 +8,6 @@ import org.datepollsystems.waiterrobot.mediator.App
 import org.datepollsystems.waiterrobot.mediator.app.Settings
 import org.datepollsystems.waiterrobot.mediator.data.api.AuthApi
 
-
 fun createAuthorizedClient(enableNetworkLogs: Boolean = false, logger: Logger): AuthorizedClient = AuthorizedClient(
     createClient(enableNetworkLogs, logger).config {
         configureAuth(enableNetworkLogs, logger)
@@ -21,6 +20,7 @@ fun HttpClientConfig<*>.configureAuth(enableNetworkLogs: Boolean, logger: Logger
     install(Auth) {
         suspend fun refreshTokens(refreshToken: String): BearerTokens? {
             val authApi = AuthApi(createClient(enableNetworkLogs, logger))
+            @Suppress("TooGenericExceptionCaught")
             return try {
                 val tokenInfo = authApi.refresh(refreshToken)
 
@@ -56,8 +56,7 @@ fun HttpClientConfig<*>.configureAuth(enableNetworkLogs: Boolean, logger: Logger
             }
 
             refreshTokens {
-                val sessionToken: String = Settings.refreshToken
-                    ?: throw IllegalStateException("No session token stored")
+                val sessionToken: String = Settings.refreshToken ?: error("No session token stored")
 
                 return@refreshTokens refreshTokens(sessionToken)
             }

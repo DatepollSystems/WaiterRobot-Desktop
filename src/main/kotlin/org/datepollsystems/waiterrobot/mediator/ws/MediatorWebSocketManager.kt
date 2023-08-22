@@ -30,19 +30,18 @@ class MediatorWebSocketManager : KoinComponent {
     private val registerMessages: MutableSet<AbstractWsMessage<WsMessageBody>> = mutableSetOf()
     private var registerCalled = false
     private val registerLock = Object()
-    private val handlers: MutableMap<KClass<out AbstractWsMessage<WsMessageBody>>, WsMessageHandler<out WsMessageBody>> =
-        mutableMapOf()
-    private val suspendingBackoff =
-        SuspendingExponentialBackoff(
-            initialDelay = Duration.ofMillis(500),
-            resetAfter = Duration.ofMinutes(2), // When a connection last for 2 minutes reset the backoff counter
-            maxBackoffTime = Duration.ofSeconds(5), // Wait a maximum of 5 seconds for a connection retry
-            name = "WebSocket auto recovery"
-        )
+    private val handlers: HandlerMap = mutableMapOf()
 
-    // TODO evaluate bufferSize
-    private val receiveChannel = Channel<AbstractWsMessage<WsMessageBody>>(10)
-    private val sendChannel = Channel<AbstractWsMessage<WsMessageBody>>(10) {
+    @Suppress("MagicNumber")
+    private val suspendingBackoff = SuspendingExponentialBackoff(
+        initialDelay = Duration.ofMillis(500),
+        resetAfter = Duration.ofMinutes(2), // When a connection last for 2 minutes reset the backoff counter
+        maxBackoffTime = Duration.ofSeconds(5), // Wait a maximum of 5 seconds for a connection retry
+        name = "WebSocket auto recovery"
+    )
+
+    private val receiveChannel = Channel<AbstractWsMessage<WsMessageBody>>(CHANNEL_BUFFER_SIZE)
+    private val sendChannel = Channel<AbstractWsMessage<WsMessageBody>>(CHANNEL_BUFFER_SIZE) {
         send(it) // Will be called when the session could not send the element -> queue it again
     }
 
@@ -66,6 +65,7 @@ class MediatorWebSocketManager : KoinComponent {
 
         managerScope.launch(CoroutineName("StartWsSession")) {
             suspendingBackoff.acquire()
+            @Suppress("TooGenericExceptionCaught")
             try {
                 session.start().invokeOnCompletion { e ->
                     closeCurrentSession()
@@ -134,12 +134,14 @@ class MediatorWebSocketManager : KoinComponent {
         handle(T::class, handler)
     }
 
-    // TODO handle session "switch" (still referencing old session which ist not active any more -> reemit message (also reemit messages which were not sent on the old session? or not because this message may caused an error -> infinite loop?)
+    // TODO handle session "switch" (still referencing old session which ist not active any more
+    //  -> reemit message (also reemit messages which were not sent on the old session?
+    //  or not because this message may caused an error -> infinite loop?)
     /**
      * Send a message
      */
     fun <T : WsMessageBody> send(message: AbstractWsMessage<T>) {
-        if (closed.get()) throw IllegalStateException("SocketManager is already closed")
+        check(closed.get()) { "SocketManager is already closed" }
         managerScope.launch(CoroutineName("WsSendMessage")) { sendChannel.send(message) }
     }
 
@@ -162,8 +164,9 @@ class MediatorWebSocketManager : KoinComponent {
                 if (handler == null) {
                     logger.w("No handler for message type '${message::class.simpleName}' found")
                 } else {
-                    // Launch on managerScope (SuperVisorJob) so that a failing handler does not cancel the whole handler
+                    // Launch on managerScope (SuperVisorJob) so that a failing handlers don't cancel the whole handler
                     managerScope.launch(CoroutineName("WsMessageHandler")) {
+                        @Suppress("TooGenericExceptionCaught")
                         try {
                             handler(message)
                         } catch (e: Exception) {
@@ -174,4 +177,11 @@ class MediatorWebSocketManager : KoinComponent {
             }
         }
     }
+
+    companion object {
+        // TODO evaluate bufferSize
+        private const val CHANNEL_BUFFER_SIZE = 10
+    }
 }
+
+typealias HandlerMap = MutableMap<KClass<out AbstractWsMessage<WsMessageBody>>, WsMessageHandler<out WsMessageBody>>

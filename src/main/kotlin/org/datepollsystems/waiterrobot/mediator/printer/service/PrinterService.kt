@@ -37,7 +37,6 @@ object PrinterService {
         val printerPairing = backendIdToPairing[printerId] ?: throw PrinterWithIdNotFoundException(printerId)
         printerPairing.loPrinter.printPdf(pdfId, base64data)
 
-
         printQueue.emit(PrintTransaction(pdfId, LocalDateTime.now(), printerPairing.bePrinter.name))
         // test is the id of the test pdf, no response expected by backend
         if (pdfId != "test") App.socketManager.send(PrintedPdfMessage(pdfId = pdfId))

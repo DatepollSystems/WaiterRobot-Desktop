@@ -10,13 +10,14 @@ import kotlin.random.Random
 
 data class MainScreenState(
     override val screenState: ScreenState = ScreenState.Idle,
-    val printTransactions: CircularQueue<PrintTransaction> = CircularQueue(100),
+    val printTransactions: CircularQueue<PrintTransaction> = CircularQueue(MAX_TRANSACTIONS),
     val printers: List<Pair<ID, ConfigurePrintersState.PrinterPairing>> = emptyList(),
 ) : State<MainScreenState> {
     override fun withScreenState(screenState: ScreenState): MainScreenState = copy(screenState = screenState)
 }
 
 class PrintTransaction(val jobName: String, val time: LocalDateTime, val printer: String) {
+    @Suppress("MagicNumber")
     val id: String = jobName + if (jobName == "test") Random.nextBytes(10).toHex() else ""
 }
 
@@ -36,3 +37,5 @@ class CircularQueue<T : Any> private constructor(private val stack: ArrayDeque<T
 
     val items get() = stack.toList()
 }
+
+private const val MAX_TRANSACTIONS = 100

@@ -3,9 +3,13 @@ package org.datepollsystems.waiterrobot.mediator.app
 data class AppVersion(val major: Int, val minor: Int, val patch: Int) {
 
     operator fun compareTo(other: AppVersion): Int {
-        if (this.major != other.major) return this.major.compareTo(other.major)
-        if (this.minor != other.minor) return this.minor.compareTo(other.minor)
-        return this.patch.compareTo(other.patch)
+        return if (this.major != other.major) {
+            this.major.compareTo(other.major)
+        } else if (this.minor != other.minor) {
+            this.minor.compareTo(other.minor)
+        } else {
+            this.patch.compareTo(other.patch)
+        }
     }
 
     override fun toString(): String = "$major.$minor.$patch"

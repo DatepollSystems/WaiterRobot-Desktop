@@ -41,7 +41,7 @@ class MediatorWebSocketSession(
      * Suspends till the connection is established. The returned job completes when the session is closed.
      */
     suspend fun start(): Job {
-        if (started.getAndSet(true)) throw IllegalStateException("Session already started")
+        check(started.getAndSet(true)) { "Session already started" }
         session = client.webSocketSession {
             url.takeFrom(App.config.wsUrl)
             headers.append("organisationId", Settings.organisationId.toString())
@@ -56,6 +56,7 @@ class MediatorWebSocketSession(
 
     private suspend fun handleSend() {
         while (coroutineContext.isActive) { // Keep listening as long as the coroutine is active
+            @Suppress("TooGenericExceptionCaught")
             try {
                 val message = outgoing.receive()
                 logger.d("Sending message: $message")
@@ -76,6 +77,7 @@ class MediatorWebSocketSession(
 
     private suspend fun handleIncomingMessage() {
         while (coroutineContext.isActive) { // Keep listening as long as the coroutine is active
+            @Suppress("TooGenericExceptionCaught")
             try {
                 val message = session.receiveDeserialized<AbstractWsMessage<WsMessageBody>>()
                 logger.d("Got message: $message")

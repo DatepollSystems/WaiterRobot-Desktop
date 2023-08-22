@@ -23,7 +23,6 @@ import org.datepollsystems.waiterrobot.mediator.ui.common.onEnterKeyDown
 
 @Composable
 fun LoginScreen(vm: LoginViewModel) {
-
     val state = vm.state.collectAsState().value
 
     LoadableScreen(state.screenState) {
@@ -83,7 +82,11 @@ fun LoginScreen(vm: LoginViewModel) {
                 isError = state.loginErrorMessage != null,
                 onValueChange = { password = it },
                 label = { Text(text = "Password") },
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation = if (passwordVisible) {
+                    VisualTransformation.None
+                } else {
+                    PasswordVisualTransformation()
+                },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 keyboardActions = KeyboardActions(onDone = { vm.doLogin(mail, password) }),
                 trailingIcon = {

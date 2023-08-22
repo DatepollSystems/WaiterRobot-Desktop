@@ -21,6 +21,7 @@ fun createClient(enableNetworkLogs: Boolean = App.config.enableNetworkLogging, l
     }
 
     install(HttpTimeout) {
+        @Suppress("MagicNumber")
         requestTimeoutMillis = 5000 // TODO increase?
     }
 

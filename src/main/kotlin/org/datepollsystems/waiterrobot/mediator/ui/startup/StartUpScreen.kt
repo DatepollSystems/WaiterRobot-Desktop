@@ -12,7 +12,6 @@ import org.datepollsystems.waiterrobot.mediator.ui.common.LoadableScreen
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun StartUpScreen(vm: StartUpViewModel) {
-
     val state = vm.state.collectAsState().value
 
     LoadableScreen(state.screenState) {
@@ -36,7 +35,10 @@ fun StartUpScreen(vm: StartUpViewModel) {
                     Text("Neue Version")
                 },
                 text = {
-                    Text("Eine neue Version steht zur Verfügung. Update jetzt um alle neuen Funktionalitäten nutzen zu können.")
+                    Text(
+                        "Eine neue Version steht zur Verfügung. " +
+                            "Update jetzt um alle neuen Funktionalitäten nutzen zu können."
+                    )
                 }
             )
         }

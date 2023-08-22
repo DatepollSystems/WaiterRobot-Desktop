@@ -1,3 +1,5 @@
+import io.gitlab.arturbosch.detekt.Detekt
+import io.gitlab.arturbosch.detekt.report.ReportMergeTask
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -6,6 +8,7 @@ plugins {
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.serialization") version kotlinVersion
     id("org.jetbrains.compose") version "1.4.3"
+    id("io.gitlab.arturbosch.detekt") version "1.23.1"
 }
 
 group = "org.datepollsystems.waiterrobot.mediator"
@@ -48,6 +51,8 @@ dependencies {
 
     testImplementation(kotlin("test"))
     testImplementation("co.touchlab:kermit-test:$kermitVersion")
+
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.1")
 }
 
 tasks.withType<KotlinCompile> {
@@ -84,4 +89,27 @@ compose.desktop {
 
 kotlin.sourceSets.all {
     languageSettings.optIn("kotlin.RequiresOptIn")
+}
+
+val detektReportMergeSarif by tasks.registering(ReportMergeTask::class) {
+    output = layout.buildDirectory.file("reports/detekt/merge.sarif")
+}
+
+detekt {
+    config.from(rootDir.resolve("detekt.yml"))
+    buildUponDefaultConfig = true
+    basePath = rootDir.path
+    // Autocorrection can only be done locally
+    autoCorrect = System.getenv("CI")?.lowercase() != true.toString()
+}
+
+tasks.withType<Detekt>().configureEach {
+    reports {
+        html.required = true
+        sarif.required = true
+    }
+    finalizedBy(detektReportMergeSarif)
+}
+detektReportMergeSarif {
+    input.from(tasks.withType<Detekt>().map { it.sarifReportFile })
 }

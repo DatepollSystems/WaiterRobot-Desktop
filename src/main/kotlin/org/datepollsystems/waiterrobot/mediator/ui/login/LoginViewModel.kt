@@ -33,10 +33,12 @@ class LoginViewModel(
             Settings.refreshToken = tokens.refreshToken!!
 
             navigator.navigate(Screen.ConfigurePrintersScreen)
-        } catch (e: Exception) {
+        } catch (e: ApiException) {
             // TODO this should be unified (see WR-307)
-            if (e is ApiException.Unauthorized || e is ApiException.CredentialsIncorrect ||
-                (e is ApiException && e.httpCode == HttpStatusCode.Unauthorized.value)
+            @Suppress("InstanceOfCheckForException")
+            if (e is ApiException.Unauthorized ||
+                e is ApiException.CredentialsIncorrect ||
+                e.httpCode == HttpStatusCode.Unauthorized.value
             ) {
                 logger.d(e) { "Login failed" }
                 reduce {
