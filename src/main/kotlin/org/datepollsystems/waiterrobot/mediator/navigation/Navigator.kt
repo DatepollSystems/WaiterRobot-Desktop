@@ -11,7 +11,8 @@ import org.koin.core.component.KoinComponent
 
 /**
  * A really simple navigator
- * Attention does currently not support back navigation and state-keeping (each screen state gets discharged when navigated away)
+ * Attention: does currently not support back navigation and state-keeping
+ * (each screen state gets discharged when navigated away)
  */
 class Navigator(startScreen: Screen) : KoinComponent {
     private val logger by injectLoggerForClass()

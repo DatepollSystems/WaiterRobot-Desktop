@@ -28,12 +28,14 @@ fun listPrinters() {
         PrintServiceLookup.lookupPrintServices(null, null).map { LocalPrinter(it) }
     val longestName = allLocalPrinters.maxOf { it.name.length } + 5
     println("-".repeat(longestName + 30))
-    println("Found ${allLocalPrinters.count()} local printers. ${localPdfPrinters.count()} of them support BYTE_ARRAY.PDF")
+    println(
+        "Found ${allLocalPrinters.count()} local printers. ${localPdfPrinters.count()} of them support BYTE_ARRAY.PDF"
+    )
     println("-".repeat(longestName + 30))
     allLocalPrinters.forEach { printer ->
         println(
             "${printer.name.padEnd(longestName, ' ')} BYTE_ARRAY.PDF ${
-            localPdfPrinters.find { printer.localId == it.localId }?.let { "" } ?: "not "
+                localPdfPrinters.find { printer.localId == it.localId }?.let { "" } ?: "not "
             }supported"
         )
     }

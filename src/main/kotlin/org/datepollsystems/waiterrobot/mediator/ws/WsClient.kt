@@ -19,10 +19,12 @@ fun createWsClient(enableNetworkLogs: Boolean = App.config.enableNetworkLogging,
     install(WebSockets) {
         contentConverter = KotlinxWebsocketSerializationConverter(Json { ignoreUnknownKeys = true })
         pingInterval = 10.seconds.inWholeMilliseconds // TODO adapt?
-        // Use compression (improve network usage especially for pdf transferring as internet connection may be very slow)
+        // Use compression? (especially for pdf transferring as internet connection may be very slow)
         // TODO test if it really brings benefits
-        // TODO receiving does not work out of the box probably needs adaptions on the backend (how to tell spring to use compression for responses?)
-        //  Maybe we should then also add compressMinSize as a header so the server also respects this or how does ktor determine if it must decompress incoming messages
+        // TODO receiving does not work out of the box probably needs adaptions on the backend
+        //  (how to tell spring to use compression for responses?)
+        //  Maybe we should then also add compressMinSize as a header so the server also respects this #
+        //  or how does ktor determine if it must decompress incoming messages
         /*extensions {
             install(WebSocketDeflateExtension) {
                 compressIfBiggerThan(500) // Do not compress very small messages as this would probably make them bigger

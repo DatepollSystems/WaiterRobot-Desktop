@@ -30,7 +30,8 @@ fun ForceUpdateScreen() {
             Spacer(modifier = Modifier.height(30.dp))
 
             Text(
-                text = "Deine installierte Version wird nicht mehr unterstützt. Bitte lade die neuste version herunter und installiere diese.",
+                text = "Deine installierte Version wird nicht mehr unterstützt. " +
+                    "Bitte lade die neuste version herunter und installiere diese.",
                 textAlign = TextAlign.Center
             )
 

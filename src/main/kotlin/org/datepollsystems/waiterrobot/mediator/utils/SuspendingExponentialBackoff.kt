@@ -14,7 +14,8 @@ import kotlin.math.pow
  *
  * @param initialDelay delay on first backoff next backoff will be twice, then four times, ... that long. Must be > 0
  * @param maxBackoffs maximum number of possible backoffs null for unlimited. When reached an error is thrown.
- * @param resetAfter reset the backoff after a duration (starts then again with [initialDelay]) null for never. Must be > 0 or null
+ * @param resetAfter reset the backoff after a duration (starts then again with [initialDelay]) null for never.
+ *                   Must be greater than 0 or null
  * @param maxBackoffTime maximum duration of backoff. null for no max time. Must be >= initialDelay or null
  * @param name for logging
  *
@@ -49,7 +50,9 @@ class SuspendingExponentialBackoff(
     init {
         require(initialDelay > Duration.ZERO) { "initialDelay must be > 0" }
         require(resetAfter == null || resetAfter > Duration.ZERO) { "resetAfter must be > 0 or null" }
-        require(maxBackoffTime == null || maxBackoffTime >= initialDelay) { "maxBackoffTime must be >= initialDelay or null" }
+        require(
+            maxBackoffTime == null || maxBackoffTime >= initialDelay
+        ) { "maxBackoffTime must be >= initialDelay or null" }
         require(maxBackoffs == null || maxBackoffs > 0)
     }
 

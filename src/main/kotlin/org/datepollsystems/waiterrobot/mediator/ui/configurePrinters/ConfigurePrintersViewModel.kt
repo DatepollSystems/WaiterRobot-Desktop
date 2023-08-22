@@ -42,7 +42,9 @@ class ConfigurePrintersViewModel(
 
                 val pairings = if ( // Pairing can only be applied when all printers are present
                     backendMap.isNotEmpty() &&
-                    initConfig.printerPairings.all { it.backendPrinterId in backendMap.keys && it.localPrinterId in localIds }
+                    initConfig.printerPairings.all {
+                        it.backendPrinterId in backendMap.keys && it.localPrinterId in localIds
+                    }
                 ) {
                     initConfig.printerPairings.map { pairing ->
                         ConfigurePrintersState.PrinterPairing(
@@ -86,8 +88,10 @@ class ConfigurePrintersViewModel(
         return organisations
     }
 
-    private suspend fun loadOrganisationEvents(organisationId: ID = state.value.selectedOrganisation!!.id): List<GetEventDto> {
-        // TODO handle org not set
+    private suspend fun loadOrganisationEvents(
+        organisationId: ID = state.value.selectedOrganisation!!.id
+    ): List<GetEventDto> {
+        // TODO handle organization not set
         val events = eventApi.getOrganisationEvents(organisationId)
         reduce { copy(screenState = ScreenState.Idle, availableEvents = events) }
         return events

@@ -26,7 +26,11 @@ fun <T : Any> DropDownInput(
     content: @Composable (T) -> Unit
 ) {
     var expanded: Boolean by remember { mutableStateOf(false) }
-    var textFieldSize by remember { mutableStateOf(Size.Zero) } // This value is used to assign to the DropDown the same width
+    var textFieldSize by remember {
+        mutableStateOf(
+            Size.Zero
+        )
+    } // This value is used to assign to the DropDown the same width
 
     val icon = if (expanded) Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown
 

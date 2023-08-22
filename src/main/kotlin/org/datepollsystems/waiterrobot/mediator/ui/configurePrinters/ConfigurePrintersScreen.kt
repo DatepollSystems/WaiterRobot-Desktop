@@ -91,7 +91,6 @@ fun ConfigurePrintersScreen(vm: ConfigurePrintersViewModel) {
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     Row(modifier = Modifier.weight(1f)) {
-
                         // Backend Printers
                         LazyColumn(modifier = Modifier.weight(1f)) {
                             items(state.unPairedBackendPrinters, key = GetPrinterDto::id) {
