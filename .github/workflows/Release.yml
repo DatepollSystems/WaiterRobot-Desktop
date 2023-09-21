@@ -51,14 +51,13 @@ jobs:
           
       - name: Create latest and move files in place
         run: |
-          mkdir binary_files
-          cp build/compose/binaries/main/${{ matrix.pkg }}/* binary_files
-          mv binary_files/* binary_files/WaiterRobot-Desktop-latest.${{ matrix.pkg}}
-      
+          cd build/compose/binaries/main/${{ matrix.pkg }}/
+          cp ./* ./WaiterRobot-Desktop-latest.${{ matrix.pkg}}
+
       - name: Move to release server
         uses: garygrossgarten/github-action-scp@release
         with:
-          local: binary_files
+          local: build/compose/binaries/main/${{ matrix.pkg }}
           remote: /var/www/datepoll-share/WaiterRobot/Desktop-Releases/${{ matrix.pkg}}
           host: ${{ secrets.RELEASES_SSH_HOST }}
           port: ${{ secrets.RELEASES_SSH_PORT }}
