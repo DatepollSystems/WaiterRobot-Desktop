@@ -36,7 +36,11 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # TODO run tests?
+      - name: Test
+        run: ./gradlew test --stacktrace
+        env:
+          env: CI
+          GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx3g"
 
       - name: Create distributable
         run: ./gradlew packageDistributionForCurrentOS -PversionString="${{ github.ref_name }}" # TODO use "packageReleaseDistributionForCurrentOS" as this also uses Pro-Guard (but there needs to be more configuration)
@@ -49,7 +53,7 @@ jobs:
           allowUpdates: true # Matrix strategy -> executed multiple times
           artifacts: "build/compose/binaries/main/${{ matrix.pkg }}/*"
           
-      - name: Create latest and move files in place
+      - name: Create latest
         run: |
           cd build/compose/binaries/main/${{ matrix.pkg }}/
           cp ./* ./WaiterRobot-Desktop-latest.${{ matrix.pkg}}
