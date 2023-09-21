@@ -53,7 +53,7 @@ jobs:
         run: |
           mkdir binary_files
           mv build/compose/binaries/main/${{ matrix.pkg }}/* binary_files
-          cp "$(ls -1 binary_files | head -n 1)" binary_files/WaiterRobot-Desktop-latest.${{ matrix.pkg}}
+          mv "binary_files/$(ls -1 binary_files | head -n 1)" binary_files/WaiterRobot-Desktop-latest.${{ matrix.pkg}}
       
       - name: Move to release server
         uses: garygrossgarten/github-action-scp@release
