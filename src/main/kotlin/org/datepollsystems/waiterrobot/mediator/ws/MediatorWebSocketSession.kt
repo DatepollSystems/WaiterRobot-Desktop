@@ -41,7 +41,7 @@ class MediatorWebSocketSession(
      * Suspends till the connection is established. The returned job completes when the session is closed.
      */
     suspend fun start(): Job {
-        check(started.getAndSet(true)) { "Session already started" }
+        check(!started.getAndSet(true)) { "Session already started" }
         session = client.webSocketSession {
             url.takeFrom(App.config.wsUrl)
             headers.append("organisationId", Settings.organisationId.toString())

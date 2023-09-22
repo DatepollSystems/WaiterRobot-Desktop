@@ -1,3 +1,6 @@
 package org.datepollsystems.waiterrobot.mediator.core.api
 
-abstract class AuthorizedApi(basePath: String, client: AuthorizedClient) : AbstractApi(basePath, client.delegate)
+abstract class AuthorizedApi(
+    baseUrlLoader: () -> String,
+    client: AuthorizedClient
+) : AbstractApi(baseUrlLoader, client.delegate)

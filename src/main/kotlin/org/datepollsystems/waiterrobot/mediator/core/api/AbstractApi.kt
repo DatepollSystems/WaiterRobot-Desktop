@@ -5,10 +5,15 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 
-abstract class AbstractApi(baseUrl: String, protected val client: HttpClient) {
+// baseUrlLoader lambda is needed as the App.config can change after the class was already created by koin
+// TODO refactor! (e.g. reinitialize the whole koin module when App.config changes)
+abstract class AbstractApi(private val baseUrlLoader: () -> String, protected val client: HttpClient) {
 
     // Make sure that the baseUrl ends with a "/"
-    private val baseUrl = if (baseUrl.endsWith("/")) baseUrl else "$baseUrl/"
+    private val baseUrl: String
+        get() = baseUrlLoader().let {
+            if (it.endsWith("/")) it else "$it/"
+        }
 
     /**
      * prepend string (endpoint) with base and make sure that endpoint does not start with "/"

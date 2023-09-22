@@ -7,7 +7,7 @@ import org.datepollsystems.waiterrobot.mediator.core.api.AbstractApi
 
 class GitHubApi(
     client: HttpClient
-) : AbstractApi("https://github.com/DatepollSystems/waiterrobot-desktop", client) {
+) : AbstractApi({ "https://github.com/DatepollSystems/waiterrobot-desktop" }, client) {
     suspend fun getLatestVersion(): AppVersion? {
         // "releases/latest" always redirects to the latest release (e.g. "/releases/tag/v1.0.2")
         val versionString = head("releases/latest").request.url.pathSegments.last().removePrefix("v")

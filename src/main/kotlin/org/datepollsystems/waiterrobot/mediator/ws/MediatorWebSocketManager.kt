@@ -141,7 +141,7 @@ class MediatorWebSocketManager : KoinComponent {
      * Send a message
      */
     fun <T : WsMessageBody> send(message: AbstractWsMessage<T>) {
-        check(closed.get()) { "SocketManager is already closed" }
+        check(!closed.get()) { "SocketManager is already closed" }
         managerScope.launch(CoroutineName("WsSendMessage")) { sendChannel.send(message) }
     }
 
