@@ -21,7 +21,7 @@ fun Navigation() {
     val screenState = navigator.screenState.collectAsState().value
     when (screenState) {
         Screen.StartUpScreen -> {
-            val viewModel = getViewModel { StartUpViewModel(navigator, get()) }
+            val viewModel = getViewModel { StartUpViewModel(navigator) }
             StartUpScreen(viewModel)
         }
 

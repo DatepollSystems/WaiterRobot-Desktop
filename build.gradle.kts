@@ -1,6 +1,5 @@
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.report.ReportMergeTask
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -9,10 +8,11 @@ plugins {
     kotlin("plugin.serialization") version kotlinVersion
     id("org.jetbrains.compose") version "1.4.3"
     id("io.gitlab.arturbosch.detekt") version "1.23.1"
+    id("dev.hydraulic.conveyor") version "1.6"
 }
 
 group = "org.datepollsystems.waiterrobot.mediator"
-version = "1.0.0"
+version = (project.findProperty("versionString") as? String)?.removePrefix("v") ?: "99.99.99"
 
 repositories {
     google()
@@ -20,7 +20,12 @@ repositories {
 }
 
 dependencies {
-    implementation(compose.desktop.currentOs)
+    linuxAmd64(compose.desktop.linux_x64)
+    linuxAarch64(compose.desktop.linux_arm64)
+    macAmd64(compose.desktop.macos_x64)
+    macAarch64(compose.desktop.macos_arm64)
+    windowsAmd64(compose.desktop.windows_x64)
+
     implementation(compose.materialIconsExtended)
 
     val ktorVersion = "2.3.2"
@@ -60,30 +65,14 @@ tasks.withType<KotlinCompile> {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
 }
 
 compose.desktop {
     application {
         mainClass = "org.datepollsystems.waiterrobot.mediator.App"
-        nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.Deb) // TODO add more?
-            packageName = "WaiterRobot Desktop"
-            packageVersion = (project.findProperty("versionString") as? String)?.removePrefix("v")
-
-            macOS {
-                iconFile.set(project.file("icon.icns"))
-            }
-            windows {
-                iconFile.set(project.file("icon.ico"))
-            }
-            linux {
-                iconFile.set(project.file("icon.png"))
-            }
-
-            includeAllModules = true // TODO figure out which modules are really needed -> reduces app size
-        }
     }
 }
 
@@ -112,4 +101,12 @@ tasks.withType<Detekt>().configureEach {
 }
 detektReportMergeSarif {
     input.from(tasks.withType<Detekt>().map { it.sarifReportFile })
+}
+
+// Work around temporary Compose bugs.
+configurations.all {
+    attributes {
+        // https://github.com/JetBrains/compose-jb/issues/1404#issuecomment-1146894731
+        attribute(Attribute.of("ui", String::class.java), "awt")
+    }
 }

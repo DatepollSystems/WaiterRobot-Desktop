@@ -30,7 +30,7 @@ data class MediatorConfiguration(
     companion object {
         // TODO fix this location is not valid in prod
         private fun getFile(): File {
-            val rootPath = System.getProperty("user.dir")
+            val rootPath = System.getProperty("user.dir") // TODO maybe replace with app.dir (see https://conveyor.hydraulic.dev/12.1/configs/jvm/#appjvmsystem-properties)
             return File(rootPath, "WaiterRobot/config/mediatorConfig.json")
         }
 

@@ -232,5 +232,6 @@ gradle-app.setting
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,intellij,kotlin,gradle,windows,linux
 
-# Application generated files
-/WaiterRobot/config/mediatorConfig.json
+#Conveyor
+output
+.keys
