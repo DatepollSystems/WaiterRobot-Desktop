@@ -12,7 +12,9 @@ plugins {
 }
 
 group = "org.datepollsystems.waiterrobot.mediator"
-version = (project.findProperty("versionString") as? String)?.removePrefix("v") ?: "99.99.99"
+version = (project.findProperty("versionString") as? String)?.removePrefix("v")
+    ?: System.getenv("WAITERROBOT_VERSION_STRING")?.removePrefix("v")?.ifEmpty { null }
+    ?: "99.99.99"
 
 repositories {
     google()

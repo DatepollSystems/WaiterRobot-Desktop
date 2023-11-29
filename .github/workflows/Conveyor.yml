@@ -49,6 +49,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           APPLE_ISSUER_ID: ${{ secrets.APPLE_ISSUER_ID }}
           APPLE_KEY_ID: ${{ secrets.APPLE_KEY_ID }}
+          WAITERROBOT_VERSION_STRING: ${{ github.ref_name }}
         with:
           command: make copied-site
           extra_flags: -f ci.conveyor.conf
