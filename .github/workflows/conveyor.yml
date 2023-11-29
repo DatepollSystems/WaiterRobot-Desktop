@@ -42,7 +42,6 @@ jobs:
           echo "${{ secrets.KEYS_TAR_ASC }}" > .keys.tar.gz.asc
           gpg -d --passphrase "${{ secrets.KEYS_PASSPHRASE }}" --batch .keys.tar.gz.asc > .keys.tar.gz
           tar xzf .keys.tar.gz
-          cd ..
 
       - name: Run Conveyor
         uses: hydraulic-software/conveyor/actions/build@v12.1
@@ -55,18 +54,3 @@ jobs:
           extra_flags: -f ci.conveyor.conf
           signing_key: ${{ secrets.SIGNING_KEY }}
           agree_to_license: 1
-
-      - name: Create latest
-        run: |
-          cd build/compose/binaries/main/${{ matrix.pkg }}/
-          cp ./* ./WaiterRobot-Desktop-latest.${{ matrix.pkg}}
-
-      - name: Move to release server
-        uses: garygrossgarten/github-action-scp@release
-        with:
-          local: build/compose/binaries/main/${{ matrix.pkg }}
-          remote: /var/www/datepoll-share/WaiterRobot/Desktop-Releases/${{ matrix.pkg}}
-          host: ${{ secrets.RELEASES_SSH_HOST }}
-          port: ${{ secrets.RELEASES_SSH_PORT }}
-          username: ${{ secrets.RELEASES_SSH_USER }}
-          privateKey: ${{ secrets.RELEASES_SSH_PRIVATE_KEY }}
