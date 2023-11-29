@@ -22,9 +22,10 @@ data class AppVersion(val major: Int, val minor: Int, val patch: Int) {
             return AppVersion(major, minor, patch)
         }
 
-        fun fromVersionStringOrNull(version: String): AppVersion? =
-            runCatching { fromVersionString(version) }.getOrNull()
+        fun fromVersionStringOrNull(version: String?): AppVersion? =
+            version?.runCatching { fromVersionString(version) }?.getOrNull()
 
-        val current: AppVersion = fromVersionString(System.getProperty("jpackage.app-version"))
+        val current: AppVersion = fromVersionStringOrNull(System.getProperty("app.version"))
+            ?: AppVersion(99, 99, 99)
     }
 }
