@@ -1,9 +1,12 @@
 package org.datepollsystems.waiterrobot.mediator.app
 
+import org.datepollsystems.waiterrobot.mediator.utils.emptyToNull
+
 sealed class Config(domain: String, secure: Boolean) {
     val apiBase: String
     val wsUrl: String
     val displayName: String = this::class.simpleName!!
+    val basePath: String = System.getProperty("app.dir")?.emptyToNull() ?: System.getProperty("user.dir")
     abstract val loginPrefix: String
 
     val enableNetworkLogging = System.getenv("ENABLE_NETWORK_LOG") == "true"
