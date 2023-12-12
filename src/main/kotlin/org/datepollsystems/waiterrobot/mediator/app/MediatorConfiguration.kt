@@ -35,7 +35,7 @@ data class MediatorConfiguration(
         }
 
         fun createFromStore(): MediatorConfiguration? = runCatching {
-            Json.decodeFromString<MediatorConfiguration>(getFile().also { println("Getting config from ${it.absolutePath}") }.readText())
+            Json.decodeFromString<MediatorConfiguration>(getFile().readText())
         }.onFailure {
             // TODO log
         }.getOrNull()
