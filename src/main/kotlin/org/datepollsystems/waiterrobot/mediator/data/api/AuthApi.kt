@@ -12,7 +12,7 @@ import org.datepollsystems.waiterrobot.mediator.data.api.dto.RefreshDto
 import org.datepollsystems.waiterrobot.mediator.data.api.dto.TokenDto
 
 // TODO add better session information (version, os, ...)
-class AuthApi(client: HttpClient) : AbstractApi({ "${App.config.apiBase}auth/" }, client) {
+class AuthApi(client: HttpClient) : AbstractApi({ "${App.config.apiBase}v1/auth/" }, client) {
 
     suspend fun login(email: String, password: String, stayLoggedIn: Boolean = true) =
         post(

@@ -8,7 +8,7 @@ import org.datepollsystems.waiterrobot.mediator.core.api.AuthorizedApi
 import org.datepollsystems.waiterrobot.mediator.core.api.AuthorizedClient
 import org.datepollsystems.waiterrobot.mediator.data.api.dto.GetPrinterDto
 
-class PrinterApi(client: AuthorizedClient) : AuthorizedApi({ "${App.config.apiBase}config/printer" }, client) {
+class PrinterApi(client: AuthorizedClient) : AuthorizedApi({ "${App.config.apiBase}v1/config/printer" }, client) {
     suspend fun getEventPrinters(eventId: ID) = get("/") {
         parameter("eventId", eventId)
     }.body<List<GetPrinterDto>>()
