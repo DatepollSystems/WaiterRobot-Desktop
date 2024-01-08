@@ -71,6 +71,7 @@ private val fileLogger = Logger(
     })
 )
 
+@Suppress("CyclomaticComplexMethod", "LongMethod")
 suspend fun main(): Unit = try {
     coroutineScope {
         startKoin {
@@ -223,7 +224,6 @@ suspend fun main(): Unit = try {
                 else -> error("Invalid option")
             }
 
-
         if (prompt(
                 "Type 'start' to start sending random orders. You can stop at any point by pressing 'q'.\n" +
                     "Make sure to also start a Mediator (with virtual printer), " +
@@ -370,6 +370,7 @@ private suspend fun refreshData(waiterClient: WaiterClient, eventId: ID) {
 }
 
 private fun randomNote(): String {
+    @Suppress("MaxLineLength")
     val charset =
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 \\\"'`´#~!?\$€&%()={}\\[\\]_/*+-.,><\\-|°\\^\\\\:;ßäöüÄÖÜ\\n\\r"
     return buildString {

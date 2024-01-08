@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Manual Testing Tool" type="JetRunConfigurationType">
+    <option name="MAIN_CLASS_NAME" value="org.datepollsystems.waiterrobot.mediator.maual.ManualTestingToolKt" />
+    <module name="Mediator.test" />
+    <shortenClasspath name="NONE" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
