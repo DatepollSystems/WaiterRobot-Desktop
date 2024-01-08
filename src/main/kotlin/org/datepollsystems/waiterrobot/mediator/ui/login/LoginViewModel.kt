@@ -13,6 +13,7 @@ import org.datepollsystems.waiterrobot.mediator.data.api.ApiException
 import org.datepollsystems.waiterrobot.mediator.data.api.AuthApi
 import org.datepollsystems.waiterrobot.mediator.navigation.Navigator
 import org.datepollsystems.waiterrobot.mediator.navigation.Screen
+import org.datepollsystems.waiterrobot.mediator.printer.service.PrinterDiscoverService
 
 class LoginViewModel(
     navigator: Navigator,
@@ -25,6 +26,7 @@ class LoginViewModel(
         App.config = Config.getFromLoginIdentifier(email)
         Settings.loginPrefix = App.config.loginPrefix
         Sentry.setTag(SentryTagKeys.environment, App.config.displayName)
+        PrinterDiscoverService.refreshPrinters()
 
         try {
             val tokens = authApi.login(email.removeLoginIdentifierEnvPrefix(), password)

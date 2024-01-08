@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import org.datepollsystems.waiterrobot.mediator.App
 import org.datepollsystems.waiterrobot.mediator.core.ID
 import org.datepollsystems.waiterrobot.mediator.data.api.dto.GetPrinterDto
-import org.datepollsystems.waiterrobot.mediator.printer.LocalPrinter
+import org.datepollsystems.waiterrobot.mediator.printer.AbstractLocalPrinter
 import org.datepollsystems.waiterrobot.mediator.printer.PrinterWithIdNotFoundException
 import org.datepollsystems.waiterrobot.mediator.ui.configurePrinters.ConfigurePrintersState
 import org.datepollsystems.waiterrobot.mediator.ui.main.PrintTransaction
@@ -42,7 +42,7 @@ object PrinterService {
         if (pdfId != "test") App.socketManager.send(PrintedPdfMessage(pdfId = pdfId))
     }
 
-    fun pair(bePrinter: GetPrinterDto, loPrinter: LocalPrinter) {
+    fun pair(bePrinter: GetPrinterDto, loPrinter: AbstractLocalPrinter) {
         backendIdToPairing[bePrinter.id] = PrinterPairing(bePrinter, loPrinter)
         App.socketManager.addRegisterMessage(RegisterPrinterMessage(printerId = bePrinter.id))
     }
@@ -54,4 +54,4 @@ object PrinterService {
     }
 }
 
-class PrinterPairing(val bePrinter: GetPrinterDto, val loPrinter: LocalPrinter)
+class PrinterPairing(val bePrinter: GetPrinterDto, val loPrinter: AbstractLocalPrinter)

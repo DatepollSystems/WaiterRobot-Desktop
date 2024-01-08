@@ -3,9 +3,10 @@ package org.datepollsystems.waiterrobot.mediator.app
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.datepollsystems.waiterrobot.mediator.App
 import org.datepollsystems.waiterrobot.mediator.core.ID
-import org.datepollsystems.waiterrobot.mediator.utils.emptyToNull
 import java.io.File
+import kotlin.io.path.Path
 
 @Serializable
 data class MediatorConfiguration(
@@ -30,8 +31,7 @@ data class MediatorConfiguration(
 
     companion object {
         private fun getFile(): File {
-            val rootPath = System.getProperty("app.dir")?.emptyToNull() ?: System.getProperty("user.dir")
-            return File(rootPath, "WaiterRobot/config/mediatorConfig.json")
+            return Path(App.config.basePath, "config", "mediatorConfig.json").toFile()
         }
 
         fun createFromStore(): MediatorConfiguration? = runCatching {
