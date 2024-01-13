@@ -48,7 +48,7 @@ dependencies {
 
     val kermitVersion = "2.0.2"
     implementation("co.touchlab:kermit:$kermitVersion")
-    implementation("io.sentry:sentry:6.27.0")
+    implementation("io.sentry:sentry:7.2.0")
 
     implementation("org.apache.pdfbox:pdfbox:3.0.1")
     runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.3") // Adds a Main Dispatcher for Desktop
