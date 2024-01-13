@@ -12,7 +12,7 @@ sealed class Config(domain: String, secure: Boolean) {
     val enableNetworkLogging = System.getenv("ENABLE_NETWORK_LOG") == "true"
 
     init {
-        this.apiBase = "${if (secure) "https" else "http"}://$domain/api/v1/"
+        this.apiBase = "${if (secure) "https" else "http"}://$domain/api/"
         this.wsUrl = "${if (secure) "wss" else "ws"}://$domain/api/mediator"
     }
 

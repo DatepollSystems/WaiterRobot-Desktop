@@ -8,7 +8,7 @@ import org.datepollsystems.waiterrobot.mediator.core.api.AuthorizedApi
 import org.datepollsystems.waiterrobot.mediator.core.api.AuthorizedClient
 import org.datepollsystems.waiterrobot.mediator.data.api.dto.GetEventDto
 
-class EventApi(client: AuthorizedClient) : AuthorizedApi({ "${App.config.apiBase}config/event" }, client) {
+class EventApi(client: AuthorizedClient) : AuthorizedApi({ "${App.config.apiBase}v1/config/event" }, client) {
     suspend fun getOrganisationEvents(organisationId: ID) = get("/") {
         parameter("organisationId", organisationId)
     }.body<List<GetEventDto>>()

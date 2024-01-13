@@ -8,6 +8,6 @@ import org.datepollsystems.waiterrobot.mediator.data.api.dto.GetOrganisationDto
 
 class OrganisationApi(
     client: AuthorizedClient
-) : AuthorizedApi({ "${App.config.apiBase}config/organisation" }, client) {
+) : AuthorizedApi({ "${App.config.apiBase}v1/config/organisation" }, client) {
     suspend fun getUserOrganisations() = get("/").body<List<GetOrganisationDto>>()
 }
