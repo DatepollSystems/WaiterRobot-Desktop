@@ -17,8 +17,17 @@ To run with a specific version you can supply the app version as system properti
 Releases are created by CI and are published to GitHub releases. There are executables for Windows, Mac and Linux
 created. To create a new release just push a tag in the form of `vmajor.minor.patch` (e.g. `v1.0.0`) to GitHub. This
 will start the CI. After a few minutes the artifacts can be downloaded
-from [here](https://datepollsystems.github.io/WaiterRobot-Desktop/download.html) (or
-[GitHub Releases](https://github.com/DatepollSystems/WaiterRobot-Desktop/releases)).
+from [here](https://datepollsystems.github.io/WaiterRobot-Desktop/download.html) (
+or[GitHub Releases](https://github.com/DatepollSystems/WaiterRobot-Desktop/releases)).
+
+For convenience there is also a gradle task to start a release.
+
+```sh
+./gradlew release
+```
+
+You will be asked if you want to increase `major`, `minor` or `patch`.  
+You can also supply a specific version by using the `v` parameter `./gradlew release -Pv=1.2.3`.
 
 ## Recommendations
 
