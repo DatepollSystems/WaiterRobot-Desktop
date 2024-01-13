@@ -3,11 +3,11 @@ import io.gitlab.arturbosch.detekt.report.ReportMergeTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    val kotlinVersion = "1.9.0"
+    val kotlinVersion = "1.9.21"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.serialization") version kotlinVersion
-    id("org.jetbrains.compose") version "1.4.3"
-    id("io.gitlab.arturbosch.detekt") version "1.23.1"
+    id("org.jetbrains.compose") version "1.5.11"
+    id("io.gitlab.arturbosch.detekt") version "1.23.4"
     id("dev.hydraulic.conveyor") version "1.6"
 }
 
@@ -30,7 +30,7 @@ dependencies {
 
     implementation(compose.materialIconsExtended)
 
-    val ktorVersion = "2.3.2"
+    val ktorVersion = "2.3.7"
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
@@ -43,23 +43,23 @@ dependencies {
     implementation("dev.icerock.moko:mvvm-core:${mokoMvvmVersion}")
     implementation("dev.icerock.moko:mvvm-compose:${mokoMvvmVersion}")
 
-    implementation("io.insert-koin:koin-core:3.4.3")
-    implementation("io.insert-koin:koin-compose:1.0.4")
+    implementation("io.insert-koin:koin-core:3.5.3")
+    implementation("io.insert-koin:koin-compose:1.1.2")
 
-    val kermitVersion = "2.0.0-RC5"
+    val kermitVersion = "2.0.2"
     implementation("co.touchlab:kermit:$kermitVersion")
-    implementation("io.sentry:sentry:6.27.0")
+    implementation("io.sentry:sentry:7.2.0")
 
-    implementation("org.apache.pdfbox:pdfbox:3.0.0-RC1")
+    implementation("org.apache.pdfbox:pdfbox:3.0.1")
     runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.3") // Adds a Main Dispatcher for Desktop
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
     implementation(kotlin("reflect"))
 
     testImplementation(kotlin("test"))
     testImplementation("co.touchlab:kermit-test:$kermitVersion")
 
-    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.1")
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.4")
 }
 
 tasks.withType<KotlinCompile> {
