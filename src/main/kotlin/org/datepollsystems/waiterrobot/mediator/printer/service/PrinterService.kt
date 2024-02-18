@@ -35,7 +35,7 @@ object PrinterService {
     private suspend fun print(pdfId: String, printerId: ID, base64data: String) {
         // TODO handle printer is not registered on this mediator (info to BE)
         val printerPairing = backendIdToPairing[printerId] ?: throw PrinterWithIdNotFoundException(printerId)
-        printerPairing.loPrinter.printPdf(pdfId, base64data)
+        printerPairing.loPrinter.printPdf(pdfId, printerPairing.bePrinter.id, base64data)
 
         printQueue.emit(PrintTransaction(pdfId, LocalDateTime.now(), printerPairing.bePrinter.name))
         // test is the id of the test pdf, no response expected by backend

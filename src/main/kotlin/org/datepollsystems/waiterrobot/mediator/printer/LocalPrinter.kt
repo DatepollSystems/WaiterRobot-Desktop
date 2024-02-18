@@ -2,18 +2,16 @@ package org.datepollsystems.waiterrobot.mediator.printer
 
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.printing.PDFPageable
+import org.datepollsystems.waiterrobot.mediator.core.ID
 import org.datepollsystems.waiterrobot.mediator.utils.sha256
 import java.awt.print.PrinterJob
 import javax.print.PrintService
 
 class LocalPrinter(private val service: PrintService) : AbstractLocalPrinter() {
     override val localId = service.name.sha256() // Name should be unique (on a system level)
-    override val name get() = service.name
+    override val name: String get() = service.name
 
-    override fun printPdf(
-        pdfId: String,
-        document: PDDocument,
-    ) {
+    override fun printPdf(pdfId: String, bePrinterId: ID, document: PDDocument) {
         val pageable = PDFPageable(document)
 
         val printJob = PrinterJob.getPrinterJob()

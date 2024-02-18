@@ -2,6 +2,7 @@ package org.datepollsystems.waiterrobot.mediator.printer
 
 import org.apache.pdfbox.Loader
 import org.apache.pdfbox.pdmodel.PDDocument
+import org.datepollsystems.waiterrobot.mediator.core.ID
 import org.koin.core.component.KoinComponent
 import java.util.*
 
@@ -14,12 +15,12 @@ import java.util.*
  * @see org.datepollsystems.waiterrobot.mediator.printer.LocalPrinterTest.testPrint
  */
 abstract class AbstractLocalPrinter : LocalPrinterInfo, KoinComponent {
-    fun printPdf(pdfId: String, base64data: String) {
+    fun printPdf(pdfId: String, bePrinterId: ID, base64data: String) {
         val decoded = Base64.getDecoder().decode(base64data)
-        printPdf(pdfId, Loader.loadPDF(decoded))
+        printPdf(pdfId, bePrinterId, Loader.loadPDF(decoded))
     }
 
-    protected abstract fun printPdf(pdfId: String, document: PDDocument)
+    protected abstract fun printPdf(pdfId: String, bePrinterId: ID, document: PDDocument)
 
     override fun equals(other: Any?): Boolean {
         if (other !is AbstractLocalPrinter) return false

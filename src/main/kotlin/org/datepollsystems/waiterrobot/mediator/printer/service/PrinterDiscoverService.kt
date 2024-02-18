@@ -24,7 +24,7 @@ object PrinterDiscoverService {
             .map { LocalPrinter(it) }
             .let {
                 if (App.config !is Config.Prod) {
-                    it.plus(VirtualLocalPrinter(1))
+                    it.plus(VirtualLocalPrinter)
                 } else {
                     it
                 }
