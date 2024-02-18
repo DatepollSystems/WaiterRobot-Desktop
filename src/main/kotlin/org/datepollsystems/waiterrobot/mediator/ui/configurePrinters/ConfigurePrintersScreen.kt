@@ -164,9 +164,9 @@ fun ConfigurePrintersScreen(vm: ConfigurePrintersViewModel) {
                         }
                     }
                 }
-            } else if(state.selectedOrganisation == null) {
+            } else if (state.selectedOrganisation == null) {
                 CenteredText("Please select an Organization.")
-            } else if(state.selectedEvent == null) {
+            } else if (state.selectedEvent == null) {
                 CenteredText("Please select an Event.")
             }
         }
