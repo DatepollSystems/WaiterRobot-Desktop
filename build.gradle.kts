@@ -4,12 +4,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.ByteArrayOutputStream
 
 plugins {
-    val kotlinVersion = "1.9.21"
+    val kotlinVersion = "1.9.22"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.serialization") version kotlinVersion
-    id("org.jetbrains.compose") version "1.5.11"
-    id("io.gitlab.arturbosch.detekt") version "1.23.4"
-    id("dev.hydraulic.conveyor") version "1.6"
+    id("org.jetbrains.compose") version "1.5.12"
+    id("io.gitlab.arturbosch.detekt") version "1.23.5"
+    id("dev.hydraulic.conveyor") version "1.8"
 }
 
 group = "org.datepollsystems.waiterrobot.mediator"
@@ -31,7 +31,7 @@ dependencies {
 
     implementation(compose.materialIconsExtended)
 
-    val ktorVersion = "2.3.7"
+    val ktorVersion = "2.3.8"
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
@@ -47,20 +47,20 @@ dependencies {
     implementation("io.insert-koin:koin-core:3.5.3")
     implementation("io.insert-koin:koin-compose:1.1.2")
 
-    val kermitVersion = "2.0.2"
+    val kermitVersion = "2.0.3"
     implementation("co.touchlab:kermit:$kermitVersion")
-    implementation("io.sentry:sentry:7.2.0")
+    implementation("io.sentry:sentry:7.3.0")
 
     implementation("org.apache.pdfbox:pdfbox:3.0.1")
-    runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.3") // Adds a Main Dispatcher for Desktop
+    runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.8.0") // Adds a Main Dispatcher for Desktop
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     implementation(kotlin("reflect"))
 
     testImplementation(kotlin("test"))
     testImplementation("co.touchlab:kermit-test:$kermitVersion")
 
-    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.4")
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.5")
 }
 
 tasks.withType<KotlinCompile> {
