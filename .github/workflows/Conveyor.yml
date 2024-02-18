@@ -44,7 +44,7 @@ jobs:
           tar xzf .keys.tar.gz
 
       - name: Run Conveyor
-        uses: hydraulic-software/conveyor/actions/build@v13.0
+        uses: hydraulic-software/conveyor/actions/build@v13.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           APPLE_ISSUER_ID: ${{ secrets.APPLE_ISSUER_ID }}
