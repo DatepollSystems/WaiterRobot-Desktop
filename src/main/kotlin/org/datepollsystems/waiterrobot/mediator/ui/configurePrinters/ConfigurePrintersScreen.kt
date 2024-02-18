@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import org.datepollsystems.waiterrobot.mediator.App
 import org.datepollsystems.waiterrobot.mediator.data.api.dto.GetPrinterDto
 import org.datepollsystems.waiterrobot.mediator.printer.LocalPrinterInfo
+import org.datepollsystems.waiterrobot.mediator.ui.common.CenteredText
 import org.datepollsystems.waiterrobot.mediator.ui.common.DropDownInput
 import org.datepollsystems.waiterrobot.mediator.ui.common.LoadableScreen
 import org.datepollsystems.waiterrobot.mediator.ui.common.SelectedEnvironmentInfo
@@ -163,6 +164,10 @@ fun ConfigurePrintersScreen(vm: ConfigurePrintersViewModel) {
                         }
                     }
                 }
+            } else if(state.selectedOrganisation == null) {
+                CenteredText("Please select an Organization.")
+            } else if(state.selectedEvent == null) {
+                CenteredText("Please select an Event.")
             }
         }
     }

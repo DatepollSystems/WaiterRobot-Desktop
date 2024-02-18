@@ -29,13 +29,12 @@ class ConfigurePrintersViewModel(
     init {
         val initConfig = MediatorConfiguration.createFromStore()
         inVmScope {
-            val organisations = loadUserOrganisations()
+            loadUserOrganisations(
+                selectId = initConfig?.selectedOrganisationId,
+                selectEventId = initConfig?.selectedEventId
+            )
             if (initConfig != null) {
-                val selectedOrg = organisations.find { it.id == initConfig.selectedOrganisationId }
-
-                val events = if (selectedOrg != null) loadOrganisationEvents(selectedOrg.id) else null
-                val selectedEvent = events?.find { it.id == initConfig.selectedEventId }
-
+                val selectedEvent = state.value.selectedEvent
                 val bePrinters = if (selectedEvent != null) loadEventPrinters(selectedEvent.id) else null
                 val backendMap = bePrinters?.associateBy(GetPrinterDto::id) ?: emptyMap()
                 val localIds = PrinterDiscoverService.localPrinters.map(LocalPrinterInfo::localId)
@@ -56,15 +55,10 @@ class ConfigurePrintersViewModel(
                     emptyList()
                 }
 
-                val pairedBackendPrinterIds =
-                    initConfig.printerPairings.map(MediatorConfiguration.PrinterPairing::backendPrinterId).toSet()
+                val pairedBackendPrinterIds = pairings.map { it.bePrinter.id }.toSet()
                 reduce {
                     copy(
                         screenState = ScreenState.Idle,
-                        availableOrganisations = organisations,
-                        availableEvents = events,
-                        selectedOrganisation = selectedOrg,
-                        selectedEvent = selectedEvent,
                         pairings = pairings,
                         localPrinters = PrinterDiscoverService.localPrinters.toList(),
                         unPairedBackendPrinters = bePrinters?.filter { it.id !in pairedBackendPrinterIds }
@@ -74,7 +68,6 @@ class ConfigurePrintersViewModel(
                 reduce {
                     copy(
                         screenState = ScreenState.Idle,
-                        availableOrganisations = organisations,
                         localPrinters = PrinterDiscoverService.localPrinters.toList(),
                     )
                 }
@@ -82,19 +75,24 @@ class ConfigurePrintersViewModel(
         }
     }
 
-    private suspend fun loadUserOrganisations(): List<GetOrganisationDto> {
+    private suspend fun loadUserOrganisations(selectId: ID? = null, selectEventId: ID? = null) {
         val organisations = organisationApi.getUserOrganisations()
         reduce { copy(availableOrganisations = organisations) }
-        return organisations
+        val organisationToSelect = organisations.singleOrNull()
+            ?: if (selectId != null) organisations.find { it.id == selectId } else null
+        if (organisationToSelect != null) changeOrganisation(organisationToSelect, selectEventId).join()
     }
 
     private suspend fun loadOrganisationEvents(
-        organisationId: ID = state.value.selectedOrganisation!!.id
-    ): List<GetEventDto> {
+        organisationId: ID = state.value.selectedOrganisation!!.id,
+        selectId: ID? = null
+    ) {
         // TODO handle organization not set
         val events = eventApi.getOrganisationEvents(organisationId)
         reduce { copy(screenState = ScreenState.Idle, availableEvents = events) }
-        return events
+        val eventToSelect = events.singleOrNull()
+            ?: if (selectId != null) events.find { it.id == selectId } else null
+        if (eventToSelect != null) changeEvent(eventToSelect).join()
     }
 
     private suspend fun loadEventPrinters(eventId: ID = state.value.selectedEvent!!.id): List<GetPrinterDto> {
@@ -133,7 +131,7 @@ class ConfigurePrintersViewModel(
         }
     }
 
-    fun changeOrganisation(organisation: GetOrganisationDto) = inVmScope {
+    fun changeOrganisation(organisation: GetOrganisationDto, selectEventId: ID? = null) = inVmScope {
         reduce {
             copy(
                 selectedOrganisation = organisation,
@@ -144,7 +142,7 @@ class ConfigurePrintersViewModel(
                 pairings = emptyList()
             )
         }
-        loadOrganisationEvents()
+        loadOrganisationEvents(selectId = selectEventId)
     }
 
     fun changeEvent(event: GetEventDto) = inVmScope {
