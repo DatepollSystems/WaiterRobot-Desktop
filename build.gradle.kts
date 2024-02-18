@@ -51,10 +51,7 @@ dependencies {
     implementation("co.touchlab:kermit:$kermitVersion")
     implementation("io.sentry:sentry:7.2.0")
 
-    // TODO pdfbox does not work well with conveyor as the tool uses jlink and pdfbox is a auto-module which is not
-    //  supported by jlink. Updating to 3.0.1 currently would break the Mediator completely. With 3.0.0-RC1 just
-    //  VirtualPrinters do not work.
-    implementation("org.apache.pdfbox:pdfbox:3.0.0-RC1")
+    implementation("org.apache.pdfbox:pdfbox:3.0.1")
     runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.3") // Adds a Main Dispatcher for Desktop
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
