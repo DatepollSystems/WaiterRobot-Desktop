@@ -2,6 +2,7 @@ package org.datepollsystems.waiterrobot.mediator.core
 
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -46,8 +47,8 @@ abstract class AbstractViewModel<T : State<T>>(
         _stateFlow.update(reducer)
     }
 
-    fun <T> inVmScope(block: suspend () -> T) {
-        viewModelScope.launch(SupervisorJob() + exceptionHandler) {
+    fun <T> inVmScope(block: suspend () -> T): Job {
+        return viewModelScope.launch(SupervisorJob() + exceptionHandler) {
             block()
         }
     }
@@ -60,7 +61,7 @@ abstract class AbstractViewModel<T : State<T>>(
         withScreenState(ScreenState.Error(errorTitle, errorMsg, dismiss))
     }
 
-    private fun dismissError() = inVmScope {
+    private fun dismissError() {
         reduce {
             withScreenState(ScreenState.Idle)
         }
