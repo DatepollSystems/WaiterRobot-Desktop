@@ -4,12 +4,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.ByteArrayOutputStream
 
 plugins {
-    val kotlinVersion = "1.9.22"
+    val kotlinVersion = "1.9.24"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.serialization") version kotlinVersion
-    id("org.jetbrains.compose") version "1.5.12"
-    id("io.gitlab.arturbosch.detekt") version "1.23.5"
-    id("dev.hydraulic.conveyor") version "1.8"
+    id("org.jetbrains.compose") version "1.6.2"
+    id("io.gitlab.arturbosch.detekt") version "1.23.6"
+    id("dev.hydraulic.conveyor") version "1.10"
 }
 
 group = "org.datepollsystems.waiterrobot.mediator"
@@ -31,7 +31,7 @@ dependencies {
 
     implementation(compose.materialIconsExtended)
 
-    val ktorVersion = "2.3.8"
+    val ktorVersion = "2.3.11"
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
@@ -44,15 +44,15 @@ dependencies {
     implementation("dev.icerock.moko:mvvm-core:$mokoMvvmVersion")
     implementation("dev.icerock.moko:mvvm-compose:$mokoMvvmVersion")
 
-    implementation("io.insert-koin:koin-core:3.5.3")
-    implementation("io.insert-koin:koin-compose:1.1.2")
+    implementation("io.insert-koin:koin-core:3.5.6")
+    implementation("io.insert-koin:koin-compose:1.1.5")
 
     val kermitVersion = "2.0.3"
     implementation("co.touchlab:kermit:$kermitVersion")
-    implementation("io.sentry:sentry:7.3.0")
+    implementation("io.sentry:sentry:7.9.0")
 
-    implementation("org.apache.pdfbox:pdfbox:3.0.1")
-    runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.8.0") // Adds a Main Dispatcher for Desktop
+    implementation("org.apache.pdfbox:pdfbox:3.0.2")
+    runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.8.1") // Adds a Main Dispatcher for Desktop
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     implementation(kotlin("reflect"))
@@ -60,7 +60,7 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation("co.touchlab:kermit-test:$kermitVersion")
 
-    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.5")
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.6")
 }
 
 tasks.withType<KotlinCompile> {
