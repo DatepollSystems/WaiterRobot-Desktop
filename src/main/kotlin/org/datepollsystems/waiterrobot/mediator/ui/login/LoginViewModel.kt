@@ -2,13 +2,14 @@ package org.datepollsystems.waiterrobot.mediator.ui.login
 
 import io.ktor.http.*
 import io.sentry.Sentry
+import io.sentry.protocol.User
 import org.datepollsystems.waiterrobot.mediator.App
 import org.datepollsystems.waiterrobot.mediator.app.Config
 import org.datepollsystems.waiterrobot.mediator.app.Settings
 import org.datepollsystems.waiterrobot.mediator.app.removeLoginIdentifierEnvPrefix
 import org.datepollsystems.waiterrobot.mediator.core.AbstractViewModel
 import org.datepollsystems.waiterrobot.mediator.core.ScreenState
-import org.datepollsystems.waiterrobot.mediator.core.sentry.SentryTagKeys
+import org.datepollsystems.waiterrobot.mediator.core.sentry.SentryHelper
 import org.datepollsystems.waiterrobot.mediator.data.api.ApiException
 import org.datepollsystems.waiterrobot.mediator.data.api.AuthApi
 import org.datepollsystems.waiterrobot.mediator.navigation.Navigator
@@ -25,12 +26,16 @@ class LoginViewModel(
 
         App.config = Config.getFromLoginIdentifier(email)
         Settings.loginPrefix = App.config.loginPrefix
-        Sentry.setTag(SentryTagKeys.environment, App.config.displayName)
+        SentryHelper.updateEnvironment()
         PrinterDiscoverService.refreshPrinters()
 
         try {
             val tokens = authApi.login(email.removeLoginIdentifierEnvPrefix(), password)
-            // TODO set sentry user
+            Sentry.setUser(
+                User().apply {
+                    setEmail(email.removeLoginIdentifierEnvPrefix())
+                }
+            )
             Settings.accessToken = tokens.accessToken
             Settings.refreshToken = tokens.refreshToken!!
 

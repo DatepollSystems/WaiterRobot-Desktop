@@ -14,7 +14,7 @@ object VirtualLocalPrinter : AbstractLocalPrinter() {
     private val logger by injectLoggerForClass()
 
     init {
-        logger.i("Will save to: $basePath")
+        logger.i("Will save virtual printer to: $basePath")
     }
 
     override fun printPdf(pdfId: String, bePrinterId: ID, document: PDDocument) {
