@@ -5,6 +5,7 @@ import org.datepollsystems.waiterrobot.mediator.app.AppVersion
 import org.datepollsystems.waiterrobot.mediator.app.Config
 import org.datepollsystems.waiterrobot.mediator.app.Settings
 import org.datepollsystems.waiterrobot.mediator.core.di.initKoin
+import org.datepollsystems.waiterrobot.mediator.core.sentry.SentryHelper
 import org.datepollsystems.waiterrobot.mediator.core.sentry.SentryTagKeys
 import org.datepollsystems.waiterrobot.mediator.ui.startUI
 import org.datepollsystems.waiterrobot.mediator.utils.isLazyInitialized
@@ -22,9 +23,10 @@ object App {
     @JvmStatic
     fun main(args: Array<String>) {
         Sentry.init { options ->
-            options.dsn = "" // TODO
+            options.dsn = "https://8c0bbf7475344a0095f9ac542a7b616d@glitchtip.kellner.team/2"
             options.release = AppVersion.current.toString()
         }
+        SentryHelper.updateEnvironment()
         initKoin()
         startUI(this::onClose)
     }
@@ -49,8 +51,8 @@ object App {
         Settings.loginPrefix = null
         Sentry.removeTag(SentryTagKeys.organizationId)
         Sentry.removeTag(SentryTagKeys.eventId)
-        Sentry.removeTag(SentryTagKeys.environment)
         Sentry.setUser(null)
+        SentryHelper.updateEnvironment()
         logoutListeners.forEach { it.invoke() }
     }
 }

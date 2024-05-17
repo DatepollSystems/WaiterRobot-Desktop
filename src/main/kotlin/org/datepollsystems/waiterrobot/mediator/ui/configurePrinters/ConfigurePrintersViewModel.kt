@@ -132,6 +132,8 @@ class ConfigurePrintersViewModel(
     }
 
     fun changeOrganisation(organisation: GetOrganisationDto, selectEventId: ID? = null) = inVmScope {
+        Sentry.setTag(SentryTagKeys.organizationId, organisation.id.toString())
+        Sentry.removeTag(SentryTagKeys.eventId)
         reduce {
             copy(
                 selectedOrganisation = organisation,
@@ -146,6 +148,7 @@ class ConfigurePrintersViewModel(
     }
 
     fun changeEvent(event: GetEventDto) = inVmScope {
+        Sentry.setTag(SentryTagKeys.eventId, event.id.toString())
         reduce {
             copy(
                 selectedEvent = event,
