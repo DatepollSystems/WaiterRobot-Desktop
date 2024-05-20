@@ -11,7 +11,9 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.AutofillType
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -19,8 +21,10 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.datepollsystems.waiterrobot.mediator.ui.common.LoadableScreen
+import org.datepollsystems.waiterrobot.mediator.ui.common.autofill
 import org.datepollsystems.waiterrobot.mediator.ui.common.onEnterKeyDown
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun LoginScreen(vm: LoginViewModel) {
     val state = vm.state.collectAsState().value
@@ -64,7 +68,9 @@ fun LoginScreen(vm: LoginViewModel) {
             }
 
             OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .autofill(AutofillType.Username, AutofillType.EmailAddress) { mail = it },
                 value = mail,
                 isError = state.loginErrorMessage != null,
                 singleLine = true,
@@ -76,7 +82,8 @@ fun LoginScreen(vm: LoginViewModel) {
             OutlinedTextField(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .onEnterKeyDown { vm.doLogin(mail, password) },
+                    .onEnterKeyDown { vm.doLogin(mail, password) }
+                    .autofill(AutofillType.Password) { password = it },
                 value = password,
                 singleLine = true,
                 isError = state.loginErrorMessage != null,
@@ -97,7 +104,7 @@ fun LoginScreen(vm: LoginViewModel) {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(imageVector = image, description)
                     }
-                }
+                },
             )
 
             OutlinedButton(
