@@ -6,6 +6,7 @@ import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.datepollsystems.waiterrobot.mediator.core.di.injectLoggerForClass
+import org.datepollsystems.waiterrobot.mediator.printer.service.PrinterService
 import org.datepollsystems.waiterrobot.mediator.utils.SuspendingExponentialBackoff
 import org.datepollsystems.waiterrobot.mediator.ws.messages.AbstractWsMessage
 import org.datepollsystems.waiterrobot.mediator.ws.messages.WsMessageBody
@@ -13,6 +14,8 @@ import org.koin.core.component.KoinComponent
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.reflect.KClass
+
+private const val MAX_CONSECUTIVE_FAILS = 10
 
 /**
  * Handles a websocket session and auto recovers on an exception in the session.
@@ -31,6 +34,9 @@ class MediatorWebSocketManager : KoinComponent {
     private var registerCalled = false
     private val registerLock = Object()
     private val handlers: HandlerMap = mutableMapOf()
+
+    private var websocketExceptionCount = 0 // Counter for consecutive exceptions
+    private var hasPrintedWebsocketError = false
 
     @Suppress("MagicNumber")
     private val suspendingBackoff = SuspendingExponentialBackoff(
@@ -73,6 +79,7 @@ class MediatorWebSocketManager : KoinComponent {
                     // This should only be triggered on Errors as ktor already handles connection loss internally
                     if (!closedIntentional.get()) {
                         logger.w(e) { "WebSocket session completed" }
+                        handleConsecutiveWebsocketErrors(e)
                         suspendingBackoff.backoff(e)
                         startWatching()
                     } else {
@@ -80,8 +87,10 @@ class MediatorWebSocketManager : KoinComponent {
                     }
                 }
                 setIsConnected(true)
+                handleConsecutiveWebsocketErrors()
             } catch (e: Exception) {
                 closeCurrentSession()
+                handleConsecutiveWebsocketErrors(e)
                 suspendingBackoff.backoff(e)
                 return@launch startWatching()
             }
@@ -89,6 +98,22 @@ class MediatorWebSocketManager : KoinComponent {
                 registerMessages.forEach { send(it) }
                 registerCalled = true
             }
+        }
+    }
+
+    private fun handleConsecutiveWebsocketErrors(e: Throwable? = null) {
+        if (e != null) {
+            if (!hasPrintedWebsocketError && websocketExceptionCount >= MAX_CONSECUTIVE_FAILS) {
+                PrinterService.printNetworkDisconnect()
+                hasPrintedWebsocketError = true
+
+                return
+            }
+
+            websocketExceptionCount++
+        } else {
+            websocketExceptionCount = 0
+            hasPrintedWebsocketError = false
         }
     }
 
