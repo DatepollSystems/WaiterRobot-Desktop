@@ -7,12 +7,15 @@ import org.datepollsystems.waiterrobot.mediator.core.ID
 import org.datepollsystems.waiterrobot.mediator.data.api.dto.GetPrinterDto
 import org.datepollsystems.waiterrobot.mediator.printer.AbstractLocalPrinter
 import org.datepollsystems.waiterrobot.mediator.printer.PrinterWithIdNotFoundException
+import org.datepollsystems.waiterrobot.mediator.printer.getNetworkErrorBase64
 import org.datepollsystems.waiterrobot.mediator.ui.configurePrinters.ConfigurePrintersState
 import org.datepollsystems.waiterrobot.mediator.ui.main.PrintTransaction
+import org.datepollsystems.waiterrobot.mediator.utils.toHex
 import org.datepollsystems.waiterrobot.mediator.ws.messages.PrintPdfMessage
 import org.datepollsystems.waiterrobot.mediator.ws.messages.PrintedPdfMessage
 import org.datepollsystems.waiterrobot.mediator.ws.messages.RegisterPrinterMessage
 import java.time.LocalDateTime
+import kotlin.random.Random
 
 object PrinterService {
 
@@ -50,6 +53,17 @@ object PrinterService {
     private fun registerHandlers() {
         App.socketManager.handle<PrintPdfMessage> {
             print(it.body.id, it.body.printerId, it.body.file.data)
+        }
+    }
+
+    fun printNetworkDisconnect() {
+        backendIdToPairing.values.forEach {
+            it.loPrinter.printPdf(
+                @Suppress("MagicNumber")
+                "Network_Disconnect_${Random.nextBytes(5).toHex()}",
+                it.bePrinter.id,
+                getNetworkErrorBase64()
+            )
         }
     }
 }
