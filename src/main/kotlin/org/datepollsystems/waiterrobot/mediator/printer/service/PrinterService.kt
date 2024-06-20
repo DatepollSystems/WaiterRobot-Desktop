@@ -60,7 +60,7 @@ object PrinterService {
         backendIdToPairing.values.forEach {
             it.loPrinter.printPdf(
                 @Suppress("MagicNumber")
-                """Network_Disconnect_${Random.nextBytes(5).toHex()}""",
+                "Network_Disconnect_${Random.nextBytes(5).toHex()}",
                 it.bePrinter.id,
                 getNetworkErrorBase64()
             )
