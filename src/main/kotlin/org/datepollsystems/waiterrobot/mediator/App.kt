@@ -26,7 +26,6 @@ object App {
             options.dsn = "https://8c0bbf7475344a0095f9ac542a7b616d@glitchtip.kellner.team/2"
             options.release = AppVersion.current.toString()
         }
-        SentryHelper.updateEnvironment()
         initKoin()
         startUI(this::onClose)
     }

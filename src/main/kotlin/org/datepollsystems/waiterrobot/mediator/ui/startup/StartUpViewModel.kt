@@ -5,6 +5,7 @@ import org.datepollsystems.waiterrobot.mediator.App
 import org.datepollsystems.waiterrobot.mediator.app.Config
 import org.datepollsystems.waiterrobot.mediator.app.Settings
 import org.datepollsystems.waiterrobot.mediator.core.AbstractViewModel
+import org.datepollsystems.waiterrobot.mediator.core.sentry.SentryHelper
 import org.datepollsystems.waiterrobot.mediator.navigation.Navigator
 import org.datepollsystems.waiterrobot.mediator.navigation.Screen
 import kotlin.time.Duration.Companion.milliseconds
@@ -35,6 +36,7 @@ class StartUpViewModel(
             App.config = Config.getFromLoginIdentifier(loginPrefix)
             Screen.ConfigurePrintersScreen
         }
+        SentryHelper.updateEnvironment()
         navigator.navigate(startScreen)
     }
 }
