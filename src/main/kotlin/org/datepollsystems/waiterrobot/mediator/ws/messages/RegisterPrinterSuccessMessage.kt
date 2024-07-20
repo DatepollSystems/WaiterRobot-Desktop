@@ -10,5 +10,5 @@ data class RegisterPrinterSuccessMessage(
     override val body: Body,
 ) : AbstractWsMessage<RegisterPrinterSuccessMessage.Body>() {
     @Serializable
-    data class Body(val text: String) : WsMessageBody
+    data class Body(val printerId: Long? = null) : WsMessageBody
 }
