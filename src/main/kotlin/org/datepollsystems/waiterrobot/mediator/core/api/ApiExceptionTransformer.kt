@@ -11,7 +11,7 @@ import org.datepollsystems.waiterrobot.mediator.data.api.ApiException
 fun HttpClientConfig<*>.installApiClientExceptionTransformer(json: Json, logger: Logger) {
     expectSuccess = true
     HttpResponseValidator {
-        handleResponseExceptionWithRequest { exception, _ ->
+        handleResponseExceptionWithRequest { exception, request ->
             val clientException =
                 exception as? ClientRequestException ?: return@handleResponseExceptionWithRequest
 
@@ -21,7 +21,10 @@ fun HttpClientConfig<*>.installApiClientExceptionTransformer(json: Json, logger:
             throw try {
                 json.decodeFromString<ApiException>(jsonString)
             } catch (e: SerializationException) {
-                logger.w(e) { "Could not serialize ClientError using fallback" }
+                logger.w(e) {
+                    "Could not serialize ClientError using fallback.\n" +
+                        "\t(${request.method.value}: ${request.url}, ${clientException.response.status} '$jsonString')"
+                }
                 try {
                     json.decodeFromString<ApiException.Generic>(jsonString)
                 } catch (_: SerializationException) {

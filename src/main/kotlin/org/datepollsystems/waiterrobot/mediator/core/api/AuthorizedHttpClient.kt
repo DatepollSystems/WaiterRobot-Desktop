@@ -35,6 +35,7 @@ fun HttpClientConfig<*>.configureAuth(enableNetworkLogs: Boolean, logger: Logger
             } catch (e: Exception) {
                 // TODO improve request errors handling (-> try again, logout?, no connection info)
                 logger.e(e) { "Error while refreshing token: ${e.message}" }
+                App.logout()
                 null
             }
         }
