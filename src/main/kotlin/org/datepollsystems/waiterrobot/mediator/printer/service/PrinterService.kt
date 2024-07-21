@@ -76,6 +76,7 @@ object PrinterService {
         }
     }
 
+    @Suppress("MagicNumber")
     private fun getLocalPrintJobId(name: String): String = "LOCAL_${name}_${Random.nextBytes(5).toHex()}"
 }
 
