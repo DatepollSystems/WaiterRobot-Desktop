@@ -1,5 +1,7 @@
 package org.datepollsystems.waiterrobot.mediator.printer.service
 
+import org.datepollsystems.waiterrobot.mediator.App
+import org.datepollsystems.waiterrobot.mediator.app.Config
 import org.datepollsystems.waiterrobot.mediator.printer.AbstractLocalPrinter
 import org.datepollsystems.waiterrobot.mediator.printer.LocalPrinter
 import org.datepollsystems.waiterrobot.mediator.printer.LocalPrinterInfo
@@ -20,6 +22,13 @@ object PrinterDiscoverService {
         _localPrinterMap = PrintServiceLookup
             .lookupPrintServices(DocFlavor.SERVICE_FORMATTED.PAGEABLE, null)
             .map { LocalPrinter(it) }
+            .let {
+                if (App.config !is Config.Prod) {
+                    it.plus(VirtualLocalPrinter)
+                } else {
+                    it
+                }
+            }
             .associateBy { it.localId }
     }
 
