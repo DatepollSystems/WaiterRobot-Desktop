@@ -33,6 +33,9 @@ fun LoginScreen(vm: LoginViewModel) {
         var mail by remember { mutableStateOf("") }
         var password by remember { mutableStateOf("") }
         var passwordVisible by remember { mutableStateOf(false) }
+        val loginContainsControlChar by remember {
+            derivedStateOf { mail.any { Character.isISOControl(it.code) } || password.any { Character.isISOControl(it.code) } }
+        }
 
         Column(
             modifier = Modifier.padding(50.dp).requiredWidthIn(max = 500.dp),
@@ -106,6 +109,18 @@ fun LoginScreen(vm: LoginViewModel) {
                     }
                 },
             )
+
+            if (loginContainsControlChar) {
+                Card(
+                    shape = RoundedCornerShape(10),
+                    border = BorderStroke(2.dp, Color.Yellow.copy(0.8f)),
+                    backgroundColor = Color.Yellow.copy(0.5f),
+                ) {
+                    Box(modifier = Modifier.padding(vertical = 20.dp, horizontal = 50.dp)) {
+                        Text("Email or password contains control characters. Probably a copy past error.")
+                    }
+                }
+            }
 
             OutlinedButton(
                 onClick = { vm.doLogin(mail, password) }
