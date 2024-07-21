@@ -8,6 +8,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import org.datepollsystems.waiterrobot.mediator.core.ShortcutManager
 import org.datepollsystems.waiterrobot.mediator.navigation.Navigation
 import org.datepollsystems.waiterrobot.mediator.ui.theme.WaiterRobotTheme
 import java.nio.file.Paths
@@ -34,7 +35,8 @@ fun startUI(onClose: () -> Unit = {}) {
             onCloseRequest = {
                 onClose()
                 this.exitApplication()
-            }
+            },
+            onKeyEvent = ShortcutManager::handleKeyEvent
         ) {
             WaiterRobotTheme {
                 Navigation()

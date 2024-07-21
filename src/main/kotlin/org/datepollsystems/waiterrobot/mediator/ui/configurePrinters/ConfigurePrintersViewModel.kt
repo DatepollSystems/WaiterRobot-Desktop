@@ -1,11 +1,10 @@
 package org.datepollsystems.waiterrobot.mediator.ui.configurePrinters
 
+import androidx.compose.ui.input.key.*
 import io.sentry.Sentry
 import org.datepollsystems.waiterrobot.mediator.app.MediatorConfiguration
 import org.datepollsystems.waiterrobot.mediator.app.Settings
-import org.datepollsystems.waiterrobot.mediator.core.AbstractViewModel
-import org.datepollsystems.waiterrobot.mediator.core.ID
-import org.datepollsystems.waiterrobot.mediator.core.ScreenState
+import org.datepollsystems.waiterrobot.mediator.core.*
 import org.datepollsystems.waiterrobot.mediator.core.sentry.SentryTagKeys
 import org.datepollsystems.waiterrobot.mediator.data.api.EventApi
 import org.datepollsystems.waiterrobot.mediator.data.api.OrganisationApi
@@ -24,9 +23,10 @@ class ConfigurePrintersViewModel(
     private val organisationApi: OrganisationApi,
     private val eventApi: EventApi,
     private val printerApi: PrinterApi,
-) : AbstractViewModel<ConfigurePrintersState>(navigator, ConfigurePrintersState()) {
+) : AbstractViewModel<ConfigurePrintersState>(navigator, ConfigurePrintersState()), ShortcutHandler {
 
     init {
+        ShortcutManager.registerHandler(this)
         val initConfig = MediatorConfiguration.createFromStore()
         inVmScope {
             loadUserOrganisations(
@@ -73,6 +73,11 @@ class ConfigurePrintersViewModel(
                 }
             }
         }
+    }
+
+    override fun onCleared() {
+        ShortcutManager.removeHandler(this)
+        super.onCleared()
     }
 
     private suspend fun loadUserOrganisations(selectId: ID? = null, selectEventId: ID? = null) {
@@ -175,6 +180,20 @@ class ConfigurePrintersViewModel(
                 unPairedBackendPrinters = unPairedBackendPrinters?.plus(pairing.bePrinter),
                 pairings = pairings.minus(pairing)
             )
+        }
+    }
+
+    override fun onKeyEvent(event: KeyEvent): Boolean {
+        return when {
+            (event.isCtrlPressed || event.isMetaPressed) && event.key == Key.D -> {
+                PrinterDiscoverService.addVirtualPrinter()
+                reduce {
+                    copy(localPrinters = PrinterDiscoverService.localPrinters.toList())
+                }
+                true
+            }
+
+            else -> false
         }
     }
 }
