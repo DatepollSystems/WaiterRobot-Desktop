@@ -6,7 +6,6 @@
         <entry key="GitHub Action">
           <value>
             <SchemaInfo>
-              <option name="generatedName" value="New Schema" />
               <option name="name" value="GitHub Action" />
               <option name="relativePathToSchema" value="https://raw.githubusercontent.com/SchemaStore/schemastore/master/src/schemas/json/github-workflow.json" />
               <option name="patterns">
