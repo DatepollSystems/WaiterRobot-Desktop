@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.ByteArrayOutputStream
 
 plugins {
-    val kotlinVersion = "1.9.23"
+    val kotlinVersion = "2.0.21"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.serialization") version kotlinVersion
     id("org.jetbrains.compose") version "1.6.2"
@@ -31,7 +31,7 @@ dependencies {
 
     implementation(compose.materialIconsExtended)
 
-    val ktorVersion = "2.3.11"
+    val ktorVersion = "3.0.0"
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
@@ -44,8 +44,8 @@ dependencies {
     implementation("dev.icerock.moko:mvvm-core:$mokoMvvmVersion")
     implementation("dev.icerock.moko:mvvm-compose:$mokoMvvmVersion")
 
-    implementation("io.insert-koin:koin-core:3.5.6")
-    implementation("io.insert-koin:koin-compose:1.1.5")
+    implementation("io.insert-koin:koin-core:4.0.0")
+    implementation("io.insert-koin:koin-compose:4.0.0")
 
     val kermitVersion = "2.0.3"
     implementation("co.touchlab:kermit:$kermitVersion")
