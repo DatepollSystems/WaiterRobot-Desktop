@@ -3,11 +3,11 @@ package org.datepollsystems.waiterrobot.mediator.ui.main
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Print
 import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material.icons.filled.WifiOff
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -16,10 +16,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.datepollsystems.waiterrobot.mediator.App
+import org.datepollsystems.waiterrobot.mediator.mediator.generated.resources.Res
+import org.datepollsystems.waiterrobot.mediator.mediator.generated.resources.main_connected
+import org.datepollsystems.waiterrobot.mediator.mediator.generated.resources.main_lost_connection
+import org.datepollsystems.waiterrobot.mediator.mediator.generated.resources.main_running
 import org.datepollsystems.waiterrobot.mediator.ui.common.DemoEventInfo
 import org.datepollsystems.waiterrobot.mediator.ui.common.SelectedEnvironmentInfo
+import org.jetbrains.compose.resources.stringResource
 import java.time.format.DateTimeFormatter
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(vm: MainScreenViewModel) {
     val state = vm.state.collectAsState().value
@@ -33,18 +39,33 @@ fun MainScreen(vm: MainScreenViewModel) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Running...",
+                text = stringResource(Res.string.main_running),
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center,
             )
 
-            Icon(
-                if (isConnected) Icons.Filled.Wifi else Icons.Filled.WifiOff,
-                contentDescription = "Socket Connected",
-                modifier = Modifier.padding(horizontal = 10.dp)
-            )
+            val tooltipPosition = TooltipDefaults.rememberPlainTooltipPositionProvider()
+            val tooltipState = rememberTooltipState()
+
+            TooltipBox(
+                positionProvider = tooltipPosition,
+                state = tooltipState,
+                tooltip = {
+                    Text(
+                        stringResource(
+                            if (isConnected) Res.string.main_connected else Res.string.main_lost_connection
+                        )
+                    )
+                }
+            ) {
+                Icon(
+                    if (isConnected) Icons.Filled.Wifi else Icons.Filled.WifiOff,
+                    contentDescription = "Socket Connected",
+                    modifier = Modifier.padding(horizontal = 10.dp)
+                )
+            }
         }
-        Divider(thickness = 3.dp)
+        HorizontalDivider(thickness = 3.dp)
 
         Row {
             // Transaction log
@@ -75,7 +96,7 @@ fun MainScreen(vm: MainScreenViewModel) {
                                     overflow = TextOverflow.Ellipsis
                                 )
                             }
-                            Divider()
+                            HorizontalDivider()
                         }
                     }
                 }
@@ -99,7 +120,7 @@ fun MainScreen(vm: MainScreenViewModel) {
                             Icon(Icons.Filled.Print, "Execute test print")
                         }
                     }
-                    Divider()
+                    HorizontalDivider()
                 }
             }
         }

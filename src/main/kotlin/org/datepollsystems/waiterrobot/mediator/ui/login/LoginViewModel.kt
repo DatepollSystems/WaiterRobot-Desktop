@@ -12,6 +12,8 @@ import org.datepollsystems.waiterrobot.mediator.core.ScreenState
 import org.datepollsystems.waiterrobot.mediator.core.sentry.SentryHelper
 import org.datepollsystems.waiterrobot.mediator.data.api.ApiException
 import org.datepollsystems.waiterrobot.mediator.data.api.AuthApi
+import org.datepollsystems.waiterrobot.mediator.mediator.generated.resources.Res
+import org.datepollsystems.waiterrobot.mediator.mediator.generated.resources.login_wrong_credentials
 import org.datepollsystems.waiterrobot.mediator.navigation.Navigator
 import org.datepollsystems.waiterrobot.mediator.navigation.Screen
 import org.datepollsystems.waiterrobot.mediator.printer.service.PrinterDiscoverService
@@ -51,7 +53,7 @@ class LoginViewModel(
                 reduce {
                     copy(
                         screenState = ScreenState.Idle,
-                        loginErrorMessage = "Wrong credentials. Please try again!"
+                        loginErrorMessage = Res.string.login_wrong_credentials
                     )
                 }
             } else {

@@ -2,8 +2,8 @@ package org.datepollsystems.waiterrobot.mediator.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
@@ -19,11 +19,10 @@ fun WaiterRobotTheme(
     }
 
     MaterialTheme(
-        colors = colors,
+        colorScheme = colors,
     ) {
         Surface(
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
         ) {
             content()
         }

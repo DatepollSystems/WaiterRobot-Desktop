@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <string name="ok">OK</string>
+
+    <string name="error">Fehler</string>
+    <string name="error_general">Etwas ist schief gegangen. Bitte versuch es noch einmal</string>
+    <string name="continue_">Weiter</string> <!-- continue is a keyword -->
+
+    <string name="organization">Organisation</string>
+    <string name="select_organization_placeholder">Wähle eine Organisation...</string>
+    <string name="event">Event</string>
+    <string name="select_event_placeholder">Wähle ein Event...</string>
+
+    <string name="pairing_pairings">Verbindungen</string>
+    <string name="pairing_backend_printers">Backend Drucker</string>
+    <string name="pairing_local_printers">Lokale Drucker</string>
+    <string name="pairing_pair">Ausgewählte Drucker verbinden</string>
+    <string name="pairing_select_organization">Bitte wähle eine Organisation.</string>
+    <string name="pairing_select_event">Bitte wähle ein Event.</string>
+
+    <string name="login">Anmelden</string>
+    <string name="login_title">Mediator Login</string>
+    <string name="login_subtitle">Bitte melde dich mit deinem WaiterRobot admin Account an</string>
+    <string name="login_wrong_credentials">Invalide Zugangsdaten. Bitte versuche es noch einmal!</string>
+    <string name="login_email">E-Mail</string>
+    <string name="login_password">Passwort</string>
+    <string name="login_control_char_warning">E-Mail oder Passwort enthält ein Steuerungszeichen. Wahrscheinlich ein
+        Fehler beim Kopieren.
+    </string>
+
+    <string name="demo_event_info">Das ausgewälte ist ein Demo-Event. Bestellungen werden nicht vollständig gedruckt.
+    </string>
+
+    <string name="update_required_title">Aktualisierung benötigt</string>
+    <string name="update_required_description">Deine installierte Version wird nicht mehr unterstützt. Bitte lade die
+        neuste version herunter und installiere diese
+    </string>
+    <string name="update_go_to_download">Zum Download</string>
+
+    <string name="main_connected">Verbungen</string>
+    <string name="main_lost_connection">Verbindung verloren - reconnecting...</string>
+    <string name="main_running">Wird ausgeführt...</string>
+
+    <string name="start_update_now">Jetzt aktualisieren</string>
+    <string name="start_update_not_now">Nicht jetzt</string>
+    <string name="start_new_version_title">Neue Version</string>
+    <string name="start_new_version_description">Eine neue Version steht zur Verfügung. Update jetzt um alle neuen
+        Funktionalitäten nutzen zu können.
+    </string>
+</resources>

@@ -1,27 +1,28 @@
 package org.datepollsystems.waiterrobot.mediator.ui.common
 
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Text
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import org.datepollsystems.waiterrobot.mediator.core.ScreenState
+import org.datepollsystems.waiterrobot.mediator.mediator.generated.resources.Res
+import org.datepollsystems.waiterrobot.mediator.mediator.generated.resources.ok
+import org.jetbrains.compose.resources.stringResource
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ErrorDialog(error: ScreenState.Error) {
     AlertDialog(
         onDismissRequest = error.onDismiss,
         confirmButton = {
             Button(onClick = error.onDismiss) {
-                Text("OK")
+                Text(text = stringResource(Res.string.ok))
             }
         },
         title = {
-            Text(text = error.title)
+            Text(text = stringResource(error.title))
         },
         text = {
-            Text(text = error.message)
+            Text(text = stringResource(error.message))
         }
     )
 }

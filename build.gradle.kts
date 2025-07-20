@@ -7,7 +7,7 @@ plugins {
     val kotlinVersion = "1.9.23"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.serialization") version kotlinVersion
-    id("org.jetbrains.compose") version "1.6.2"
+    id("org.jetbrains.compose") version "1.7.1"
     id("io.gitlab.arturbosch.detekt") version "1.23.6"
     id("dev.hydraulic.conveyor") version "1.10"
 }
@@ -29,7 +29,9 @@ dependencies {
     macAarch64(compose.desktop.macos_arm64)
     windowsAmd64(compose.desktop.windows_x64)
 
+    implementation(compose.material3)
     implementation(compose.materialIconsExtended)
+    implementation(compose.components.resources)
 
     val ktorVersion = "2.3.11"
     implementation("io.ktor:ktor-client-core:$ktorVersion")
@@ -81,6 +83,7 @@ compose.desktop {
 
 kotlin.sourceSets.all {
     languageSettings.optIn("kotlin.RequiresOptIn")
+    languageSettings.optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
 }
 
 val detektReportMergeSarif by tasks.registering(ReportMergeTask::class) {

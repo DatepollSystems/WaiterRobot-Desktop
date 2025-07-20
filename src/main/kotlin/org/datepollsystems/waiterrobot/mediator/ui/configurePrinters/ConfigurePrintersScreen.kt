@@ -3,19 +3,21 @@ package org.datepollsystems.waiterrobot.mediator.ui.configurePrinters
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.datepollsystems.waiterrobot.mediator.App
 import org.datepollsystems.waiterrobot.mediator.data.api.dto.GetPrinterDto
+import org.datepollsystems.waiterrobot.mediator.mediator.generated.resources.*
 import org.datepollsystems.waiterrobot.mediator.printer.LocalPrinterInfo
 import org.datepollsystems.waiterrobot.mediator.ui.common.*
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun ConfigurePrintersScreen(vm: ConfigurePrintersViewModel) {
@@ -33,8 +35,8 @@ fun ConfigurePrintersScreen(vm: ConfigurePrintersViewModel) {
                     modifier = Modifier
                         .padding(10.dp)
                         .weight(1f),
-                    label = "Organisation",
-                    placeHolderText = "Select a Organisation...",
+                    label = stringResource(Res.string.organization),
+                    placeHolderText = stringResource(Res.string.select_organization_placeholder),
                     items = state.availableOrganisations ?: emptyList(),
                     onSelectionChange = { vm.changeOrganisation(it) },
                     selectedOptionText = state.selectedOrganisation?.name
@@ -46,8 +48,8 @@ fun ConfigurePrintersScreen(vm: ConfigurePrintersViewModel) {
                         modifier = Modifier
                             .padding(10.dp)
                             .weight(1f),
-                        label = "Event",
-                        placeHolderText = "Select a Event...",
+                        label = stringResource(Res.string.event),
+                        placeHolderText = stringResource(Res.string.select_event_placeholder),
                         items = state.availableEvents ?: emptyList(),
                         onSelectionChange = { vm.changeEvent(it) },
                         selectedOptionText = state.selectedEvent?.name
@@ -73,13 +75,13 @@ fun ConfigurePrintersScreen(vm: ConfigurePrintersViewModel) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(modifier = Modifier.padding(horizontal = 20.dp).weight(1f)) {
-                        Text("Backend Printers") // TODO better naming for user
+                        Text(stringResource(Res.string.pairing_backend_printers)) // TODO better naming for user
                     }
                     Box(modifier = Modifier.padding(horizontal = 20.dp).weight(1f)) {
-                        Text("Local Printers")
+                        Text(stringResource(Res.string.pairing_local_printers))
                     }
                     Box(modifier = Modifier.padding(horizontal = 20.dp).weight(1f)) {
-                        Text("Pairings")
+                        Text(stringResource(Res.string.pairing_pairings))
                     }
                 }
 
@@ -151,21 +153,21 @@ fun ConfigurePrintersScreen(vm: ConfigurePrintersViewModel) {
                                 selectedLocalPrinter = null
                             },
                         ) {
-                            Text("Pair selected printers")
+                            Text(stringResource(Res.string.pairing_pair))
                         }
 
                         Button(
                             onClick = vm::saveAndContinue,
                             enabled = state.pairings.isNotEmpty()
                         ) {
-                            Text("Continue")
+                            Text(stringResource(Res.string.continue_))
                         }
                     }
                 }
             } else if (state.selectedOrganisation == null) {
-                CenteredText("Please select an Organization.")
+                CenteredText(stringResource(Res.string.pairing_select_organization))
             } else if (state.selectedEvent == null) {
-                CenteredText("Please select an Event.")
+                CenteredText(stringResource(Res.string.pairing_select_event))
             }
         }
     }

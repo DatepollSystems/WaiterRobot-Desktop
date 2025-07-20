@@ -2,13 +2,16 @@ package org.datepollsystems.waiterrobot.mediator.ui.common
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import org.datepollsystems.waiterrobot.mediator.mediator.generated.resources.Res
+import org.datepollsystems.waiterrobot.mediator.mediator.generated.resources.demo_event_info
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun DemoEventInfo(isDemoEvent: Boolean?) {
@@ -20,7 +23,7 @@ fun DemoEventInfo(isDemoEvent: Boolean?) {
         contentColor = Color.Black
     ) {
         Text(
-            text = "The selected Event is a Demo-Event. Orders will not be printed completely.",
+            text = stringResource(Res.string.demo_event_info),
             modifier = Modifier.padding(5.dp).fillMaxWidth(),
             textAlign = TextAlign.Center
         )

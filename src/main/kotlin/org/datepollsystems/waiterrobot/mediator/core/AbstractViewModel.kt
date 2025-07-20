@@ -10,8 +10,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.datepollsystems.waiterrobot.mediator.core.di.injectLoggerForClass
 import org.datepollsystems.waiterrobot.mediator.data.api.ApiException
+import org.datepollsystems.waiterrobot.mediator.mediator.generated.resources.Res
+import org.datepollsystems.waiterrobot.mediator.mediator.generated.resources.error
+import org.datepollsystems.waiterrobot.mediator.mediator.generated.resources.error_general
 import org.datepollsystems.waiterrobot.mediator.navigation.Navigator
 import org.datepollsystems.waiterrobot.mediator.navigation.Screen
+import org.jetbrains.compose.resources.StringResource
 import org.koin.core.component.KoinComponent
 
 abstract class AbstractViewModel<T : State<T>>(
@@ -30,7 +34,7 @@ abstract class AbstractViewModel<T : State<T>>(
                 logger.e(exception) {
                     "Unhandled exception in intent. Exceptions should be handled directly in the intent!"
                 }
-                reduceError("Fehler", "Etwas ist schief gelaufen. Bitte versuche es erneut.")
+                reduceError(Res.string.error, Res.string.error_general)
             }
         }
     }
@@ -54,8 +58,8 @@ abstract class AbstractViewModel<T : State<T>>(
     }
 
     protected fun reduceError(
-        errorTitle: String,
-        errorMsg: String,
+        errorTitle: StringResource,
+        errorMsg: StringResource,
         dismiss: () -> Unit = this@AbstractViewModel::dismissError
     ) = reduce {
         withScreenState(ScreenState.Error(errorTitle, errorMsg, dismiss))
@@ -77,7 +81,7 @@ interface State<out S : State<S>> {
 sealed class ScreenState {
     object Idle : ScreenState()
     object Loading : ScreenState()
-    data class Error(val title: String, val message: String, val onDismiss: () -> Unit) : ScreenState()
+    data class Error(val title: StringResource, val message: StringResource, val onDismiss: () -> Unit) : ScreenState()
 }
 
 object EmptyState : State<EmptyState> {
