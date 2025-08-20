@@ -3,9 +3,8 @@ package org.datepollsystems.waiterrobot.mediator.ui
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.loadImageBitmap
-import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import org.datepollsystems.waiterrobot.mediator.core.ShortcutManager
@@ -21,7 +20,7 @@ fun startUI(onClose: () -> Unit = {}) {
             title = "kellner.team",
             icon = appIcon,
             state = rememberWindowState(
-                size = DpSize(1300.dp, 800.dp)
+                placement = WindowPlacement.Maximized,
             ),
             onCloseRequest = {
                 onClose()

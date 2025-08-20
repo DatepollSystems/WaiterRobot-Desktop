@@ -16,6 +16,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.AutofillType
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -44,18 +45,27 @@ fun LoginScreen(vm: LoginViewModel) {
         }
 
         Column(
-            modifier = Modifier.padding(50.dp).requiredWidthIn(max = 550.dp),
+            modifier = Modifier.padding(10.dp).requiredWidthIn(max = 550.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(25.dp, Alignment.CenterVertically)
         ) {
-            Image(
-                painter = painterResource(Res.drawable.icon_round),
-                contentDescription = "WaiterRobot icon",
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth(0.4f)
-                    .aspectRatio(1f)
-                    .padding(bottom = 20.dp)
-            )
+                    .weight(1f, fill = false)
+                    .heightIn(max = 300.dp)
+                    .aspectRatio(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(Res.drawable.icon_round),
+                    contentDescription = "WaiterRobot icon",
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .aspectRatio(1f),
+                    contentScale = ContentScale.Fit
+                )
+            }
+
             Text(text = stringResource(Res.string.login_title), style = MaterialTheme.typography.headlineMedium)
             Text(
                 modifier = Modifier.padding(horizontal = 20.dp),
