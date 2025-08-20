@@ -183,6 +183,28 @@ class ConfigurePrintersViewModel(
         }
     }
 
+    fun refreshLocalPrinters() = inVmScope {
+        PrinterDiscoverService.refreshPrinters()
+        reduce {
+            val localPrinters = PrinterDiscoverService.localPrinterMap.toList().dropLast(1).toMap()
+            val unpairedBackendPrinters = unPairedBackendPrinters?.toMutableList() ?: mutableListOf()
+            val newPairings = pairings.mapNotNull { pairing ->
+                val loPrinter = localPrinters[pairing.loPrinter.localId]
+                if (loPrinter != null) {
+                    ConfigurePrintersState.PrinterPairing(pairing.bePrinter, loPrinter)
+                } else {
+                    unpairedBackendPrinters.add(pairing.bePrinter)
+                    null // Remove pairing if local printer is not present anymore
+                }
+            }
+            copy(
+                localPrinters = localPrinters.values.toList(),
+                pairings = newPairings,
+                unPairedBackendPrinters = unpairedBackendPrinters
+            )
+        }
+    }
+
     override fun onKeyEvent(event: KeyEvent): Boolean {
         return when {
             (event.isCtrlPressed || event.isMetaPressed) && event.key == Key.D -> {

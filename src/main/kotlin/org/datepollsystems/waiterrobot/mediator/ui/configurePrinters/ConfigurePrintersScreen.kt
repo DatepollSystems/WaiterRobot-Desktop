@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -60,11 +61,15 @@ fun ConfigurePrintersScreen(vm: ConfigurePrintersViewModel) {
                     Spacer(modifier = Modifier.weight(1f))
                 }
 
+                IconButton(onClick = { vm.refreshLocalPrinters() }) {
+                    Icon(Icons.Filled.Refresh, contentDescription = null)
+                }
+
                 IconButton(onClick = { App.logout() }) {
                     Icon(Icons.Filled.Logout, contentDescription = null)
                 }
             }
-            Divider(modifier = Modifier.fillMaxWidth())
+            HorizontalDivider(modifier = Modifier.fillMaxWidth())
 
             if (state.unPairedBackendPrinters != null) {
                 // TODO small infotext for user
@@ -85,7 +90,7 @@ fun ConfigurePrintersScreen(vm: ConfigurePrintersViewModel) {
                     }
                 }
 
-                Divider(modifier = Modifier.fillMaxWidth())
+                HorizontalDivider(modifier = Modifier.fillMaxWidth())
 
                 Column(
                     modifier = Modifier.fillMaxHeight(),
