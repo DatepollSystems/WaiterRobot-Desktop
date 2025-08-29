@@ -23,13 +23,19 @@ object App {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        SingleAppInstanceLock.ensureSingleInstance()
         Sentry.init { options ->
             options.dsn = "https://8c0bbf7475344a0095f9ac542a7b616d@glitchtip.kellner.team/2"
             options.release = AppVersion.current.toString()
             options.setTag(SentryTagKeys.instanceId, Settings.instanceId)
         }
+        Runtime.getRuntime().addShutdownHook(object : Thread() {
+            override fun run() {
+                @Suppress("MagicNumber")
+                Sentry.flush(5_000)
+            }
+        })
         initKoin()
+        SingleAppInstanceLock.ensureSingleInstance()
         startUI(this::onClose)
     }
 
