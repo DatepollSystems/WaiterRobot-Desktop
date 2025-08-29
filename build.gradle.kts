@@ -49,8 +49,9 @@ dependencies {
     implementation("io.insert-koin:koin-core:3.5.6")
     implementation("io.insert-koin:koin-compose:1.1.5")
 
-    val kermitVersion = "2.0.3"
+    val kermitVersion = "2.0.5"
     implementation("co.touchlab:kermit:$kermitVersion")
+    implementation("co.touchlab:kermit-io:$kermitVersion")
     implementation("io.sentry:sentry:7.9.0")
 
     implementation("org.apache.pdfbox:pdfbox:3.0.2")

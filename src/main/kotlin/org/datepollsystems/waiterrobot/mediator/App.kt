@@ -2,6 +2,7 @@ package org.datepollsystems.waiterrobot.mediator
 
 import io.sentry.Sentry
 import org.datepollsystems.waiterrobot.mediator.app.AppVersion
+import org.datepollsystems.waiterrobot.mediator.app.BuildType
 import org.datepollsystems.waiterrobot.mediator.app.Config
 import org.datepollsystems.waiterrobot.mediator.app.Settings
 import org.datepollsystems.waiterrobot.mediator.core.di.initKoin
@@ -14,6 +15,7 @@ import org.datepollsystems.waiterrobot.mediator.ws.MediatorWebSocketManager
 
 object App {
     var config: Config = Config.Prod // Use prod config for start and change then to the "right" at login
+    val buildType = BuildType.fromProperty()
 
     val socketManager: MediatorWebSocketManager by lazy {
         MediatorWebSocketManager()
