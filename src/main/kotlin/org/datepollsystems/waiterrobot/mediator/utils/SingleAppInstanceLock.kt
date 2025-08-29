@@ -36,7 +36,9 @@ object SingleAppInstanceLock : KoinComponent {
     private fun tryLock(): Boolean {
         @Suppress("TooGenericExceptionCaught")
         return try {
-            file = File(App.config.basePath, "kellner.team.lock")
+            file = File(App.config.basePath, "kellner.team.lock").also {
+                it.parentFile.mkdirs() // On Windows the parent folder must exist before creating the lock file
+            }
             channel = RandomAccessFile(file, "rw").getChannel()
             lock = channel!!.tryLock()
 
