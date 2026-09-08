@@ -7,8 +7,8 @@ plugins {
     val kotlinVersion = "1.9.23"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.serialization") version kotlinVersion
-    id("org.jetbrains.compose") version "1.7.1"
-    id("io.gitlab.arturbosch.detekt") version "1.23.6"
+    id("org.jetbrains.compose") version "1.12.0"
+    id("io.gitlab.arturbosch.detekt") version "1.23.8"
     id("dev.hydraulic.conveyor") version "1.10"
 }
 
@@ -49,20 +49,20 @@ dependencies {
     implementation("io.insert-koin:koin-core:3.5.6")
     implementation("io.insert-koin:koin-compose:1.1.5")
 
-    val kermitVersion = "2.0.3"
+    val kermitVersion = "2.2.0"
     implementation("co.touchlab:kermit:$kermitVersion")
     implementation("io.sentry:sentry:7.9.0")
 
-    implementation("org.apache.pdfbox:pdfbox:3.0.2")
-    runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.8.1") // Adds a Main Dispatcher for Desktop
+    implementation("org.apache.pdfbox:pdfbox:3.0.8")
+    runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.11.0") // Adds a Main Dispatcher for Desktop
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
     implementation(kotlin("reflect"))
 
     testImplementation(kotlin("test"))
     testImplementation("co.touchlab:kermit-test:$kermitVersion")
 
-    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.6")
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.8")
 }
 
 tasks.withType<KotlinCompile> {
